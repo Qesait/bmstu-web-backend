@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    <img class="card-img-top" src={{.ImageURL}} alt="Card image cap">
+    <div>
+        <h4>Груз</h4>
+        <p>{{.Cargo.Name}}</p> 
+        <p>Вес: {{.Cargo.Weight}}кг</p> 
+        <h4>Контейнер №{{.SerialNumber}}</h4>
+        <p>Тип: {{.Type}}</p>
+        <p>Длина: {{.Dimentions.Length}}</p>
+        <p>Ширина: {{.Dimentions.Width}}</p>
+        <p>Высота: {{.Dimentions.Height}}</p>
+        <a href="#" class="btn btn-primary">Go back</a>
+    </div>
+</body>
+</html>
