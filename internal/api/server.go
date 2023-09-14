@@ -2,20 +2,18 @@ package api
 
 import (
 	"log"
-	"net/http"
 
 	"bmstu-web-backend/internal/models"
 
 	"github.com/gin-gonic/gin"
-	"strconv"
 )
 
 func StartServer() {
 	log.Println("Server start up")
 
-	containers := []models.Container{
-		{
-			SerialNumber: 0,
+	containers := map[string]models.Container{
+		"ys7E4rnOxo": {
+			SerialNumber: "ys7E4rnOxo",
 			Type:         "20 футов Dry Cube",
 			ImageURL:     "http://localhost:8080/image/0.jpeg",
 			Dimentions:   models.DRY_CUBE_20,
@@ -24,8 +22,8 @@ func StartServer() {
 				Weight: 20000,
 			},
 		},
-		{
-			SerialNumber: 1,
+		"2TdWlrFGe5": {
+			SerialNumber: "2TdWlrFGe5",
 			Type:         "20 футов High Cube",
 			ImageURL:     "http://localhost:8080/image/1.jpg",
 			Dimentions:   models.HIGH_CUBE_20,
@@ -40,13 +38,8 @@ func StartServer() {
 
 	r.LoadHTMLGlob("templates/*")
 
-	r.GET("/containers", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tmpl", containers)
-	})
-	r.GET("/containers/:id", func(c *gin.Context) {
-		id, _ := strconv.Atoi(c.Param("id"))
-		c.HTML(http.StatusOK, "item-info.tmpl", containers[id])
-	})
+	r.GET("/containers", GetAllContainers(containers))
+	r.GET("/containers/:id", GetOneContainer(containers))
 
 	r.Static("/image", "./resources")
 

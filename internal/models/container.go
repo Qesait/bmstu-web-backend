@@ -19,14 +19,14 @@ type Dimentions struct {
 }
 
 type Cargo struct {
-	Name    string `json:"name"`
-	Weight  uint   `json:"weight"`
+	Name   string `json:"name"`
+	Weight uint   `json:"weight"`
 }
 
 type Container struct {
-	SerialNumber uint       `json:"serial_number"`
+	SerialNumber string     `json:"serial_number"`
 	Type         string     `json:"type"`
-	ImageURL     string     `json:"image_url"`
 	Dimentions   Dimentions `json:"dimentions"`
+	ImageURL     string     `json:"image_url"`
 	Cargo        Cargo      `json:"cargo"`
 }

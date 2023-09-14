@@ -5,14 +5,14 @@
 <body>
     <h1>Containers List</h1>
     <ul>
-        {{range .}}
+        {{range $key, $value := .}}
             <li>
                 <div class="card" style="width: 18rem;">
-                    <img class="card-img-top" src={{.ImageURL}} alt="Card image cap">
+                    <img class="card-img-top" src={{$value.ImageURL}} alt="Card image cap">
                     <div class="card-body">
-                        <h5 class="card-title">{{.Cargo.Name}}</h5>
-                        <p class="card-text">{{.Type}}</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        <h5 class="card-title">{{$value.Cargo.Name}}</h5>
+                        <p class="card-text">{{$value.Type}}</p>
+                        <a href="http://localhost:8080/containers/{{$value.SerialNumber}}" class="btn btn-primary">Подробнее</a>
                     </div>
                 </div>
             </li>
