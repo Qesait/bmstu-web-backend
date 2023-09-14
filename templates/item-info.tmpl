@@ -5,15 +5,20 @@
 <body>
     <img class="card-img-top" src={{.ImageURL}} alt="Card image cap">
     <div>
+        <h4>Контейнер №{{.Id}}</h4>
+        <p>Текущее местоположение: {{.CurrentLocation}}</p>
+        <p>Тип: {{.Type.Name}}</p>
+        <p>Длина: {{.Type.Dimentions.Length}} мм</p>
+        <p>Ширина: {{.Type.Dimentions.Width}} мм</p>
+        <p>Высота: {{.Type.Dimentions.Height}} мм</p>
+        <p>Вес контейнера: {{.Type.Tare}} кг</p>
+        <p>Максимальная масса брутто: {{.Type.MaxGross}} кг</p>
+    </div>
+    <div>
         <h4>Груз</h4>
         <p>{{.Cargo.Name}}</p> 
         <p>Вес: {{.Cargo.Weight}}кг</p> 
-        <h4>Контейнер №{{.SerialNumber}}</h4>
-        <p>Тип: {{.Type}}</p>
-        <p>Длина: {{.Dimentions.Length}}</p>
-        <p>Ширина: {{.Dimentions.Width}}</p>
-        <p>Высота: {{.Dimentions.Height}}</p>
-        <a href="http://localhost:8080/containers" class="btn btn-primary">Go back</a>
     </div>
+    <a href="http://localhost:8080/containers" class="btn btn-primary">Go back</a>
 </body>
 </html>

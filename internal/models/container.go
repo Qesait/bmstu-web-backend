@@ -1,21 +1,48 @@
 package models
 
-var DRY_CUBE_20 = Dimentions{
-	Length: 6058,
-	Width:  2438,
-	Height: 2591,
+var DRY_CUBE_20 = ContainerType{
+	Name: "Стандартный 20-ти футовый контейнер",
+	Dimentions: dimentions{
+		Length: 6058,
+		Width:  2438,
+		Height: 2591,
+	},
+	Tare:     2230,
+	MaxGross: 21770,
 }
 
-var HIGH_CUBE_20 = Dimentions{
-	Length: 6058,
-	Width:  2438,
-	Height: 2896,
+var HIGH_CUBE_20 = ContainerType{
+	Name: "20 футовый контейнер увеличенной высоты",
+	Dimentions: dimentions{
+		Length: 6058,
+		Width:  2438,
+		Height: 2896,
+	},
+	Tare:     2350,
+	MaxGross: 21650,
 }
 
-type Dimentions struct {
+// type Identification struct {
+// 	// three uppercase Latin letters
+// 	OwnerCode string `json:"owner_conde"`
+// 	// one uppercase Latin letter (U, J, Z, R)
+// 	EquipmentCategoryIdentifier string `json:"equipment_category_identifier"`
+// 	// six numbers
+// 	SerialNumber string `json:"serial_number"`
+// 	CheckDigit   string `json:"check_digit"`
+// }
+
+type dimentions struct {
 	Width  uint `json:"width"`
 	Height uint `json:"height"`
 	Length uint `json:"length"`
+}
+
+type ContainerType struct {
+	Name       string     `json:"name"`
+	Dimentions dimentions `json:"dimentions"`
+	MaxGross   uint       `json:"max_gross"`
+	Tare       uint       `json:"tare"`
 }
 
 type Cargo struct {
@@ -24,9 +51,14 @@ type Cargo struct {
 }
 
 type Container struct {
-	SerialNumber string     `json:"serial_number"`
-	Type         string     `json:"type"`
-	Dimentions   Dimentions `json:"dimentions"`
-	ImageURL     string     `json:"image_url"`
-	Cargo        Cargo      `json:"cargo"`
+	// owner code - 3 uppercase Latin letters
+	// equipment category - 1 uppercase Latin letter (U, J, Z, R)
+	// serial number - 6 digits
+	// check digit
+	// ___ _ ______ _
+	Id              string        `json:"id"`
+	Type            ContainerType `json:"type"`
+	ImageURL        string        `json:"image_url"`
+	Cargo           Cargo         `json:"cargo"`
+	CurrentLocation string
 }

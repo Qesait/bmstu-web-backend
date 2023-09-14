@@ -3,18 +3,22 @@
 <head>
 </head>
 <body>
-    <h1>Containers List</h1>
+    <h1>Список контейнеров</h1>
     <ul>
         {{range $key, $value := .}}
             <li>
-                <div class="card" style="width: 18rem;">
-                    <img class="card-img-top" src={{$value.ImageURL}} alt="Card image cap">
-                    <div class="card-body">
-                        <h5 class="card-title">{{$value.Cargo.Name}}</h5>
-                        <p class="card-text">{{$value.Type}}</p>
-                        <a href="http://localhost:8080/containers/{{$value.SerialNumber}}" class="btn btn-primary">Подробнее</a>
+                <a href="http://localhost:8080/containers/{{$value.Id}}" class="btn btn-primary">
+                    <div class="card">
+                        <img class="card-img-top" src={{$value.ImageURL}} alt="Card image cap">
+                        <div class="card-body">
+                            <h5 class="card-text">№{{$value.Id}}</h5>
+                            <p class="card-text">{{$value.Type.Name}}</p>
+                            <p class="card-text">{{$value.CurrentLocation}}</p>
+                            <h5 class="card-title">Груз:</h5>
+                            <p class="card-title">{{$value.Cargo.Name}}</p>
+                        </div>
                     </div>
-                </div>
+                </a>
             </li>
         {{end}}
     </ul>
