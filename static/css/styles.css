@@ -1,0 +1,109 @@
+:root {
+	/* Basic */
+	--c-white: #fff;
+	--c-black: #000;
+
+	/* Greys */
+	--c-ash: #eaeef6;
+	--c-charcoal: #a0a0a0;
+	--c-void: #141b22;
+
+	/* Beige/Browns */
+	--c-fair-pink: #FFEDEC;
+	--c-apricot: #FBC8BE;
+	--c-coffee: #754D42;
+	--c-del-rio: #917072;
+
+	/* Greens */
+	--c-java: #1FCAC5;
+
+	/* Purples */
+	--c-titan-white: #f1eeff;
+	--c-cold-purple: #a69fd6;
+	--c-indigo: #6558d3;
+	--c-governor: #4133B7;
+}
+
+body {
+	font-family: "Spline Sans", sans-serif;
+	line-height: 1.5;
+	min-height: 100vh;
+	background-color: var(--c-ash);
+}
+
+
+/* Style the container grid */
+.container-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Responsive grid with minimum column width of 250px */
+    grid-gap: 20px; /* Space between cards */
+    padding: 20px;
+}
+
+/* Style the card content */
+/* .card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    background-color: #fff;
+} */
+
+.card {
+	border-radius: 16px;
+	box-shadow: 0 30px 30px -25px rgba(#4133B7, .25);
+	max-width: 400px;
+    background-color: var(--c-white);
+	padding: 1.5rem;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    color: var(--c-void);
+    line-height: 1.25;
+    & + * {
+        margin-top: 1rem;
+    }
+}
+
+.card-info {
+    color: var(--c-charcoal);
+    & + * {
+        margin-top: 1.25rem;
+    }
+}
+
+.card-button {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+    font: inherit;
+    line-height: 1;
+    background-color: var(--c-white);
+    border: 2px solid var(--c-indigo);
+    color: var(--c-indigo);
+    padding: 0.5em 1em;
+    border-radius: 6px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    text-decoration: none;
+    &:hover,
+    &:focus {
+        background-color: var(--c-indigo);
+        color: var(--c-white);
+    }
+    /* display: flex;
+    flex-direction: column;
+    justify-content: flex-end; */
+}
+
+/* Limit the image size */
+.card-img-top {
+    max-width: 100%; /* Adjust the maximum width as needed */
+    max-height: 200px; /* Adjust the maximum height as needed */
+    display: block; /* Remove any extra spacing around the image */
+    margin: 0 auto; /* Center the image horizontally */
+}

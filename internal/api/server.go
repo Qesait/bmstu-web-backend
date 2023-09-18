@@ -41,7 +41,8 @@ func StartServer() {
 	r.GET("/containers", GetAllContainers(&containers))
 	r.GET("/containers/:id", GetOneContainer(&containers))
 
-	r.Static("/image", "./resources")
+	r.Static("/image", "./static/image")
+	r.Static("/css", "./static/css")
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 

@@ -14,52 +14,59 @@ import (
 func GetAllContainers(containers *map[string]models.Container) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		query := c.Request.URL.Query()
-		log.Println(query)
 
 		if len(query) == 0 {
 			c.HTML(http.StatusOK, "index.tmpl", containers)
 			return
 		}
 
-		filterenContainers := make(map[string]models.Container)
-		if values, exists := query["id"]; exists {
-			log.Println("Look! It's id!")
-			searchId := values[0]
-			for id, container := range *containers {
-				if strings.Contains(id, searchId) {
-					filterenContainers[searchId] = container
-				}
-			}
-			} else if values, exists := query["location"]; exists {
-			log.Println("Look! It's location!")
-			searchLocation := values[0]
-			for id, container := range *containers {
-				if strings.Contains(strings.ToLower(container.CurrentLocation), strings.ToLower(searchLocation)) {
-					filterenContainers[id] = container
-				}
-			}
-			} else if values, exists := query["type"]; exists {
-			log.Println("Look! It's type!")
-			searchType := values[0]
-			for id, container := range *containers {
-				if strings.Contains(strings.ToLower(container.Type.Name), strings.ToLower(searchType)) {
-					filterenContainers[id] = container
-				}
-			}
-			} else if values, exists := query["cargo"]; exists {
-			log.Println("Look! It's cargo!")
-			searchCargo := values[0]
-			for id, container := range *containers {
-				// Сравнение без учета регистра
-				if strings.Contains(strings.ToLower(container.Cargo.Name), strings.ToLower(searchCargo)) {
-					filterenContainers[id] = container
-				}
-			}
-		} else {
+		if len(query) > 2 {
 			c.HTML(http.StatusBadRequest, "error.tmpl", http.StatusBadRequest)
 			return
 		}
-		log.Println("Filtered containers:", filterenContainers)
+
+		filter, exists := query["filter"]
+		if !exists {
+			c.HTML(http.StatusBadRequest, "error.tmpl", http.StatusBadRequest)
+			return
+		}
+		field, exists := query["field"]
+		if !exists {
+			c.HTML(http.StatusBadRequest, "error.tmpl", http.StatusBadRequest)
+			return
+		}
+
+		filterenContainers := make(map[string]models.Container)
+
+		switch field[0] {
+		case "id" :
+			for id, container := range *containers {
+				if strings.Contains(id, filter[0]) {
+					filterenContainers[filter[0]] = container
+				}
+			}
+		case "location" :
+			for id, container := range *containers {
+				if strings.Contains(strings.ToLower(container.CurrentLocation), strings.ToLower(filter[0])) {
+					filterenContainers[id] = container
+				}
+			}
+		case "type" :
+			for id, container := range *containers {
+				if strings.Contains(strings.ToLower(container.Type.Name), strings.ToLower(filter[0])) {
+					filterenContainers[id] = container
+				}
+			}
+		case "cargo" :
+			for id, container := range *containers {
+				if strings.Contains(strings.ToLower(container.Cargo.Name), strings.ToLower(filter[0])) {
+					filterenContainers[id] = container
+				}
+			}
+		default:
+			c.HTML(http.StatusBadRequest, "error.tmpl", http.StatusBadRequest)
+			return
+		}
 		c.HTML(http.StatusOK, "index.tmpl", filterenContainers)
 	}
 }

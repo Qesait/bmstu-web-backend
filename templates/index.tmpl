@@ -1,26 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Список контейнеров</title>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
 </head>
 <body>
-    <h1>Список контейнеров</h1>
-    <ul>
+    <form action="/containers" method="get">
+    <input type="text" name="filter" placeholder="Фильтр">
+    <select name = "field">
+        <option value = "type"> По типу контейнера </option>
+        <option value = "id"> Серийному номеру </option>
+        <option value = "cargo"> По грузу </option>
+        <option value = "location"> По местоположению </option>
+    </select>
+    <div class="container-grid">
         {{range $key, $value := .}}
-            <li>
-                <a href="http://localhost:8080/containers/{{$value.Id}}" class="btn btn-primary">
-                    <div class="card">
-                        <img class="card-img-top" src={{$value.ImageURL}} alt="Card image cap">
-                        <div class="card-body">
-                            <h5 class="card-text">№{{$value.Id}}</h5>
-                            <p class="card-text">{{$value.Type.Name}}</p>
-                            <p class="card-text">{{$value.CurrentLocation}}</p>
-                            <h5 class="card-title">Груз:</h5>
-                            <p class="card-title">{{$value.Cargo.Name}}</p>
-                        </div>
-                    </div>
-                </a>
-            </li>
+            <div class="card">
+                <img class="card-img-top" src="{{$value.ImageURL}}" alt="фото контейнера">
+                <h5 class="card-title">№{{$value.Id}}</h5>
+                <p class="card-info">Тип: {{$value.Type.Name}}</p>
+                <p class="card-info">Местоположение: {{$value.CurrentLocation}}</p>
+                <p class="card-info">Груз: {{$value.Cargo.Name}}</p>
+                <a href="http://localhost:8080/containers/{{$value.Id}}" class="card-button">Подробнее</a>
+            </div>
         {{end}}
-    </ul>
+    </div>
 </body>
 </html>
