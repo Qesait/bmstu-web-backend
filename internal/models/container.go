@@ -22,16 +22,6 @@ var HIGH_CUBE_20 = ContainerType{
 	MaxGross: 21650,
 }
 
-// type Identification struct {
-// 	// three uppercase Latin letters
-// 	OwnerCode string `json:"owner_conde"`
-// 	// one uppercase Latin letter (U, J, Z, R)
-// 	EquipmentCategoryIdentifier string `json:"equipment_category_identifier"`
-// 	// six numbers
-// 	SerialNumber string `json:"serial_number"`
-// 	CheckDigit   string `json:"check_digit"`
-// }
-
 type dimentions struct {
 	Width  uint `json:"width"`
 	Height uint `json:"height"`

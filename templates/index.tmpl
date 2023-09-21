@@ -2,26 +2,34 @@
 <html>
 <head>
     <title>Список контейнеров</title>
-    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="/css/index.css">
 </head>
 <body>
-    <form action="/containers" method="get">
-    <input type="text" name="filter" placeholder="Фильтр">
-    <select name = "field">
-        <option value = "type"> По типу контейнера </option>
-        <option value = "id"> Серийному номеру </option>
-        <option value = "cargo"> По грузу </option>
-        <option value = "location"> По местоположению </option>
-    </select>
-    <div class="container-grid">
+    <header class="top-bar">
+        <form action="/containers" method="get" class="search-form">
+            <input type="text" name="filter" placeholder="Фильтр">
+            <select name="field">
+                <option value="type">По типу контейнера</option>
+                <option value="id">Серийному номеру</option>
+                <option value="cargo">По грузу</option>
+                <option value="location">По местоположению</option>
+            </select>
+            <button class="button" type="submit">Поиск</button>
+        </form>
+    </header>
+    <div class="cards-grid">
         {{range $key, $value := .}}
             <div class="card">
-                <img class="card-img-top" src="{{$value.ImageURL}}" alt="фото контейнера">
-                <h5 class="card-title">№{{$value.Id}}</h5>
-                <p class="card-info">Тип: {{$value.Type.Name}}</p>
-                <p class="card-info">Местоположение: {{$value.CurrentLocation}}</p>
-                <p class="card-info">Груз: {{$value.Cargo.Name}}</p>
-                <a href="http://localhost:8080/containers/{{$value.Id}}" class="card-button">Подробнее</a>
+                <div class="image">
+                    <img class="img-top" src="{{$value.ImageURL}}" alt="фото контейнера">
+                </div>
+                <div class="content">
+                    <h5 class="title">№{{$value.Id}}</h5>
+                    <p class="info">Тип: {{$value.Type.Name}}</p>
+                    <p class="info">Местоположение: {{$value.CurrentLocation}}</p>
+                    <p class="info">Груз: {{$value.Cargo.Name}}</p>
+                </div>
+                <a href="http://localhost:8080/containers/{{$value.Id}}" class="button">Подробнее</a>
             </div>
         {{end}}
     </div>
