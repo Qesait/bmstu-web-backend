@@ -1,24 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>{{.Id}}</title>
+    <link rel="stylesheet" type="text/css" href="/css/item-info.css">
 </head>
 <body>
-    <img class="card-img-top" src={{.ImageURL}} alt="Card image cap">
-    <div>
-        <h4>Контейнер №{{.Id}}</h4>
-        <p>Текущее местоположение: {{.CurrentLocation}}</p>
-        <p>Тип: {{.Type.Name}}</p>
-        <p>Длина: {{.Type.Dimentions.Length}} мм</p>
-        <p>Ширина: {{.Type.Dimentions.Width}} мм</p>
-        <p>Высота: {{.Type.Dimentions.Height}} мм</p>
-        <p>Вес контейнера: {{.Type.Tare}} кг</p>
-        <p>Максимальная масса брутто: {{.Type.MaxGross}} кг</p>
+    <div class="grid">
+        <div class="image-container" style="background-image: url('{{.ImageURL}}');"></div>
+        <div class="container">
+            <h4 class="title">Контейнер №{{.Id}}</h4>
+            <p class="info"><b>Текущее местоположение:</b> {{.CurrentLocation}}</p>
+            <p class="info"><b>Тип:</b> {{.Type.Name}}</p>
+            <p class="info"><b>Длина:</b> {{.Type.Dimentions.Length}} мм</p>
+            <p class="info"><b>Ширина:</b> {{.Type.Dimentions.Width}} мм</p>
+            <p class="info"><b>Высота:</b> {{.Type.Dimentions.Height}} мм</p>
+            <p class="info"><b>Вес контейнера:</b> {{.Type.Tare}} кг</p>
+            <p class="info"><b>Максимальная масса брутто:</b> {{.Type.MaxGross}} кг</p>
+        </div>
+        <div class="third-row">
+            <div class="cargo">
+                <h4 class="title">Груз</h4>
+                <p class="info"><b>Товар:</b> {{.Cargo.Name}}</p> 
+                <p class="info"><b>Вес:</b> {{.Cargo.Weight}}кг</p> 
+            </div>
+            <a href="http://localhost:8080/containers" class="button">Назад </a>
+        </div>
     </div>
-    <div>
-        <h4>Груз</h4>
-        <p>{{.Cargo.Name}}</p> 
-        <p>Вес: {{.Cargo.Weight}}кг</p> 
-    </div>
-    <a href="http://localhost:8080/containers" class="btn btn-primary">Go back</a>
 </body>
 </html>

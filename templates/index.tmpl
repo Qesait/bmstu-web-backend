@@ -24,10 +24,10 @@
                     <img class="img-top" src="{{$value.ImageURL}}" alt="фото контейнера">
                 </div>
                 <div class="content">
-                    <h5 class="title">№{{$value.Id}}</h5>
-                    <p class="info">Тип: {{$value.Type.Name}}</p>
-                    <p class="info">Местоположение: {{$value.CurrentLocation}}</p>
-                    <p class="info">Груз: {{$value.Cargo.Name}}</p>
+                    <h5 class="title">{{$value.Id}}</h5>
+                    <p class="info"><b>Тип:</b> {{$value.Type.Name}}</p>
+                    <p class="info"><b>Местоположение:</b> {{$value.CurrentLocation}}</p>
+                    <p class="info"><b>Груз:</b> {{$value.Cargo.Name}}</p>
                 </div>
                 <a href="http://localhost:8080/containers/{{$value.Id}}" class="button">Подробнее</a>
             </div>

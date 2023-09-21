@@ -1,0 +1,113 @@
+:root {
+    /* Basic */
+    --c-white: #fff;
+    --c-black: #000;
+
+    /* Greys */
+    --c-ash: #eaeef6;
+    --c-charcoal: #878787;
+    --c-void: #212930;
+
+    /* Beige/Browns */
+    --c-fair-pink: #FFEDEC;
+    --c-apricot: #FBC8BE;
+    --c-coffee: #754D42;
+    --c-del-rio: #917072;
+
+    /* Greens */
+    --c-java: #1FCAC5;
+
+    /* Purples */
+    --c-titan-white: #f1eeff;
+    --c-cold-purple: #a69fd6;
+    --c-indigo: #6558d3;
+    --c-governor: #4133B7;
+}
+
+body {
+    font-family: "Spline Sans", sans-serif;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: var(--c-ash);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(600px, 2fr) minmax(300px, 1fr) minmax(300px, 1fr));
+    grid-gap: 20px;
+    padding: 20px;
+
+
+    .image-container {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        min-height: 0; /* Ensure the container can shrink */
+        border-radius: 16px;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        box-shadow: 0px 30px 30px -25px rgba(65, 51, 183, .25);
+        border-radius: 16px;
+        background-color: var(--c-white);
+        padding: 1rem;
+    }
+
+    .third-row {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 20px;
+    }
+
+    .cargo {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        border-radius: 16px;
+        background-color: var(--c-white);
+        box-shadow: 0px 30px 30px -25px rgba(65, 51, 183, .25);
+        padding: 1rem;
+        flex-grow: 1;
+    }
+
+    .title {
+        margin: 0.5rem;
+        padding: 0.5rem;
+        font-size: 1.5rem;
+        color: var(--c-void);
+        text-align: center;
+    }
+
+    .info {
+        margin: 0.2rem;
+        padding: 0.2rem;
+        color: var(--c-charcoal);
+    }
+
+    .button {
+        appearance: button;
+        text-decoration: none;
+        font: inherit;
+        line-height: 1;
+        background-color: var(--c-white);
+        border: 2px solid var(--c-indigo);
+        color: var(--c-indigo);
+        padding: 0.5em 1em;
+        box-shadow: 0px 20px 30px -10px rgba(65, 51, 183, .25);
+        border-radius: 6px;
+        font-weight: 500;
+        text-align: center;
+
+        &:hover,
+        &:focus {
+            background-color: var(--c-indigo);
+            color: var(--c-white);
+        }
+    }
+}
