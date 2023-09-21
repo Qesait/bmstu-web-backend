@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Список контейнеров</title>
-    <link rel="stylesheet" type="text/css" href="/css/index.css">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
 </head>
 <body>
     <header class="top-bar">
@@ -14,22 +14,20 @@
                 <option value="cargo">По грузу</option>
                 <option value="location">По местоположению</option>
             </select>
-            <button class="button" type="submit">Поиск</button>
+            <button class="button button-secondary" type="submit">Поиск</button>
         </form>
     </header>
-    <div class="cards-grid">
+    <div class="grid grid-cards">
         {{range $key, $value := .}}
-            <div class="card">
-                <div class="image">
-                    <img class="img-top" src="{{$value.ImageURL}}" alt="фото контейнера">
-                </div>
-                <div class="content">
+            <div class="panel">
+                <div class="image-container card-image" style="background-image: url('{{$value.ImageURL}}');"></div>
+                <div class="card-content">
                     <h5 class="title">{{$value.Id}}</h5>
                     <p class="info"><b>Тип:</b> {{$value.Type.Name}}</p>
                     <p class="info"><b>Местоположение:</b> {{$value.CurrentLocation}}</p>
                     <p class="info"><b>Груз:</b> {{$value.Cargo.Name}}</p>
                 </div>
-                <a href="http://localhost:8080/containers/{{$value.Id}}" class="button">Подробнее</a>
+                <a href="http://localhost:8080/containers/{{$value.Id}}" class="button button-primary">Подробнее</a>
             </div>
         {{end}}
     </div>
