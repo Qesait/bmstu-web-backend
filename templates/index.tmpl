@@ -15,6 +15,7 @@
                 <option value="location">По местоположению</option>
             </select>
             <button class="button button-secondary" type="submit">Поиск</button>
+            <a href="/containers/" class="button button-secondary">↺</a>
         </form>
     </header>
     <div class="grid grid-cards">
@@ -27,7 +28,7 @@
                     <p class="info"><b>Местоположение:</b> {{$value.CurrentLocation}}</p>
                     <p class="info"><b>Груз:</b> {{$value.Cargo.Name}}</p>
                 </div>
-                <a href="http://localhost:8080/containers/{{$value.Id}}" class="button button-primary">Подробнее</a>
+                <a href="/containers/{{$value.Id}}" class="button button-primary">Подробнее</a>
             </div>
         {{end}}
     </div>

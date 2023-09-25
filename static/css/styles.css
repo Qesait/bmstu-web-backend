@@ -86,6 +86,7 @@ body {
     border: 2px solid var(--c-titan-white);
     color: var(--c-titan-white);
     padding: 5px 1em;
+    margin-right: 10px;
     
     &:hover,
     &:focus {

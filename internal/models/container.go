@@ -1,27 +1,5 @@
 package models
 
-var DRY_CUBE_20 = ContainerType{
-	Name: "Стандартный 20-ти футовый контейнер",
-	Dimentions: dimentions{
-		Length: 6058,
-		Width:  2438,
-		Height: 2591,
-	},
-	Tare:     2230,
-	MaxGross: 21770,
-}
-
-var HIGH_CUBE_20 = ContainerType{
-	Name: "20 футовый контейнер увеличенной высоты",
-	Dimentions: dimentions{
-		Length: 6058,
-		Width:  2438,
-		Height: 2896,
-	},
-	Tare:     2350,
-	MaxGross: 21650,
-}
-
 type dimentions struct {
 	Width  uint `json:"width"`
 	Height uint `json:"height"`
@@ -45,10 +23,43 @@ type Container struct {
 	// equipment category - 1 uppercase Latin letter (U, J, Z, R)
 	// serial number - 6 digits
 	// check digit
-	// ___ _ ______ _
 	Id              string        `json:"id"`
 	Type            ContainerType `json:"type"`
 	ImageURL        string        `json:"image_url"`
 	Cargo           Cargo         `json:"cargo"`
 	CurrentLocation string
+}
+
+
+var DRY_FREIGHT_20 = ContainerType{
+	Name: "Стандартный 20-ти футовый контейнер",
+	Dimentions: dimentions{
+		Length: 6058,
+		Width:  2438,
+		Height: 2591,
+	},
+	Tare:     2230,
+	MaxGross: 21770,
+}
+
+var HIGH_CUBE_20 = ContainerType{
+	Name: "20 футовый контейнер увеличенной высоты",
+	Dimentions: dimentions{
+		Length: 6058,
+		Width:  2438,
+		Height: 2896,
+	},
+	Tare:     2350,
+	MaxGross: 21650,
+}
+
+var DRY_FREIGHT_40 = ContainerType{
+	Name: "Стандартный 40-ка футовый контейнер",
+	Dimentions: dimentions{
+		Length: 12192,
+		Width:  2438,
+		Height: 2591,
+	},
+	Tare:     3780,
+	MaxGross: 26700,
 }

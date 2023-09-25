@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// id, location, cargo, type
 func GetAllContainers(containers *map[string]models.Container) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		query := c.Request.URL.Query()

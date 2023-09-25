@@ -1,50 +1,33 @@
 package api
 
 import (
-	"log"
-
+	db "bmstu-web-backend/internal/database"
 	"bmstu-web-backend/internal/models"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
 
+type server struct {
+	db     map[string]models.Container
+	engine *gin.Engine
+}
+
 func StartServer() {
 	log.Println("Server start up")
-
-	containers := map[string]models.Container{
-		"AAAU1234560": {
-			Id: "AAAU1234560",
-			Type:         models.DRY_CUBE_20,
-			ImageURL:     "http://localhost:8080/image/0.jpeg",
-			Cargo: models.Cargo{
-				Name:   "Бумага",
-				Weight: 20000,
-			},
-			CurrentLocation: "Архангельск",
-		},
-		"BBBU6543210": {
-			Id: "BBBU6543210",
-			Type:         models.HIGH_CUBE_20,
-			ImageURL:     "http://localhost:8080/image/1.jpg",
-			Cargo: models.Cargo{
-				Name:   "Зерно",
-				Weight: 15000,
-			},
-			CurrentLocation: "Калининград",
-		},
+	s := server{
+		db:     db.SetupDB(),
+		engine: gin.Default(),
 	}
 
-	r := gin.Default()
+	s.engine.LoadHTMLGlob("templates/*")
 
-	r.LoadHTMLGlob("templates/*")
+	s.engine.GET("/containers", GetAllContainers(&s.db))
+	s.engine.GET("/containers/:id", GetOneContainer(&s.db))
 
-	r.GET("/containers", GetAllContainers(&containers))
-	r.GET("/containers/:id", GetOneContainer(&containers))
+	s.engine.Static("/image", "./static/image")
+	s.engine.Static("/css", "./static/css")
 
-	r.Static("/image", "./static/image")
-	r.Static("/css", "./static/css")
-
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
-
+	s.engine.Run()
 	log.Println("Server down")
 }
