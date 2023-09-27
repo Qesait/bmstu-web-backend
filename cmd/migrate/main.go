@@ -18,11 +18,11 @@ func main() {
 
 	// Migrate the schema
 	err = db.AutoMigrate(
-		&ds.ContainerType{},
+		&ds.Transportation{},
 		&ds.Status{},
+		&ds.ContainerType{},
 		&ds.User{},
 		&ds.Container{},
-		&ds.Transportation{},
 		&ds.TransportationComposition{},
 	)
 	if err != nil {
