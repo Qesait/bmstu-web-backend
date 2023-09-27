@@ -7,13 +7,7 @@
 <body>
     <header class="top-bar">
         <form action="/containers" method="get" class="search-form">
-            <input type="text" name="filter" placeholder="Фильтр">
-            <select name="field">
-                <option value="type">По типу контейнера</option>
-                <option value="id">Серийному номеру</option>
-                <option value="cargo">По грузу</option>
-                <option value="location">По местоположению</option>
-            </select>
+            <input type="text" name="type" placeholder="Поиск по типу">
             <button class="button button-secondary" type="submit">Поиск</button>
             <a href="/containers/" class="button button-secondary">↺</a>
         </form>

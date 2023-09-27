@@ -63,3 +63,14 @@ var DRY_FREIGHT_40 = ContainerType{
 	Tare:     3780,
 	MaxGross: 26700,
 }
+
+var HIGH_CUBE_40 = ContainerType{
+	Name: "40 футовый контейнер увеличенной высоты",
+	Dimentions: dimentions{
+		Length: 12192,
+		Width:  2438,
+		Height: 2896,
+	},
+	Tare:     3780,
+	MaxGross: 26700,
+}
