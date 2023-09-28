@@ -1,27 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{.Id}}</title>
+    <title>{{.ContainerId}}</title>
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
 </head>
 <body>
     <div class="grid grid-info">
-        <div class="image-container" style="background-image: url('{{.ImageURL}}');"></div>
+        <div class="image-container" style="background-image: url('/image/{{.ImageURL}}');"></div>
         <div class="panel">
-            <h4 class="title">Контейнер №{{.Id}}</h4>
-            <p class="info"><b>Текущее местоположение:</b> {{.CurrentLocation}}</p>
-            <p class="info"><b>Тип:</b> {{.Type.Name}}</p>
-            <p class="info"><b>Длина:</b> {{.Type.Dimentions.Length}} мм</p>
-            <p class="info"><b>Ширина:</b> {{.Type.Dimentions.Width}} мм</p>
-            <p class="info"><b>Высота:</b> {{.Type.Dimentions.Height}} мм</p>
-            <p class="info"><b>Вес контейнера:</b> {{.Type.Tare}} кг</p>
-            <p class="info"><b>Максимальная масса брутто:</b> {{.Type.MaxGross}} кг</p>
+            <h4 class="title">Контейнер №{{.ContainerId}}</h4>
+            <p class="info"><b>Текущее местоположение: </b>Неизвестно</p>
+            <p class="info"><b>Тип:</b> {{.ContainerType.Name}}</p>
+            <p class="info"><b>Длина:</b> {{.ContainerType.Length}} мм</p>
+            <p class="info"><b>Ширина:</b> {{.ContainerType.Width}} мм</p>
+            <p class="info"><b>Высота:</b> {{.ContainerType.Height}} мм</p>
+            <p class="info"><b>Максимальная масса брутто:</b> {{.ContainerType.MaxGross}} кг</p>
         </div>
         <div class="cargo-content">
             <div class="panel">
                 <h4 class="title">Груз</h4>
-                <p class="info"><b>Товар:</b> {{.Cargo.Name}}</p> 
-                <p class="info"><b>Вес:</b> {{.Cargo.Weight}}кг</p> 
+                <p class="info"><b>Товар: </b>Неизвестно</p> 
+                <p class="info"><b>Вес: </b>Неизвестно кг</p> 
             </div>
             <a href="/containers" class="button button-primary">Назад </a>
         </div>

@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"strings"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -37,7 +39,22 @@ func (r *Repository) GetContainerByID(id string) (*ds.Container, error) {
 func (r *Repository) GetAllContainers() ([]ds.Container, error) {
 	var containers []ds.Container
 
-	err := r.db.Find(&containers).Error
+	err := r.db.Preload("ContainerType").Find(&containers).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return containers, nil
+}
+
+func (r *Repository) GetContainersByType(containerType string) ([]ds.Container, error) {
+	var containers []ds.Container
+
+	err := r.db.Preload("ContainerType").
+		Joins("INNER JOIN container_types ON containers.type_id = container_types.container_type_id").
+		Where("LOWER(container_types.name) LIKE ?", "%"+strings.ToLower(containerType)+"%").
+		Find(&containers).Error
+
 	if err != nil {
 		return nil, err
 	}

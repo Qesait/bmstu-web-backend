@@ -7,13 +7,7 @@
 <body>
     <header class="top-bar">
         <form action="/containers" method="get" class="search-form">
-            <input type="text" name="filter" placeholder="Фильтр">
-            <select name="field">
-                <option value="type">По типу контейнера</option>
-                <option value="id">Серийному номеру</option>
-                <option value="cargo">По грузу</option>
-                <option value="location">По местоположению</option>
-            </select>
+            <input type="text" name="type" placeholder="Поиск по типу">
             <button class="button button-secondary" type="submit">Поиск</button>
             <a href="/containers/" class="button button-secondary">↺</a>
         </form>
@@ -21,14 +15,14 @@
     <div class="grid grid-cards">
         {{range $key, $value := .}}
             <div class="panel">
-                <div class="image-container card-image" style="background-image: url('{{$value.ImageURL}}');"></div>
+                <div class="image-container card-image" style="background-image: url('/image/{{$value.ImageURL}}');"></div>
                 <div class="card-content">
-                    <h5 class="title">{{$value.Id}}</h5>
-                    <p class="info"><b>Тип:</b> {{$value.Type.Name}}</p>
-                    <p class="info"><b>Местоположение:</b> {{$value.CurrentLocation}}</p>
-                    <p class="info"><b>Груз:</b> {{$value.Cargo.Name}}</p>
+                    <h5 class="title">{{$value.ContainerId}}</h5>
+                    <p class="info"><b>Тип:</b> {{$value.ContainerType.Name}}</p>
+                    <p class="info"><b>Местоположение:</b> Неизвестно</p>
+                    <p class="info"><b>Груз:</b> Неизвестно</p>
                 </div>
-                <a href="/containers/{{$value.Id}}" class="button button-primary">Подробнее</a>
+                <a href="/containers/{{$value.ContainerId}}" class="button button-primary">Подробнее</a>
             </div>
         {{end}}
     </div>

@@ -34,32 +34,31 @@ func (a *Application) Run() {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"conatiner": container,
-		})
-		return
+		c.HTML(http.StatusOK, "item-info.tmpl", *container)
 	})
 
 	r.GET("/containers", func(c *gin.Context) {
 		containerType := c.Query("type") // получаем из запроса query string
 
-		if containerType == "" {
-			// получаем данные по товару
-			containers, err := a.repo.GetAllContainers()
-			if err != nil { // если не получилось
+		if containerType != "" {
+			containers, err := a.repo.GetContainersByType(containerType)
+			if err != nil {
 				log.Println("cant get containers", err)
 				c.Error(err)
 				return
 			}
 
-			c.JSON(http.StatusOK, gin.H{
-				"containers": containers,
-			})
+			c.HTML(http.StatusOK, "index.tmpl", containers)
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{
-			"message": "not implemented",
-		})
+		containers, err := a.repo.GetAllContainers()
+		if err != nil {
+			log.Println("cant get containers", err)
+			c.Error(err)
+			return
+		}
+
+		c.HTML(http.StatusOK, "index.tmpl", containers)
 	})
 
 	r.LoadHTMLGlob("templates/*")
