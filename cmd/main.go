@@ -1,9 +1,15 @@
 package main
 
 import (
-	"bmstu-web-backend/internal/api"
+	"log"
+	"bmstu-web-backend/internal/pkg/app"
 )
 
 func main() {
-	api.StartServer()
+	app, err := app.New()
+	if err != nil {
+		log.Println("app can not be created", err)
+		return
+	}
+	app.Run()
 }

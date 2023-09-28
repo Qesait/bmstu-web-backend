@@ -31,7 +31,7 @@ type Container struct {
 	ImageURL       string `gorm:"size:100;not null"`
 	Decommissioned bool   `gorm:"not null"`
 
-	ContainerType ContainerType `gorm:"foreignKey:TypeId"`
+	ContainerType *ContainerType `gorm:"preload:false;foreignKey:TypeId"`
 }
 
 type Transportation struct {
@@ -43,7 +43,7 @@ type Transportation struct {
 	Moderator        string     `gorm:"size:50;not null"`
 	TransportVehicle string     `gorm:"size:50;not null"`
 
-	Status Status `gorm:"foreignKey:StatusId"`
+	Status Status
 }
 
 type TransportationComposition struct {
