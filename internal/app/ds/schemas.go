@@ -28,10 +28,11 @@ type User struct {
 }
 
 type Container struct {
-	ContainerId    string `gorm:"primaryKey;size:11;not null;autoIncrement:false"`
-	TypeId         uint   `gorm:"not null"`
-	ImageURL       string `gorm:"size:100;not null"`
-	Decommissioned bool   `gorm:"not null"`
+	ContainerId    string    `gorm:"primaryKey;size:11;not null;autoIncrement:false"`
+	TypeId         uint      `gorm:"not null"`
+	ImageURL       string    `gorm:"size:100;not null"`
+	Decommissioned bool      `gorm:"not null"`
+	PurchaseDate   time.Time `gorm:"not null;type:date"`
 
 	ContainerType ContainerType `gorm:"preload:false;foreignKey:TypeId"`
 }
@@ -42,11 +43,11 @@ type Transportation struct {
 	CreationDate     time.Time  `gorm:"not null;type:date"`
 	FormationDate    *time.Time `gorm:"type:date"`
 	CompletionDate   *time.Time `gorm:"type:date"`
-	ModeratorId        uint       `gorm:"not null"`
-	CustomerId         uint       `gorm:"not null"`
+	ModeratorId      uint       `gorm:"not null"`
+	CustomerId       uint       `gorm:"not null"`
 	TransportVehicle string     `gorm:"size:50;not null"`
 
-	Status Status
+	Status    Status
 	Moderator User `gorm:"foreignKey:ModeratorId"`
 	Customer  User `gorm:"foreignKey:CustomerId"`
 }
@@ -57,6 +58,6 @@ type TransportationComposition struct {
 	Cargo            string `gorm:"size:50;not null"`
 	Weight           int    `gorm:"not null"`
 
-	Container      Container      `gorm:"foreignKey:ContainerId"`
-	Transportation Transportation `gorm:"foreignKey:TransportationId"`
+	Container      *Container      `gorm:"foreignKey:ContainerId"`
+	Transportation *Transportation `gorm:"foreignKey:TransportationId"`
 }

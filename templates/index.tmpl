@@ -19,8 +19,7 @@
                 <div class="card-content">
                     <h5 class="title">{{$value.ContainerId}}</h5>
                     <p class="info"><b>Тип:</b> {{$value.ContainerType.Name}}</p>
-                    <p class="info"><b>Местоположение:</b> Неизвестно</p>
-                    <p class="info"><b>Груз:</b> Неизвестно</p>
+                    <p class="info"><b>Дата введения в эксплутацию:</b> {{$value.PurchaseDate.Format "02.01.2006"}}</p>
                 </div>
                 <a href="/containers/{{$value.ContainerId}}" class="button button-primary">Подробнее</a>
             </div>

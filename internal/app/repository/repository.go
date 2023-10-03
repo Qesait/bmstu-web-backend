@@ -2,6 +2,7 @@ package repository
 
 import (
 	"strings"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -24,7 +25,7 @@ func New(dsn string) (*Repository, error) {
 	}, nil
 }
 
-func (r *Repository) GetContainerByID(id string) (*ds.Container, error) {
+func (r *Repository) GetContainerByID(id string) (*ContainerInfo, error) {
 	container := &ds.Container{}
 
 	// err := r.db.First(container, "container_id = ?", id).Error
@@ -33,7 +34,33 @@ func (r *Repository) GetContainerByID(id string) (*ds.Container, error) {
 		return nil, err
 	}
 
-	return container, nil
+	tComposition := &ds.TransportationComposition{}
+
+	err = r.db.Where("container_id = ?", container.ContainerId).First(tComposition).Error
+	if err != nil {
+		tComposition.Cargo = "Отсутствует"
+		tComposition.Weight = 0
+	}
+
+	return &ContainerInfo{
+		ContainerId:    container.ContainerId,
+		ImageURL:       container.ImageURL,
+		Decommissioned: container.Decommissioned,
+		PurchaseDate:   container.PurchaseDate,
+		ContainerType:  container.ContainerType,
+		Cargo:          tComposition.Cargo,
+		Weight:         tComposition.Weight,
+	}, nil
+}
+
+type ContainerInfo struct {
+	ContainerId    string
+	ImageURL       string
+	Decommissioned bool
+	PurchaseDate   time.Time
+	ContainerType  ds.ContainerType
+	Cargo          string
+	Weight         int
 }
 
 func (r *Repository) GetAllContainers() ([]ds.Container, error) {
