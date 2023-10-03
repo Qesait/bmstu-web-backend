@@ -20,9 +20,11 @@ type Status struct {
 }
 
 type User struct {
-	UserId   uint   `gorm:"primaryKey"`
-	Login    string `gorm:"size:30;not null"`
-	Password string `gorm:"size:30;not null"`
+	UserId    uint   `gorm:"primaryKey"`
+	Login     string `gorm:"size:30;not null"`
+	Password  string `gorm:"size:30;not null"`
+	Name      string `gorm:"size:50;not null"`
+	Moderator bool   `gorm:"not null"`
 }
 
 type Container struct {
@@ -40,10 +42,13 @@ type Transportation struct {
 	CreationDate     time.Time  `gorm:"not null;type:date"`
 	FormationDate    *time.Time `gorm:"type:date"`
 	CompletionDate   *time.Time `gorm:"type:date"`
-	Moderator        string     `gorm:"size:50;not null"`
+	ModeratorId        uint       `gorm:"not null"`
+	CustomerId         uint       `gorm:"not null"`
 	TransportVehicle string     `gorm:"size:50;not null"`
 
 	Status Status
+	Moderator User `gorm:"foreignKey:ModeratorId"`
+	Customer  User `gorm:"foreignKey:CustomerId"`
 }
 
 type TransportationComposition struct {
