@@ -61,6 +61,21 @@ func (a *Application) Run() {
 		c.HTML(http.StatusOK, "index.tmpl", containers)
 	})
 
+	r.POST("/containers", func(c *gin.Context) {
+		id := c.PostForm("id")
+
+		// decomission container
+        
+		containers, err := a.repo.GetAllContainers()
+		if err != nil {
+			log.Println("cant get containers", err)
+			c.Error(err)
+			return
+		}
+
+		c.HTML(http.StatusOK, "index.tmpl", containers)
+	})
+
 	r.LoadHTMLGlob("templates/*")
 
 	r.Static("/image", "./static/image")
