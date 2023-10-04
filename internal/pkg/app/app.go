@@ -62,9 +62,9 @@ func (a *Application) Run() {
 	})
 
 	r.POST("/containers", func(c *gin.Context) {
-		id := c.PostForm("id")
+		id := c.PostForm("decommission")
 
-		// decomission container
+		a.repo.DecommissionContainer(id)
         
 		containers, err := a.repo.GetAllContainers()
 		if err != nil {

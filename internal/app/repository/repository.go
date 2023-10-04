@@ -88,3 +88,12 @@ func (r *Repository) GetContainersByType(containerType string) ([]ds.Container, 
 
 	return containers, nil
 }
+
+func (r *Repository) DecommissionContainer(id string) error {
+	err := r.db.Exec("UPDATE containers SET decommissioned = ? WHERE container_id = ?", true, id).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

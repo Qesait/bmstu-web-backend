@@ -23,7 +23,7 @@
                 </div>
                 {{if not .Decommissioned}}
                     <form action="/containers" method="post">
-                        <input type="hidden" name="depomission" value="{{.ContainerId}}">
+                        <input type="hidden" name="decommission" value="{{.ContainerId}}">
                         <input type="submit" value="Списать" class="button button-delete" style="width: 100%;">
                     </form>
                 {{end}}
