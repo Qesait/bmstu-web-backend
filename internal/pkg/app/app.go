@@ -20,9 +20,9 @@ func (app *Application) Run() {
 
 	r := gin.Default()
 
-	r.GET("/containers/:id", app.GetContainer())
-	r.GET("/containers", app.GetContainers())
-	r.POST("/containers", app.DecommissionContainer())
+	r.GET("/containers/:id", app.GetContainer)
+	r.GET("/containers", app.GetContainers)
+	r.POST("/containers", app.DecommissionContainer)
 
 	r.LoadHTMLGlob("templates/*")
 
