@@ -25,17 +25,24 @@ func New(dsn string) (*Repository, error) {
 	}, nil
 }
 
+type ContainerInfo struct {
+	ContainerId    string
+	ImageURL       string
+	Decommissioned bool
+	PurchaseDate   time.Time
+	ContainerType  ds.ContainerType
+	Cargo          string
+	Weight         int
+}
+
 func (r *Repository) GetContainerByID(id string) (*ContainerInfo, error) {
 	container := &ds.Container{}
-
-	// err := r.db.First(container, "container_id = ?", id).Error
 	err := r.db.Where("container_id = ?", id).Preload("ContainerType").First(container).Error
 	if err != nil {
 		return nil, err
 	}
 
 	tComposition := &ds.TransportationComposition{}
-
 	err = r.db.Where("container_id = ?", container.ContainerId).First(tComposition).Error
 	if err != nil {
 		tComposition.Cargo = "Отсутствует"
@@ -53,20 +60,15 @@ func (r *Repository) GetContainerByID(id string) (*ContainerInfo, error) {
 	}, nil
 }
 
-type ContainerInfo struct {
-	ContainerId    string
-	ImageURL       string
-	Decommissioned bool
-	PurchaseDate   time.Time
-	ContainerType  ds.ContainerType
-	Cargo          string
-	Weight         int
-}
-
 func (r *Repository) GetAllContainers() ([]ds.Container, error) {
 	var containers []ds.Container
 
-	err := r.db.Preload("ContainerType").Find(&containers).Error
+	err := r.db.
+		Preload("ContainerType").
+		Order("decommissioned ASC").
+		Find(&containers).
+		Error
+
 	if err != nil {
 		return nil, err
 	}
@@ -80,6 +82,7 @@ func (r *Repository) GetContainersByType(containerType string) ([]ds.Container, 
 	err := r.db.Preload("ContainerType").
 		Joins("INNER JOIN container_types ON containers.type_id = container_types.container_type_id").
 		Where("LOWER(container_types.name) LIKE ?", "%"+strings.ToLower(containerType)+"%").
+		Order("decommissioned ASC").
 		Find(&containers).Error
 
 	if err != nil {

@@ -7,19 +7,23 @@
 <body>
     <header class="top-bar">
         <form action="/containers" method="get" class="search-form">
-            <input type="text" name="type" placeholder="Поиск по типу">
+            <input type="text" name="type" placeholder="Поиск по типу" value="{{if ne .Search ""}}{{.Search}}{{end}}">
             <button class="button button-secondary" type="submit">Поиск</button>
             <a href="/containers/" class="button button-secondary">↺</a>
         </form>
     </header>
     <div class="grid grid-cards">
-        {{range $key, $value := .}}
+        {{range $key, $value := .Containers}}
             <div class="panel">
                 <div class="image-container card-image" style="background-image: url('/image/{{$value.ImageURL}}');"></div>
                 <div class="card-content">
                     <h5 class="title">{{$value.ContainerId}}</h5>
                     <p class="info"><b>Тип:</b> {{$value.ContainerType.Name}}</p>
-                    <p class="info"><b>Введенён в эксплутацию:</b> {{$value.PurchaseDate.Format "02.01.2006"}}</p>
+                    {{if .Decommissioned}}
+                        <p class="info"><b>Списан</b></p>
+                    {{else}}
+                        <p class="info"><b>Введенён в эксплутацию:</b> {{$value.PurchaseDate.Format "02.01.2006"}}</p>
+                    {{end}}
                 </div>
                 {{if not .Decommissioned}}
                     <form action="/containers" method="post">
