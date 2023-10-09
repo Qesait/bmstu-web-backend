@@ -62,22 +62,6 @@ func (r *Repository) GetContainerByID(id string) (*ContainerInfo, error) {
 	}, nil
 }
 
-func (r *Repository) GetAllContainers() ([]ds.Container, error) {
-	var containers []ds.Container
-
-	err := r.db.
-		Preload("ContainerType").
-		Where("decommissioned = ?", false).
-		Find(&containers).
-		Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return containers, nil
-}
-
 func (r *Repository) GetContainersByType(containerType string) ([]ds.Container, error) {
 	var containers []ds.Container
 

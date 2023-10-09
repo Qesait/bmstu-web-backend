@@ -28,14 +28,8 @@ type GetContainersResponse struct {
 
 func (app *Application) GetContainers(c *gin.Context) {
 	containerType := c.Query("type")
-	var containers []ds.Container
-	var err error
 
-	if containerType != "" {
-		containers, err = app.repo.GetContainersByType(containerType)
-	} else {
-		containers, err = app.repo.GetAllContainers()
-	}
+	containers, err := app.repo.GetContainersByType(containerType)
 	if err != nil {
 		log.Println("can't get containers from db", err)
 		c.Error(err)
@@ -53,7 +47,7 @@ func (app *Application) DecommissionContainer(c *gin.Context) {
 
 	app.repo.DecommissionContainer(id)
 
-	containers, err := app.repo.GetAllContainers()
+	containers, err := app.repo.GetContainersByType("")
 	if err != nil {
 		log.Println("can't get containers from db", err)
 		c.Error(err)
