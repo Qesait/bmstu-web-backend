@@ -9,10 +9,9 @@
         <div class="image-container item-image" style="background-image: url('/image/{{.ImageURL}}');"></div>
         <div class="panel">
             <h4 class="title">Контейнер №{{.ContainerId}}</h4>
+            <p class="info"><b>Дата введения в эксплутацию:</b> {{.PurchaseDate.Format "02.01.2006"}}</p>
             {{if .Decommissioned}}
                 <p class="info"><b>Списан</b></p>
-            {{else}}
-                <p class="info"><b>Дата введения в эксплутацию:</b> {{.PurchaseDate.Format "02.01.2006"}}</p>
             {{end}}
             <p class="info"><b>Тип:</b> {{.ContainerType.Name}}</p>
             <p class="info"><b>Длина:</b> {{.ContainerType.Length}} мм</p>

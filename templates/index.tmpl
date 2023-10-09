@@ -19,11 +19,7 @@
                 <div class="card-content">
                     <h5 class="title">{{$value.ContainerId}}</h5>
                     <p class="info"><b>Тип:</b> {{$value.ContainerType.Name}}</p>
-                    {{if .Decommissioned}}
-                        <p class="info"><b>Списан</b></p>
-                    {{else}}
-                        <p class="info"><b>Введенён в эксплутацию:</b> {{$value.PurchaseDate.Format "02.01.2006"}}</p>
-                    {{end}}
+                    <p class="info"><b>Введенён в эксплутацию:</b> {{$value.PurchaseDate.Format "02.01.2006"}}</p>
                 </div>
                 {{if not .Decommissioned}}
                     <form action="/containers" method="post">

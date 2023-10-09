@@ -37,13 +37,15 @@ type ContainerInfo struct {
 
 func (r *Repository) GetContainerByID(id string) (*ContainerInfo, error) {
 	container := &ds.Container{}
-	err := r.db.Where("container_id = ?", id).Preload("ContainerType").First(container).Error
+	err := r.db.Where("container_id = ?", id).
+		Preload("ContainerType").First(container).Error
 	if err != nil {
 		return nil, err
 	}
 
 	tComposition := &ds.TransportationComposition{}
-	err = r.db.Where("container_id = ?", container.ContainerId).First(tComposition).Error
+	err = r.db.Where("container_id = ?", container.ContainerId).
+		First(tComposition).Error
 	if err != nil {
 		tComposition.Cargo = "Отсутствует"
 		tComposition.Weight = 0
@@ -65,7 +67,7 @@ func (r *Repository) GetAllContainers() ([]ds.Container, error) {
 
 	err := r.db.
 		Preload("ContainerType").
-		Order("decommissioned ASC").
+		Where("decommissioned = ?", false).
 		Find(&containers).
 		Error
 
@@ -82,7 +84,7 @@ func (r *Repository) GetContainersByType(containerType string) ([]ds.Container, 
 	err := r.db.Preload("ContainerType").
 		Joins("INNER JOIN container_types ON containers.type_id = container_types.container_type_id").
 		Where("LOWER(container_types.name) LIKE ?", "%"+strings.ToLower(containerType)+"%").
-		Order("decommissioned ASC").
+		Where("decommissioned = ?", false).
 		Find(&containers).Error
 
 	if err != nil {
