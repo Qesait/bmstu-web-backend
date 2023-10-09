@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{.ContainerId}}</title>
+    <title>{{.Marking}}</title>
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
 </head>
 <body>
     <div class="grid grid-info">
         <div class="image-container item-image" style="background-image: url('/image/{{.ImageURL}}');"></div>
         <div class="panel">
-            <h4 class="title">Контейнер №{{.ContainerId}}</h4>
+            <h4 class="title">Контейнер №{{.Marking}}</h4>
             <p class="info"><b>Дата введения в эксплутацию:</b> {{.PurchaseDate.Format "02.01.2006"}}</p>
-            {{if .Decommissioned}}
+            {{if .IsDeleted}}
                 <p class="info"><b>Списан</b></p>
             {{end}}
             <p class="info"><b>Тип:</b> {{.ContainerType.Name}}</p>
@@ -22,7 +22,7 @@
         <div class="cargo-content">
             <div class="panel">
                 <h4 class="title">Груз</h4>
-                <p class="info"><b>Товар: </b>{{.Cargo}}</p> 
+                <p class="info"><b>Товар: </b>{{if .Cargo}}{{.Cargo}}{{else}}Отсутствует{{end}}</p> 
                 <p class="info"><b>Вес: </b>{{.Weight}} кг</p> 
             </div>
             <a href="/containers" class="button button-primary">Назад </a>

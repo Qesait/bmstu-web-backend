@@ -18,6 +18,10 @@ func (app *Application) GetContainer(c *gin.Context) {
 		return
 	}
 
+	if len(container.Cargo) == 0 {
+		log.Println("empty")
+	}
+
 	c.HTML(http.StatusOK, "item-info.tmpl", *container)
 }
 
@@ -43,7 +47,7 @@ func (app *Application) GetContainers(c *gin.Context) {
 }
 
 func (app *Application) DecommissionContainer(c *gin.Context) {
-	id := c.PostForm("decommission")
+	id := c.PostForm("delete")
 
 	app.repo.DecommissionContainer(id)
 

@@ -27,11 +27,14 @@ type User struct {
 }
 
 type Container struct {
-	ContainerId    string    `gorm:"primaryKey;size:11;not null;autoIncrement:false"`
-	TypeId         uint      `gorm:"not null"`
-	ImageURL       string    `gorm:"size:100;not null"`
-	Decommissioned bool      `gorm:"not null"`
-	PurchaseDate   time.Time `gorm:"not null;type:date"`
+	ContainerId  uint      `gorm:"primaryKey;not null;"`
+	TypeId       uint      `gorm:"not null"`
+	ImageURL     string    `gorm:"size:100;not null"`
+	IsDeleted    bool      `gorm:"not null"`
+	PurchaseDate time.Time `gorm:"not null;type:date"`
+	Cargo        string    `gorm:"size:50;not null"`
+	Weight       int       `gorm:"not null"`
+	Marking      string    `gorm:"size:11;not null"`
 
 	ContainerType ContainerType `gorm:"preload:false;foreignKey:TypeId"`
 }
@@ -52,10 +55,8 @@ type Transportation struct {
 }
 
 type TransportationComposition struct {
-	ContainerId      string `gorm:"primaryKey;size:11;not null;autoIncrement:false"`
-	TransportationId uint   `gorm:"primaryKey;not null;autoIncrement:false"`
-	Cargo            string `gorm:"size:50;not null"`
-	Weight           int    `gorm:"not null"`
+	ContainerId      uint `gorm:"primaryKey;not null;autoIncrement:false"`
+	TransportationId uint `gorm:"primaryKey;not null;autoIncrement:false"`
 
 	Container      *Container      `gorm:"foreignKey:ContainerId"`
 	Transportation *Transportation `gorm:"foreignKey:TransportationId"`
