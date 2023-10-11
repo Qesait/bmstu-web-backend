@@ -14,11 +14,6 @@ type ContainerType struct {
 	MaxGross int       `gorm:"not null"`
 }
 
-type Status struct {
-	UUID uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
-	Name string    `gorm:"size:50;not null"`
-}
-
 type User struct {
 	UUID      uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
 	Login     string    `gorm:"size:30;not null"`
@@ -41,23 +36,23 @@ type Container struct {
 }
 
 type Transportation struct {
-	UUID             uuid.UUID  `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
-	StatusId         uuid.UUID       `gorm:"type:uuid;not null"`
+	UUID uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+	// введён, в работе, завершён, отменён, удалён
+	Status           string     `gorm:"size:20;not null;default:'введён'"`
 	CreationDate     time.Time  `gorm:"not null;type:date"`
 	FormationDate    *time.Time `gorm:"type:date"`
 	CompletionDate   *time.Time `gorm:"type:date"`
-	ModeratorId      uint       `gorm:"type:uuid;not null"`
-	CustomerId       uint       `gorm:"not null"`
-	TransportVehicle string     `gorm:"size:50;not null"`
+	ModeratorId      uuid.UUID
+	CustomerId       uuid.UUID
+	TransportVehicle string `gorm:"size:50;not null"`
 
-	Status    Status
 	Moderator User `gorm:"foreignKey:ModeratorId"`
 	Customer  User `gorm:"foreignKey:CustomerId"`
 }
 
 type TransportationComposition struct {
-	ContainerId      uuid.UUID  `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
-	TransportationId uuid.UUID  `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+	TransportationId uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+	ContainerId      uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
 
 	Container      *Container      `gorm:"foreignKey:ContainerId"`
 	Transportation *Transportation `gorm:"foreignKey:TransportationId"`

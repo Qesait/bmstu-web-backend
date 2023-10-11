@@ -1,8 +1,12 @@
 package repository
 
 import (
+	"errors"
+	"log"
 	"strings"
+	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -25,22 +29,21 @@ func New(dsn string) (*Repository, error) {
 }
 
 func (r *Repository) GetContainerByID(id string) (*ds.Container, error) {
-	container := &ds.Container{}
-	err := r.db.Where("container_id = ?", id).
-		Preload("ContainerType").First(container).Error
+	container := &ds.Container{UUID: uuid.MustParse(id)}
+	err := r.db.Preload("ContainerType").
+		First(container).
+		Error
 	if err != nil {
 		return nil, err
 	}
-
 	return container, nil
 }
 
 func (r *Repository) GetContainersByType(containerType string) ([]ds.Container, error) {
 	var containers []ds.Container
 
-	err := r.db.Preload("ContainerType").
-		Joins("JOIN container_types ON containers.type_id = container_types.container_type_id").
-		Where("LOWER(container_types.name) LIKE ?", "%"+strings.ToLower(containerType)+"%").
+	err := r.db.Joins("ContainerType").
+		Where("LOWER(name) LIKE ?", "%"+strings.ToLower(containerType)+"%").
 		Where("is_deleted = ?", false).
 		Find(&containers).Error
 
@@ -52,10 +55,52 @@ func (r *Repository) GetContainersByType(containerType string) ([]ds.Container, 
 }
 
 func (r *Repository) DecommissionContainer(id string) error {
-	err := r.db.Exec("UPDATE containers SET is_deleted = ? WHERE container_id = ?", true, id).Error
+	err := r.db.Exec("UPDATE containers SET is_deleted = ? WHERE uuid = ?", true, id).Error
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (r *Repository) CreateTransportation() (*ds.Transportation, error) {
+	transportation := ds.Transportation{CreationDate: time.Now()}
+	err := r.db.Create(&transportation).Error
+	if err != nil {
+		return nil, err
+	}
+	return &transportation, nil
+}
+
+func (r *Repository) GetEditableTransportation() (*ds.Transportation, error) {
+	transportation := &ds.Transportation{}
+	err := r.db.First(transportation, ds.Transportation{Status: "введён"}).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Println("transportation not found")
+			return nil, nil
+		}
+		return nil, err
+	}
+	return transportation, nil
+}
+
+func (r *Repository) AddContainerToTransportation(transportationId uuid.UUID, containerId uuid.UUID) error {
+	tComposition := ds.TransportationComposition{TransportationId: transportationId, ContainerId: containerId}
+	err := r.db.Create(&tComposition).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *Repository) GetTransportatioinComposition(transportation *ds.Transportation) ([]ds.TransportationComposition, error) {
+	var containers []ds.TransportationComposition
+
+	err := r.db.Joins("Container").
+		Find(&containers, ds.TransportationComposition{TransportationId: transportation.UUID}).Error
+	if err != nil {
+		return nil, err
+	}
+	return containers, nil
 }

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,12 +23,7 @@ func (app *Application) GetContainer(c *gin.Context) {
 		log.Println("empty")
 	}
 
-	c.HTML(http.StatusOK, "item-info.tmpl", *container)
-}
-
-type GetContainersResponse struct {
-	Containers []ds.Container
-	Search     string
+	c.JSON(http.StatusOK, *container)
 }
 
 func (app *Application) GetContainers(c *gin.Context) {
@@ -40,10 +36,7 @@ func (app *Application) GetContainers(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "index.tmpl", GetContainersResponse{
-		Search:     containerType,
-		Containers: containers,
-	})
+	c.JSON(http.StatusOK, containers)
 }
 
 func (app *Application) DecommissionContainer(c *gin.Context) {
@@ -58,8 +51,44 @@ func (app *Application) DecommissionContainer(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "index.tmpl", GetContainersResponse{
-		Search:     "",
-		Containers: containers,
-	})
+	c.JSON(http.StatusOK, containers)
+}
+
+func (app *Application) AddToTranspostation(c *gin.Context) {
+	containerId := uuid.MustParse(c.PostForm("container_id"))
+	log.Println(containerId)
+	var err error
+	var transportation *ds.Transportation
+	
+	transportation, err = app.repo.GetEditableTransportation()
+	if err != nil {
+		log.Println("can't get transportation from db", err)
+		c.Error(err)
+		return
+	}
+	if transportation == nil {
+		transportation, err = app.repo.CreateTransportation()
+		if err != nil {
+			log.Println("can't create transportation in db", err)
+			c.Error(err)
+			return
+		}
+	}
+	log.Println(*transportation)
+	err = app.repo.AddContainerToTransportation(transportation.UUID, containerId)
+	if err != nil {
+		log.Println("can't add container to transportation in db", err)
+		c.Error(err)
+		return
+	}
+
+	var containers []ds.TransportationComposition
+	containers, err = app.repo.GetTransportatioinComposition(transportation)
+	if err != nil {
+		log.Println("can't get transportation composition from db", err)
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, containers)
 }

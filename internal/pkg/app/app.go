@@ -23,8 +23,9 @@ func (app *Application) Run() {
 	r.GET("/containers/:id", app.GetContainer)
 	r.GET("/containers", app.GetContainers)
 	r.POST("/containers", app.DecommissionContainer)
-
-	r.LoadHTMLGlob("templates/*")
+	r.POST("/transportation", app.AddToTranspostation)
+	// r.PUT("/transportation/:id/put", app.UpdateTransportation)
+	// r.DELETE("/transportation/:id/delete", app.DeleteTransportation)
 
 	r.Static("/image", "./static/image")
 	r.Static("/css", "./static/css")
