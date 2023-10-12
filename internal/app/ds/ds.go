@@ -1,8 +1,9 @@
 package ds
 
 import (
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type ContainerType struct {
@@ -36,14 +37,13 @@ type Container struct {
 }
 
 type Transportation struct {
-	UUID uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
-	// введён, в работе, завершён, отменён, удалён
-	Status           string     `gorm:"size:20;not null;default:'введён'"`
+	UUID             uuid.UUID  `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+	Status           string     `gorm:"size:20;not null;default:'введён'"` // введён, в работе, завершён, отменён, удалён
 	CreationDate     time.Time  `gorm:"not null;type:date"`
 	FormationDate    *time.Time `gorm:"type:date"`
 	CompletionDate   *time.Time `gorm:"type:date"`
-	ModeratorId      uuid.UUID
-	CustomerId       uuid.UUID
+	ModeratorId      *uuid.UUID
+	CustomerId       *uuid.UUID
 	TransportVehicle string `gorm:"size:50;not null"`
 
 	Moderator User `gorm:"foreignKey:ModeratorId"`

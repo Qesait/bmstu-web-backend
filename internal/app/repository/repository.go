@@ -2,7 +2,6 @@ package repository
 
 import (
 	"errors"
-	"log"
 	"strings"
 	"time"
 
@@ -63,24 +62,18 @@ func (r *Repository) DecommissionContainer(id string) error {
 	return nil
 }
 
-func (r *Repository) CreateTransportation() (*ds.Transportation, error) {
-	transportation := ds.Transportation{CreationDate: time.Now()}
-	err := r.db.Create(&transportation).Error
-	if err != nil {
-		return nil, err
-	}
-	return &transportation, nil
-}
-
 func (r *Repository) GetEditableTransportation() (*ds.Transportation, error) {
 	transportation := &ds.Transportation{}
 	err := r.db.First(transportation, ds.Transportation{Status: "введён"}).Error
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			log.Println("transportation not found")
-			return nil, nil
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
 		}
-		return nil, err
+		transportation = &ds.Transportation{CreationDate: time.Now()}
+		err := r.db.Create(transportation).Error
+		if err != nil {
+			return nil, err
+		}
 	}
 	return transportation, nil
 }
@@ -94,13 +87,30 @@ func (r *Repository) AddContainerToTransportation(transportationId uuid.UUID, co
 	return nil
 }
 
-func (r *Repository) GetTransportatioinComposition(transportation *ds.Transportation) ([]ds.TransportationComposition, error) {
+func (r *Repository) GetTransportatioinComposition(transportationId uuid.UUID) ([]ds.TransportationComposition, error) {
 	var containers []ds.TransportationComposition
 
-	err := r.db.Joins("Container").
-		Find(&containers, ds.TransportationComposition{TransportationId: transportation.UUID}).Error
+	err := r.db.Preload("Container.ContainerType").
+		Find(&containers, ds.TransportationComposition{TransportationId: transportationId}).Error
 	if err != nil {
 		return nil, err
 	}
 	return containers, nil
+}
+
+func (r *Repository) AddTransportVehicle(transportationId uuid.UUID, transport string) error {
+	transportation := &ds.Transportation{UUID: transportationId}
+	var err error
+
+	err = r.db.First(transportation).Error
+	if err != nil {
+		return err
+	}
+
+	transportation.TransportVehicle = transport
+	err = r.db.Save(transportation).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

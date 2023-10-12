@@ -24,7 +24,9 @@ func (app *Application) Run() {
 	r.GET("/containers", app.GetContainers)
 	r.POST("/containers", app.DecommissionContainer)
 	r.POST("/transportation", app.AddToTranspostation)
-	// r.PUT("/transportation/:id/put", app.UpdateTransportation)
+	// TODO: убрать
+	r.GET("/transportation/:id", app.TranspostationComposition)
+	r.PUT("/transportation/:id/put", app.UpdateTransportation)
 	// r.DELETE("/transportation/:id/delete", app.DeleteTransportation)
 
 	r.Static("/image", "./static/image")
