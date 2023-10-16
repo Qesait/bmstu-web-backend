@@ -125,21 +125,22 @@ func (app *Application) TranspostationComposition(c *gin.Context) {
 }
 
 func (app *Application) UpdateTransportation(c *gin.Context) {
-	id, err := uuid.Parse(c.Param("transportation_id"))
-	if err != nil {
-		log.Println("can't parse uuid", err)
+	var request UpdateTransportationRequest
+	if err := c.ShouldBindUri(&request); err != nil {
+		log.Println("can't parse request path params", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	var request UpdateTransportationRequest
-	if err := c.BindJSON(&request); err != nil {
+	if err := c.ShouldBindJSON(&request); err != nil {
 		log.Println("can't parse request body", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	app.repo.AddTransportVehicle(id, request.TransportationId)
+	log.Println(request)
+	transportationId := uuid.MustParse(request.TransportationId)
+	app.repo.AddTransportVehicle(transportationId, request.Vehicle)
 
-	containers, err := app.repo.GetTransportatioinComposition(id)
+	containers, err := app.repo.GetTransportatioinComposition(transportationId)
 	if err != nil {
 		log.Println("can't get transportation composition from db", err)
 		c.Status(http.StatusInternalServerError)

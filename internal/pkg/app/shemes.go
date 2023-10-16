@@ -12,5 +12,6 @@ type AddToTransportationRequest struct {
 }
 
 type UpdateTransportationRequest struct {
-	TransportationId string `json:"transportation_id"`
+	TransportationId string `uri:"transportation_id" binding:"uuid"`
+	Vehicle          string `json:"transport_vehicle"`
 }
