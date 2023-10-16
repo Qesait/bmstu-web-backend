@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -27,7 +26,7 @@ func New(dsn string) (*Repository, error) {
 	}, nil
 }
 
-func (r *Repository) GetContainerByID(id uuid.UUID) (*ds.Container, error) {
+func (r *Repository) GetContainerByID(id string) (*ds.Container, error) {
 	container := &ds.Container{UUID: id}
 	err := r.db.Preload("ContainerType").
 		First(container).
@@ -54,7 +53,7 @@ func (r *Repository) GetContainersByType(containerType string) ([]ds.Container, 
 	return containers, nil
 }
 
-func (r *Repository) DeleteContainer(id uuid.UUID) error {
+func (r *Repository) DeleteContainer(id string) error {
 	container := &ds.Container{UUID: id}
 	var err error
 
@@ -86,7 +85,7 @@ func (r *Repository) GetEditableTransportation() (*ds.Transportation, error) {
 	return transportation, nil
 }
 
-func (r *Repository) AddToTransportation(transportationId, containerId uuid.UUID) error {
+func (r *Repository) AddToTransportation(transportationId, containerId string) error {
 	tComposition := ds.TransportationComposition{TransportationId: transportationId, ContainerId: containerId}
 	err := r.db.Create(&tComposition).Error
 	if err != nil {
@@ -95,7 +94,7 @@ func (r *Repository) AddToTransportation(transportationId, containerId uuid.UUID
 	return nil
 }
 
-func (r *Repository) GetTransportatioinComposition(transportationId uuid.UUID) ([]ds.TransportationComposition, error) {
+func (r *Repository) GetTransportatioinComposition(transportationId string) ([]ds.TransportationComposition, error) {
 	var containers []ds.TransportationComposition
 
 	err := r.db.Preload("Container.ContainerType").
@@ -106,7 +105,7 @@ func (r *Repository) GetTransportatioinComposition(transportationId uuid.UUID) (
 	return containers, nil
 }
 
-func (r *Repository) AddTransportVehicle(transportationId uuid.UUID, transport string) error {
+func (r *Repository) AddTransportVehicle(transportationId string, transport string) error {
 	transportation := &ds.Transportation{UUID: transportationId}
 	var err error
 
@@ -123,7 +122,7 @@ func (r *Repository) AddTransportVehicle(transportationId uuid.UUID, transport s
 	return nil
 }
 
-func (r *Repository) DeleteTransportation(transportationId uuid.UUID) error {
+func (r *Repository) DeleteTransportation(transportationId string) error {
 	transportation := &ds.Transportation{UUID: transportationId}
 	var err error
 
@@ -140,7 +139,7 @@ func (r *Repository) DeleteTransportation(transportationId uuid.UUID) error {
 	return nil
 }
 
-func (r *Repository) DeleteFromTransportation(transportationId, ContainerId uuid.UUID) error {
+func (r *Repository) DeleteFromTransportation(transportationId, ContainerId string) error {
 	tComposition := &ds.TransportationComposition{TransportationId: transportationId, ContainerId: ContainerId}
 	var err error
 
