@@ -70,15 +70,22 @@ func (app *Application) DeleteContainer(c *gin.Context) {
 }
 
 func (app *Application) AddToTranspostation(c *gin.Context) {
-	var err error
-	var transportation *ds.Transportation
-	containerId, err := uuid.Parse(c.PostForm("container_id"))
+	var request AddToTransportationRequest
+	// body, err := io.ReadAll(c.Request.Body)
+	// log.Println(string(body))
+	if err := c.BindJSON(&request); err != nil {
+		log.Println("can't parse requst body", err)
+		c.Error(err)
+		return
+	}
+	containerId, err := uuid.Parse(request.ContainerId)
 	if err != nil {
 		log.Println("can't parse uuid", err)
 		c.Error(err)
 		return
 	}
 
+	var transportation *ds.Transportation
 	transportation, err = app.repo.GetEditableTransportation()
 	if err != nil {
 		log.Println("can't get transportation from db", err)
@@ -129,9 +136,13 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 		c.Error(err)
 		return
 	}
-	transportVehicle := c.PostForm("transport_vehicle")
-
-	app.repo.AddTransportVehicle(id, transportVehicle)
+	var request UpdateTransportationRequest
+	if err := c.BindJSON(&request); err != nil {
+		log.Println("can't parse requst body", err)
+		c.Error(err)
+		return
+	}
+	app.repo.AddTransportVehicle(id, request.TransportationId)
 
 	var containers []ds.TransportationComposition
 	containers, err = app.repo.GetTransportatioinComposition(id)
@@ -151,7 +162,7 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 		c.Error(err)
 		return
 	}
-	
+
 	err = app.repo.DeleteTransportation(id)
 	if err != nil {
 		log.Println("can't delete transportation from db", err)
@@ -162,7 +173,7 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func (app *Application) DeleteContainerFromTransportation (c *gin.Context) {
+func (app *Application) DeleteContainerFromTransportation(c *gin.Context) {
 	transportationId, err := uuid.Parse(c.Param("transportation_id"))
 	if err != nil {
 		log.Println("can't parse transportation uuid", err)
@@ -175,7 +186,7 @@ func (app *Application) DeleteContainerFromTransportation (c *gin.Context) {
 		c.Error(err)
 		return
 	}
-	
+
 	err = app.repo.DeleteContainerFromTransportation(transportationId, containerId)
 	if err != nil {
 		log.Println("can't delete container from transportation in db", err)
