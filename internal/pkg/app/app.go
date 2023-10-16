@@ -20,14 +20,18 @@ func (app *Application) Run() {
 
 	r := gin.Default()
 
-	r.GET("/containers/:id", app.GetContainer)
+	// Containers API
 	r.GET("/containers", app.GetContainers)
-	r.POST("/containers", app.DecommissionContainer)
+	r.GET("/containers/:id", app.GetContainer)
+	r.DELETE("/containers/:id/delete", app.DeleteContainer)
+	// Transportation API
 	r.POST("/transportation", app.AddToTranspostation)
+	r.DELETE("/transportation/:transportation_id/:container_id/delete", app.DeleteContainerFromTransportation)
+	r.PUT("/transportation/:transportation_id/put", app.UpdateTransportation)
+	r.DELETE("/transportation/:transportation_id/delete", app.DeleteTransportation)
+	
 	// TODO: убрать
-	r.GET("/transportation/:id", app.TranspostationComposition)
-	r.PUT("/transportation/:id/put", app.UpdateTransportation)
-	// r.DELETE("/transportation/:id/delete", app.DeleteTransportation)
+	r.GET("/transportation/:transportation_id", app.TranspostationComposition)
 
 	r.Static("/image", "./static/image")
 	r.Static("/css", "./static/css")

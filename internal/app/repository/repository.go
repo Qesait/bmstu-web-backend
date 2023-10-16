@@ -27,12 +27,15 @@ func New(dsn string) (*Repository, error) {
 	}, nil
 }
 
-func (r *Repository) GetContainerByID(id string) (*ds.Container, error) {
-	container := &ds.Container{UUID: uuid.MustParse(id)}
+func (r *Repository) GetContainerByID(id uuid.UUID) (*ds.Container, error) {
+	container := &ds.Container{UUID: id}
 	err := r.db.Preload("ContainerType").
 		First(container).
 		Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return container, nil
@@ -45,20 +48,25 @@ func (r *Repository) GetContainersByType(containerType string) ([]ds.Container, 
 		Where("LOWER(name) LIKE ?", "%"+strings.ToLower(containerType)+"%").
 		Where("is_deleted = ?", false).
 		Find(&containers).Error
-
 	if err != nil {
 		return nil, err
 	}
-
 	return containers, nil
 }
 
-func (r *Repository) DecommissionContainer(id string) error {
-	err := r.db.Exec("UPDATE containers SET is_deleted = ? WHERE uuid = ?", true, id).Error
+func (r *Repository) DeleteContainer(id uuid.UUID) error {
+	container := &ds.Container{UUID: id}
+	var err error
+
+	err = r.db.First(container).Error
 	if err != nil {
 		return err
 	}
-
+	container.IsDeleted = true
+	err = r.db.Save(container).Error
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -109,6 +117,39 @@ func (r *Repository) AddTransportVehicle(transportationId uuid.UUID, transport s
 
 	transportation.TransportVehicle = transport
 	err = r.db.Save(transportation).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *Repository) DeleteTransportation(transportationId uuid.UUID) error {
+	transportation := &ds.Transportation{UUID: transportationId}
+	var err error
+
+	err = r.db.First(transportation).Error
+	if err != nil {
+		return err
+	}
+
+	transportation.Status = "удалён"
+	err = r.db.Save(transportation).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *Repository) DeleteContainerFromTransportation(transportationId, ContainerId uuid.UUID) error {
+	tComposition := &ds.TransportationComposition{TransportationId: transportationId, ContainerId: ContainerId}
+	var err error
+
+	err = r.db.First(tComposition).Error
+	if err != nil {
+		return err
+	}
+
+	err = r.db.Delete(tComposition).Error
 	if err != nil {
 		return err
 	}
