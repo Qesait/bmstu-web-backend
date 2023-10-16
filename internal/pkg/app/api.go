@@ -74,28 +74,23 @@ func (app *Application) AddToTranspostation(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	containerId, err := uuid.Parse(request.ContainerId)
-	if err != nil {
-		log.Println("can't container parse uuid", err)
-		c.Status(http.StatusBadRequest)
-		return
-	}
-	customerId, err := uuid.Parse(request.CustomerId)
-	if err != nil {
-		log.Println("can't customer parse uuid", err)
-		c.Status(http.StatusBadRequest)
-		return
-	}
+	// containerId, err := uuid.Parse(request.ContainerId)
+	// if err != nil {
+	// 	log.Println("can't container parse uuid", err)
+	// 	c.Status(http.StatusBadRequest)
+	// 	return
+	// }
+	var err error
 
 	var transportation *ds.Transportation
-	transportation, err = app.repo.GetEditableTransportation(customerId)
+	transportation, err = app.repo.GetEditableTransportation()
 	if err != nil {
 		log.Println("can't get transportation from db", err)
 		c.Status(http.StatusInternalServerError)
 		return
 	}
 
-	if err = app.repo.AddToTransportation(transportation.UUID, containerId); err != nil {
+	if err = app.repo.AddToTransportation(transportation.UUID, request.ContainerId); err != nil {
 		log.Println("can't add container to transportation in db", err)
 		c.Status(http.StatusInternalServerError)
 		return
@@ -138,7 +133,7 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 	}
 	var request UpdateTransportationRequest
 	if err := c.BindJSON(&request); err != nil {
-		log.Println("can't parse requst body", err)
+		log.Println("can't parse request body", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}

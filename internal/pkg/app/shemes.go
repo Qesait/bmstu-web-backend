@@ -1,15 +1,14 @@
 package app
 
-// import (
-// 	""
-// )
+import (
+	"github.com/google/uuid"
+)
 
 type Response struct {
 }
 
 type AddToTransportationRequest struct {
-	ContainerId string `json:"container_id"`
-	CustomerId string `json:"customer_id"`
+	ContainerId uuid.UUID `json:"container_id"`
 }
 
 type UpdateTransportationRequest struct {

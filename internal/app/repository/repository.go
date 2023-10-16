@@ -70,14 +70,14 @@ func (r *Repository) DeleteContainer(id uuid.UUID) error {
 	return nil
 }
 
-func (r *Repository) GetEditableTransportation(customerId uuid.UUID) (*ds.Transportation, error) {
+func (r *Repository) GetEditableTransportation() (*ds.Transportation, error) {
 	transportation := &ds.Transportation{}
-	err := r.db.First(transportation, ds.Transportation{Status: "введён", CustomerId: customerId}).Error
+	err := r.db.First(transportation, ds.Transportation{Status: "введён"}).Error
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, err
 		}
-		transportation = &ds.Transportation{CreationDate: time.Now(), CustomerId: customerId}
+		transportation = &ds.Transportation{CreationDate: time.Now()}
 		err := r.db.Create(transportation).Error
 		if err != nil {
 			return nil, err
