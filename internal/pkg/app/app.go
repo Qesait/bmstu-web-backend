@@ -21,9 +21,9 @@ func (app *Application) Run() {
 	r := gin.Default()
 
 	// Containers API
-	r.GET("/containers", app.GetContainers)
-	r.GET("/containers/:id", app.GetContainer)
-	r.DELETE("/containers/:id/delete", app.DeleteContainer)
+	r.GET("/containers", app.GetAllContainers)
+	r.GET("/containers/:container_id", app.GetContainer)
+	r.DELETE("/containers/:container_id/delete", app.DeleteContainer)
 	// Transportation API
 	r.POST("/transportation", app.AddToTranspostation)
 	r.DELETE("/transportation/:transportation_id/:container_id/delete", app.DeleteFromTransportation)
