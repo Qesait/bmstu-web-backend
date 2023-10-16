@@ -19,12 +19,12 @@ func (app *Application) GetContainer(c *gin.Context) {
 
 	container, err := app.repo.GetContainerByID(id)
 	if err != nil {
-		log.Printf("can't get product by id %v", err)
+		log.Println("can't get product by id", err)
 		c.Status(http.StatusInternalServerError)
 		return
 	}
 	if container == nil {
-		log.Printf("no container with id %v", err)
+		log.Println("no container with id", err)
 		c.Status(http.StatusNotFound)
 		return
 	}
@@ -37,10 +37,9 @@ func (app *Application) GetContainers(c *gin.Context) {
 	containers, err := app.repo.GetContainersByType(containerType)
 	if err != nil {
 		log.Println("can't get containers from db", err)
-		c.Error(err)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
-
 	c.JSON(http.StatusOK, containers)
 }
 
@@ -52,17 +51,16 @@ func (app *Application) DeleteContainer(c *gin.Context) {
 		return
 	}
 
-	err = app.repo.DeleteContainer(id)
-	if err != nil {
+	if err = app.repo.DeleteContainer(id); err != nil {
 		log.Println("can't delete container from db", err)
-		c.Error(err)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	containers, err := app.repo.GetContainersByType("")
 	if err != nil {
 		log.Println("can't get containers from db", err)
-		c.Error(err)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -71,32 +69,35 @@ func (app *Application) DeleteContainer(c *gin.Context) {
 
 func (app *Application) AddToTranspostation(c *gin.Context) {
 	var request AddToTransportationRequest
-	// body, err := io.ReadAll(c.Request.Body)
-	// log.Println(string(body))
 	if err := c.BindJSON(&request); err != nil {
 		log.Println("can't parse requst body", err)
-		c.Error(err)
+		c.Status(http.StatusBadRequest)
 		return
 	}
 	containerId, err := uuid.Parse(request.ContainerId)
 	if err != nil {
-		log.Println("can't parse uuid", err)
-		c.Error(err)
+		log.Println("can't container parse uuid", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	customerId, err := uuid.Parse(request.CustomerId)
+	if err != nil {
+		log.Println("can't customer parse uuid", err)
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	var transportation *ds.Transportation
-	transportation, err = app.repo.GetEditableTransportation()
+	transportation, err = app.repo.GetEditableTransportation(customerId)
 	if err != nil {
 		log.Println("can't get transportation from db", err)
-		c.Error(err)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
-	err = app.repo.AddContainerToTransportation(transportation.UUID, containerId)
-	if err != nil {
+	if err = app.repo.AddToTransportation(transportation.UUID, containerId); err != nil {
 		log.Println("can't add container to transportation in db", err)
-		c.Error(err)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -104,7 +105,7 @@ func (app *Application) AddToTranspostation(c *gin.Context) {
 	containers, err = app.repo.GetTransportatioinComposition(transportation.UUID)
 	if err != nil {
 		log.Println("can't get transportation composition from db", err)
-		c.Error(err)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -115,17 +116,16 @@ func (app *Application) TranspostationComposition(c *gin.Context) {
 	transportationId, err := uuid.Parse(c.Param("transportation_id"))
 	if err != nil {
 		log.Println("can't parse uuid", err)
-		c.Error(err)
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	containers, err := app.repo.GetTransportatioinComposition(transportationId)
 	if err != nil {
 		log.Printf("can't get product by id %v", err)
-		c.Error(err)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
-
 	c.JSON(http.StatusOK, containers)
 }
 
@@ -133,22 +133,21 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("transportation_id"))
 	if err != nil {
 		log.Println("can't parse uuid", err)
-		c.Error(err)
+		c.Status(http.StatusBadRequest)
 		return
 	}
 	var request UpdateTransportationRequest
 	if err := c.BindJSON(&request); err != nil {
 		log.Println("can't parse requst body", err)
-		c.Error(err)
+		c.Status(http.StatusBadRequest)
 		return
 	}
 	app.repo.AddTransportVehicle(id, request.TransportationId)
 
-	var containers []ds.TransportationComposition
-	containers, err = app.repo.GetTransportatioinComposition(id)
+	containers, err := app.repo.GetTransportatioinComposition(id)
 	if err != nil {
 		log.Println("can't get transportation composition from db", err)
-		c.Error(err)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -159,38 +158,37 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("transportation_id"))
 	if err != nil {
 		log.Println("can't parse uuid", err)
-		c.Error(err)
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	err = app.repo.DeleteTransportation(id)
 	if err != nil {
 		log.Println("can't delete transportation from db", err)
-		c.Error(err)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	c.Status(http.StatusOK)
 }
 
-func (app *Application) DeleteContainerFromTransportation(c *gin.Context) {
+func (app *Application) DeleteFromTransportation(c *gin.Context) {
 	transportationId, err := uuid.Parse(c.Param("transportation_id"))
 	if err != nil {
 		log.Println("can't parse transportation uuid", err)
-		c.Error(err)
+		c.Status(http.StatusBadRequest)
 		return
 	}
 	containerId, err := uuid.Parse(c.Param("container_id"))
 	if err != nil {
 		log.Println("can't parse container uuid", err)
-		c.Error(err)
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
-	err = app.repo.DeleteContainerFromTransportation(transportationId, containerId)
-	if err != nil {
+	if err = app.repo.DeleteFromTransportation(transportationId, containerId); err != nil {
 		log.Println("can't delete container from transportation in db", err)
-		c.Error(err)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 

@@ -43,8 +43,8 @@ type Transportation struct {
 	FormationDate    *time.Time `gorm:"type:date"`
 	CompletionDate   *time.Time `gorm:"type:date"`
 	ModeratorId      *uuid.UUID
-	CustomerId       *uuid.UUID
-	TransportVehicle string `gorm:"size:50;not null"`
+	CustomerId       uuid.UUID `gorm:"not null"`
+	TransportVehicle string    `gorm:"size:50;not null"`
 
 	Moderator User `gorm:"foreignKey:ModeratorId"`
 	Customer  User `gorm:"foreignKey:CustomerId"`

@@ -26,7 +26,7 @@ func (app *Application) Run() {
 	r.DELETE("/containers/:id/delete", app.DeleteContainer)
 	// Transportation API
 	r.POST("/transportation", app.AddToTranspostation)
-	r.DELETE("/transportation/:transportation_id/:container_id/delete", app.DeleteContainerFromTransportation)
+	r.DELETE("/transportation/:transportation_id/:container_id/delete", app.DeleteFromTransportation)
 	r.PUT("/transportation/:transportation_id/put", app.UpdateTransportation)
 	r.DELETE("/transportation/:transportation_id/delete", app.DeleteTransportation)
 	

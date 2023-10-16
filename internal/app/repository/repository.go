@@ -70,14 +70,14 @@ func (r *Repository) DeleteContainer(id uuid.UUID) error {
 	return nil
 }
 
-func (r *Repository) GetEditableTransportation() (*ds.Transportation, error) {
+func (r *Repository) GetEditableTransportation(customerId uuid.UUID) (*ds.Transportation, error) {
 	transportation := &ds.Transportation{}
-	err := r.db.First(transportation, ds.Transportation{Status: "введён"}).Error
+	err := r.db.First(transportation, ds.Transportation{Status: "введён", CustomerId: customerId}).Error
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, err
 		}
-		transportation = &ds.Transportation{CreationDate: time.Now()}
+		transportation = &ds.Transportation{CreationDate: time.Now(), CustomerId: customerId}
 		err := r.db.Create(transportation).Error
 		if err != nil {
 			return nil, err
@@ -86,7 +86,7 @@ func (r *Repository) GetEditableTransportation() (*ds.Transportation, error) {
 	return transportation, nil
 }
 
-func (r *Repository) AddContainerToTransportation(transportationId uuid.UUID, containerId uuid.UUID) error {
+func (r *Repository) AddToTransportation(transportationId, containerId uuid.UUID) error {
 	tComposition := ds.TransportationComposition{TransportationId: transportationId, ContainerId: containerId}
 	err := r.db.Create(&tComposition).Error
 	if err != nil {
@@ -140,7 +140,7 @@ func (r *Repository) DeleteTransportation(transportationId uuid.UUID) error {
 	return nil
 }
 
-func (r *Repository) DeleteContainerFromTransportation(transportationId, ContainerId uuid.UUID) error {
+func (r *Repository) DeleteFromTransportation(transportationId, ContainerId uuid.UUID) error {
 	tComposition := &ds.TransportationComposition{TransportationId: transportationId, ContainerId: ContainerId}
 	var err error
 
