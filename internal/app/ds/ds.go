@@ -22,16 +22,16 @@ type User struct {
 }
 
 type Container struct {
-	UUID         string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"uuid"`
-	TypeId       string    `gorm:"type:uuid;not null" json:"-"`
-	ImageURL     string    `gorm:"size:100;not null" json:"image_url"`
-	IsDeleted    bool      `gorm:"not null" json:"is_deleted"`
-	PurchaseDate time.Time `gorm:"not null;type:date" json:"purchase_date"`
-	Cargo        string    `gorm:"size:50;not null" json:"cargo"`
-	Weight       int       `gorm:"not null" json:"weight"`
-	Marking      string    `gorm:"size:11;not null" json:"marking"`
+	UUID         string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"uuid" binding:"-"`
+	TypeId       string    `gorm:"type:uuid;not null" json:"type_id" binding:"required,uuid"`
+	ImageURL     string    `gorm:"size:100;not null" json:"image_url" binding:"required"`
+	IsDeleted    bool      `gorm:"not null;default:false" json:"is_deleted" binding:"-"`
+	PurchaseDate time.Time `gorm:"not null;type:date" json:"purchase_date" binding:"required"`
+	Cargo        string    `gorm:"size:50;not null" json:"cargo" binding:"required"`
+	Weight       int       `gorm:"not null" json:"weight" binding:"required"`
+	Marking      string    `gorm:"size:11;not null" json:"marking" binding:"required"`
 
-	ContainerType ContainerType `gorm:"preload:false;foreignKey:TypeId" json:"container_type"`
+	ContainerType ContainerType `gorm:"preload:false;foreignKey:TypeId" json:"container_type" binding:"-"`
 }
 
 type Transportation struct {

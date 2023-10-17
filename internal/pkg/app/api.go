@@ -2,12 +2,26 @@ package app
 
 import (
 	"bmstu-web-backend/internal/app/ds"
-	"bmstu-web-backend/internal/schemes"
+	"bmstu-web-backend/internal/app/schemes"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
+
+func (app *Application) getUser() string {
+	return "5f58c307-a3f2-4b13-b888-c80ad08d5ed3"
+}
+
+func (app *Application) GetAllContainerTypes(c *gin.Context) {
+	types, err := app.repo.GetAllContainerTypes()
+	if err != nil {
+		log.Println("can't get container types from db", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, schemes.AllContainerTypesResponse{ContainerTypes: types})
+}
 
 func (app *Application) GetContainer(c *gin.Context) {
 	var request schemes.ContainerRequest
@@ -72,6 +86,22 @@ func (app *Application) DeleteContainer(c *gin.Context) {
 	c.JSON(http.StatusOK, schemes.AllContainersResponse{Containers: containers})
 }
 
+func (app *Application) AddContainer(c *gin.Context) {
+	container := &ds.Container{}
+	if err := c.BindJSON(container); err != nil {
+		log.Println("can't parse requst body", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	if err := app.repo.AddContainer(container); err != nil {
+		log.Println("can't save container", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.Status(http.StatusOK)
+}
+
+
 func (app *Application) AddToTranspostation(c *gin.Context) {
 	var request schemes.AddToTransportationRequest
 	if err := c.BindJSON(&request); err != nil {
@@ -82,7 +112,7 @@ func (app *Application) AddToTranspostation(c *gin.Context) {
 	var err error
 
 	var transportation *ds.Transportation
-	transportation, err = app.repo.GetEditableTransportation()
+	transportation, err = app.repo.GetEditableTransportation(app.getUser())
 	if err != nil {
 		log.Println("can't get transportation from db", err)
 		c.Status(http.StatusInternalServerError)
@@ -106,6 +136,25 @@ func (app *Application) AddToTranspostation(c *gin.Context) {
 	c.JSON(http.StatusOK, schemes.TransportationResponse{Transportation: *transportation, Containers: containers})
 }
 
+func (app *Application) GetAllTransportations(c *gin.Context) {
+	var request schemes.GetAllTransportationsRequst
+	if err := c.ShouldBindQuery(&request); err != nil {
+		log.Println("can't parse request query params", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	log.Println(request)
+
+	transportations, err := app.repo.GetAllTransportations(request.FormationDate, request.Status)
+	if err != nil {
+		log.Println("can't get containers from db", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	log.Println(transportations)
+	c.JSON(http.StatusOK, schemes.AllTransportationsResponse{Transportations: transportations})
+}
+
 func (app *Application) TranspostationComposition(c *gin.Context) {
 	var request schemes.TranspostationRequest
 	if err := c.ShouldBindUri(&request); err != nil {
@@ -114,7 +163,7 @@ func (app *Application) TranspostationComposition(c *gin.Context) {
 		return
 	}
 
-	transportation, err := app.repo.GetTransportationById(request.Transpostationid)
+	transportation, err := app.repo.GetTransportationById(request.Transpostationid, app.getUser())
 	if err != nil {
 		log.Printf("can't get transportation by id %v", err)
 		c.Status(http.StatusInternalServerError)
@@ -142,7 +191,7 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	transportation, err := app.repo.GetTransportationById(request.TransportationId)
+	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getUser())
 	if err != nil {
 		log.Printf("can't get transportation by id %v", err)
 		c.Status(http.StatusInternalServerError)
@@ -173,7 +222,7 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 		return
 	}
 
-	err := app.repo.DeleteTransportation(request.Transpostationid)
+	err := app.repo.DeleteTransportation(request.Transpostationid, app.getUser())
 	if err != nil {
 		log.Println("can't delete transportation from db", err)
 		c.Status(http.StatusInternalServerError)

@@ -20,18 +20,24 @@ func (app *Application) Run() {
 
 	r := gin.Default()
 
-	// Containers API
-	r.GET("/containers", app.GetAllContainers)
-	r.GET("/containers/:container_id", app.GetContainer)
-	r.DELETE("/containers/:container_id/delete", app.DeleteContainer)
-	// Transportation API
-	r.POST("/transportation", app.AddToTranspostation)
-	r.DELETE("/transportation/:transportation_id/:container_id/delete", app.DeleteFromTransportation)
-	r.PUT("/transportation/:transportation_id/put", app.UpdateTransportation)
-	r.DELETE("/transportation/:transportation_id/delete", app.DeleteTransportation)
-	
-	// TODO: убрать
-	r.GET("/transportation/:transportation_id", app.TranspostationComposition)
+	// Типы контейнеров
+	r.GET("/container_types", app.GetAllContainerTypes)// Список типов
+	// Услуги (контейнеры)
+	r.GET("/containers", app.GetAllContainers) // Список с поиском
+	r.GET("/containers/:container_id", app.GetContainer) // Одна услуга
+	r.DELETE("/containers/:container_id/delete", app.DeleteContainer) // Удаление
+	// Изменение
+	r.POST("/containers", app.AddContainer) // Добавление
+	r.POST("/transportations", app.AddToTranspostation) // Добавление в заявку
+
+	// Заявки (перевозки)
+	r.GET("/transportations", app.GetAllTransportations)// Список (отфильтровать по дате формирования и статусу)
+	r.GET("/transportations/:transportation_id", app.TranspostationComposition) // Одна заявка
+	r.DELETE("/transportations/:transportation_id/:container_id/delete", app.DeleteFromTransportation) // Изменеие (удаление услуг)
+	r.PUT("/transportations/:transportation_id/put", app.UpdateTransportation) // Изменение (добавление транспорта)
+	r.DELETE("/transportations/:transportation_id/delete", app.DeleteTransportation) //Удаление
+	// Сформировать создателем
+	// Завершить отклонить модератором
 
 	r.Static("/image", "./static/image")
 	r.Static("/css", "./static/css")

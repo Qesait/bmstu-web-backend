@@ -4,12 +4,20 @@ import (
 	"bmstu-web-backend/internal/app/ds"
 )
 
+type AllContainerTypesResponse struct {
+	ContainerTypes []ds.ContainerType `json:"container_types"`
+}
+
 type GetContainerResponse struct {
 	Container ds.Container `json:"container"`
 }
 
 type AllContainersResponse struct {
 	Containers []ds.Container `json:"containers"`
+}
+
+type AllTransportationsResponse struct {
+	Transportations []ds.Transportation `json:"transportations"`
 }
 
 type TransportationResponse struct {
