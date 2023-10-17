@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"log"
 	"strings"
 	"time"
 
@@ -85,6 +86,15 @@ func (r *Repository) GetEditableTransportation() (*ds.Transportation, error) {
 	return transportation, nil
 }
 
+func (r *Repository) GetTransportationById(transportationId string) (*ds.Transportation, error) {
+	transportation := &ds.Transportation{}
+	err := r.db.First(transportation, ds.Transportation{UUID: transportationId}).Error
+	if err != nil {
+		return nil, err
+	}
+	return transportation, nil
+}
+
 func (r *Repository) AddToTransportation(transportationId, containerId string) error {
 	tComposition := ds.TransportationComposition{TransportationId: transportationId, ContainerId: containerId}
 	err := r.db.Create(&tComposition).Error
@@ -94,18 +104,58 @@ func (r *Repository) AddToTransportation(transportationId, containerId string) e
 	return nil
 }
 
-func (r *Repository) GetTransportatioinComposition(transportationId string) ([]ds.TransportationComposition, error) {
-	var containers []ds.TransportationComposition
+func (r *Repository) GetTransportatioinComposition(transportationId string) ([]ds.Container, error) {
+	// var containers []ds.Container
 
-	err := r.db.Preload("Container.ContainerType").
-		Find(&containers, ds.TransportationComposition{TransportationId: transportationId}).Error
+	// err := r.db.Preload("Container.ContainerType").
+	// 	Where(ds.TransportationComposition{TransportationId: transportationId}).
+	// 	Scan(&containers).Error
+
+	// var containers []ds.Container
+
+	// err := r.db.Preload("Container.ContainerType").
+	// 	Select("containers.*").
+	// 	Where(ds.TransportationComposition{TransportationId: transportationId}).
+	// 	Scan(&containers).Error
+
+	// var containers []ds.Container
+	// err := r.db.Preload("Container").
+	// 	Model(&ds.TransportationComposition{}).
+	// 	Joins("Container").
+	// 	Where("transportation_compositions.transportation_id = ?", transportationId).
+	// 	Select("containers.*").
+	// 	Scan(&containers).Error
+
+	// var containers []ds.Container
+	// err := r.db.Table("transportation_compositions").
+	// 	Select("containers.*").
+	// 	Joins("JOIN containers ON transportation_compositions.container_id = containers.uuid").
+	// 	Preload("Container.ContainerType").
+	// 	Where(ds.TransportationComposition{TransportationId: transportationId}).
+	// 	Scan(&containers).Error
+
+	var containerIDs []string
+	err := r.db.Table("transportation_compositions").
+		Where("transportation_id = ?", transportationId).
+		Pluck("container_id", &containerIDs).Error
+	if err != nil {
+		return nil, err
+	}
+	log.Println(containerIDs)
+	var containers []ds.Container
+	err = r.db.Preload("ContainerType").
+		Find(&containers, containerIDs).Error
+	if err != nil {
+		return nil, err
+	}
+
 	if err != nil {
 		return nil, err
 	}
 	return containers, nil
 }
 
-func (r *Repository) AddTransportVehicle(transportationId string, transport string) error {
+func (r *Repository) AddTransport(transportationId string, transport string) error {
 	transportation := &ds.Transportation{UUID: transportationId}
 	var err error
 
@@ -114,8 +164,16 @@ func (r *Repository) AddTransportVehicle(transportationId string, transport stri
 		return err
 	}
 
-	transportation.TransportVehicle = transport
+	transportation.Transport = transport
 	err = r.db.Save(transportation).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *Repository) SaveTransportation(transportation *ds.Transportation) error {
+	err := r.db.Save(transportation).Error
 	if err != nil {
 		return err
 	}

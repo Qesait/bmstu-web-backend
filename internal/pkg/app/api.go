@@ -2,6 +2,7 @@ package app
 
 import (
 	"bmstu-web-backend/internal/app/ds"
+	"bmstu-web-backend/internal/schemes"
 	"log"
 	"net/http"
 
@@ -9,7 +10,7 @@ import (
 )
 
 func (app *Application) GetContainer(c *gin.Context) {
-	var request ContainerRequest
+	var request schemes.ContainerRequest
 	if err := c.ShouldBindUri(&request); err != nil {
 		log.Println("can't parse request path params", err)
 		c.Status(http.StatusBadRequest)
@@ -27,11 +28,11 @@ func (app *Application) GetContainer(c *gin.Context) {
 		c.Status(http.StatusNotFound)
 		return
 	}
-	c.JSON(http.StatusOK, *container)
+	c.JSON(http.StatusOK, schemes.GetContainerResponse{Container: *container})
 }
 
 func (app *Application) GetAllContainers(c *gin.Context) {
-	var request GetAllContainersRequest
+	var request schemes.GetAllContainersRequest
 	if err := c.ShouldBindQuery(&request); err != nil {
 		log.Println("can't parse request query params", err)
 		c.Status(http.StatusBadRequest)
@@ -44,11 +45,11 @@ func (app *Application) GetAllContainers(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, containers)
+	c.JSON(http.StatusOK, schemes.AllContainersResponse{Containers: containers})
 }
 
 func (app *Application) DeleteContainer(c *gin.Context) {
-	var request ContainerRequest
+	var request schemes.ContainerRequest
 	if err := c.ShouldBindUri(&request); err != nil {
 		log.Println("can't parse request path params", err)
 		c.Status(http.StatusBadRequest)
@@ -68,11 +69,11 @@ func (app *Application) DeleteContainer(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, containers)
+	c.JSON(http.StatusOK, schemes.AllContainersResponse{Containers: containers})
 }
 
 func (app *Application) AddToTranspostation(c *gin.Context) {
-	var request AddToTransportationRequest
+	var request schemes.AddToTransportationRequest
 	if err := c.BindJSON(&request); err != nil {
 		log.Println("can't parse requst body", err)
 		c.Status(http.StatusBadRequest)
@@ -94,7 +95,7 @@ func (app *Application) AddToTranspostation(c *gin.Context) {
 		return
 	}
 
-	var containers []ds.TransportationComposition
+	var containers []ds.Container
 	containers, err = app.repo.GetTransportatioinComposition(transportation.UUID)
 	if err != nil {
 		log.Println("can't get transportation composition from db", err)
@@ -102,28 +103,35 @@ func (app *Application) AddToTranspostation(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, containers)
+	c.JSON(http.StatusOK, schemes.TransportationResponse{Transportation: *transportation, Containers: containers})
 }
 
 func (app *Application) TranspostationComposition(c *gin.Context) {
-	var request TranspostationRequest
+	var request schemes.TranspostationRequest
 	if err := c.ShouldBindUri(&request); err != nil {
 		log.Println("can't parse request path params", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
-	containers, err := app.repo.GetTransportatioinComposition(request.Transpostationid)
+	transportation, err := app.repo.GetTransportationById(request.Transpostationid)
 	if err != nil {
-		log.Printf("can't get product by id %v", err)
+		log.Printf("can't get transportation by id %v", err)
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, containers)
+
+	containers, err := app.repo.GetTransportatioinComposition(request.Transpostationid)
+	if err != nil {
+		log.Printf("can't get transportation composition by id %v", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, schemes.TransportationResponse{Transportation: *transportation, Containers: containers})
 }
 
 func (app *Application) UpdateTransportation(c *gin.Context) {
-	var request UpdateTransportationRequest
+	var request schemes.UpdateTransportationRequest
 	if err := c.ShouldBindUri(&request); err != nil {
 		log.Println("can't parse request path params", err)
 		c.Status(http.StatusBadRequest)
@@ -134,7 +142,18 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	app.repo.AddTransportVehicle(request.TransportationId, request.Vehicle)
+	transportation, err := app.repo.GetTransportationById(request.TransportationId)
+	if err != nil {
+		log.Printf("can't get transportation by id %v", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	transportation.Transport = request.Transport
+	if app.repo.SaveTransportation(transportation); err != nil {
+		log.Printf("can't save transportation %v", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
 
 	containers, err := app.repo.GetTransportatioinComposition(request.TransportationId)
 	if err != nil {
@@ -143,11 +162,11 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, containers)
+	c.JSON(http.StatusOK, schemes.TransportationResponse{Transportation: *transportation, Containers: containers})
 }
 
 func (app *Application) DeleteTransportation(c *gin.Context) {
-	var request TranspostationRequest
+	var request schemes.TranspostationRequest
 	if err := c.ShouldBindUri(&request); err != nil {
 		log.Println("can't parse request path params", err)
 		c.Status(http.StatusBadRequest)
@@ -165,7 +184,7 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 }
 
 func (app *Application) DeleteFromTransportation(c *gin.Context) {
-	var request DeleteFromTransportationRequest
+	var request schemes.DeleteFromTransportationRequest
 	if err := c.ShouldBindUri(&request); err != nil {
 		log.Println("can't parse request path params", err)
 		c.Status(http.StatusBadRequest)

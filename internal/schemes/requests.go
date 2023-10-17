@@ -1,8 +1,4 @@
-package app
-
-import (
-	// "github.com/google/uuid"
-)
+package schemes
 
 type ContainerRequest struct {
 	ContainerId string `uri:"container_id" binding:"uuid"`
@@ -22,10 +18,10 @@ type TranspostationRequest struct {
 
 type UpdateTransportationRequest struct {
 	TransportationId string `uri:"transportation_id" binding:"uuid"`
-	Vehicle          string `json:"transport_vehicle"`
+	Transport        string `json:"transport"`
 }
 
 type DeleteFromTransportationRequest struct {
 	Transpostationid string `uri:"transportation_id" binding:"uuid"`
-	ContainerId string `uri:"container_id" binding:"uuid"`
+	ContainerId      string `uri:"container_id" binding:"uuid"`
 }
