@@ -5,7 +5,11 @@ import (
 )
 
 type ContainerRequest struct {
-	ContainerId string `uri:"container_id" binding:"uuid"`
+	ContainerId string `uri:"container_id" binding:"required,uuid"`
+}
+
+type TypeRequest struct {
+	TypeId string `uri:"type_id" binding:"required,uuid"`
 }
 
 type GetAllContainersRequest struct {
@@ -23,7 +27,7 @@ type ChangeContainerRequest struct {
 }
 
 type AddToTransportationRequest struct {
-	ContainerId string `json:"container_id" binding:"uuid"`
+	ContainerId string `json:"container_id" binding:"required,uuid"`
 }
 
 type GetAllTransportationsRequst struct {
@@ -32,15 +36,15 @@ type GetAllTransportationsRequst struct {
 }
 
 type TranspostationRequest struct {
-	Transpostationid string `uri:"transportation_id" binding:"uuid"`
+	Transpostationid string `uri:"transportation_id" binding:"required,uuid"`
 }
 
 type UpdateTransportationRequest struct {
-	TransportationId string `uri:"transportation_id" binding:"uuid"`
-	Transport        string `json:"transport"`
+	TransportationId string `uri:"transportation_id" binding:"required,uuid"`
+	Transport        string `json:"transport" binding:"required"`
 }
 
 type DeleteFromTransportationRequest struct {
-	Transpostationid string `uri:"transportation_id" binding:"uuid"`
-	ContainerId      string `uri:"container_id" binding:"uuid"`
+	Transpostationid string `uri:"transportation_id" binding:"required,uuid"`
+	ContainerId      string `uri:"container_id" binding:"required,uuid"`
 }

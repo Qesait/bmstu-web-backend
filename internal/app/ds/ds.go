@@ -5,7 +5,7 @@ import (
 )
 
 type ContainerType struct {
-	UUID     string `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"-"`
+	UUID     string `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"uuid"`
 	Name     string `gorm:"size:50;not null" json:"name"`
 	Length   int    `gorm:"not null" json:"length"`
 	Height   int    `gorm:"not null" json:"height"`

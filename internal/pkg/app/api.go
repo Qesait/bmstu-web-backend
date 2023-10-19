@@ -298,3 +298,20 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 
 	c.Status(http.StatusOK)
 }
+
+func (app *Application) GetContainerType(c *gin.Context) {
+	var request schemes.TypeRequest
+	if err := c.ShouldBindUri(&request); err != nil {
+		log.Println("can't parse request path params", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	containerType, err := app.repo.GetContainerType(request.TypeId)
+	if err != nil {
+		log.Println("can't get container by id", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, schemes.GetTypeResponse{ContainerType: *containerType})
+}

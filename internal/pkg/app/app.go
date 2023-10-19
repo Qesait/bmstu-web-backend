@@ -23,6 +23,7 @@ func (app *Application) Run() {
 
 	// Типы контейнеров
 	r.GET("/container_types", app.GetAllContainerTypes) // Список типов
+	r.GET("/container_types/:type_id", app.GetContainerType) // один тип
 	// Услуги (контейнеры)
 	r.GET("/containers", app.GetAllContainers)                        // Список с поиском
 	r.GET("/containers/:container_id", app.GetContainer)              // Одна услуга

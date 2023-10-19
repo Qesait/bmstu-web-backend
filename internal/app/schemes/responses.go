@@ -12,6 +12,10 @@ type GetContainerResponse struct {
 	Container ds.Container `json:"container"`
 }
 
+type GetTypeResponse struct {
+	ContainerType ds.ContainerType `json:"container_type"`
+}
+
 type AllContainersResponse struct {
 	Containers []ds.Container `json:"containers"`
 }
