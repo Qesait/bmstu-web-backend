@@ -33,13 +33,8 @@ func (app *Application) GetContainer(c *gin.Context) {
 
 	container, err := app.repo.GetContainerByID(request.ContainerId)
 	if err != nil {
-		log.Println("can't get product by id", err)
+		log.Println("can't get container by id", err)
 		c.Status(http.StatusInternalServerError)
-		return
-	}
-	if container == nil {
-		log.Println("no container with id", err)
-		c.Status(http.StatusNotFound)
 		return
 	}
 	c.JSON(http.StatusOK, schemes.GetContainerResponse{Container: *container})
@@ -101,6 +96,61 @@ func (app *Application) AddContainer(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+func (app *Application) ChangeContainer(c *gin.Context) {
+	var request schemes.ChangeContainerRequest
+	if err := c.ShouldBindUri(&request); err != nil {
+		log.Println("can't parse request path params", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		log.Println("can't parse requst body", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	container, err := app.repo.GetContainerByID(request.ContainerId)
+	if err != nil {
+		log.Println("can't get container by id", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	if request.TypeId != nil {
+		container.TypeId = *request.TypeId
+		containerType, err := app.repo.GetContainerType(*request.TypeId)
+		if err != nil {
+			log.Printf("can't get new container type %v", err)
+			c.Status(http.StatusBadRequest)
+			return
+		}
+		container.ContainerType = *containerType
+	}
+	if request.ImageURL != nil {
+		container.ImageURL = *request.ImageURL
+	}
+	if request.PurchaseDate != nil {
+		container.PurchaseDate = *request.PurchaseDate
+	}
+	if request.Cargo != nil {
+		container.Cargo = *request.Cargo
+	}
+	if request.Weight != nil {
+		container.Weight = *request.Weight
+	}
+	if request.Marking != nil {
+		container.Marking = *request.Marking
+	}
+
+	log.Println(*container)
+
+	if err := app.repo.SaveContainer(container); err != nil {
+		log.Printf("can't save container %v", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
 
 func (app *Application) AddToTranspostation(c *gin.Context) {
 	var request schemes.AddToTransportationRequest

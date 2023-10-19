@@ -31,7 +31,7 @@ type Container struct {
 	Weight       int       `gorm:"not null" json:"weight" binding:"required"`
 	Marking      string    `gorm:"size:11;not null" json:"marking" binding:"required"`
 
-	ContainerType ContainerType `gorm:"preload:false;foreignKey:TypeId" json:"container_type" binding:"-"`
+	ContainerType ContainerType `gorm:"foreignKey:TypeId" json:"container_type" binding:"-"`
 }
 
 type Transportation struct {

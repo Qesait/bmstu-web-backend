@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -21,28 +22,28 @@ func (app *Application) Run() {
 	r := gin.Default()
 
 	// Типы контейнеров
-	r.GET("/container_types", app.GetAllContainerTypes)// Список типов
+	r.GET("/container_types", app.GetAllContainerTypes) // Список типов
 	// Услуги (контейнеры)
-	r.GET("/containers", app.GetAllContainers) // Список с поиском
-	r.GET("/containers/:container_id", app.GetContainer) // Одна услуга
+	r.GET("/containers", app.GetAllContainers)                        // Список с поиском
+	r.GET("/containers/:container_id", app.GetContainer)              // Одна услуга
 	r.DELETE("/containers/:container_id/delete", app.DeleteContainer) // Удаление
-	// Изменение
-	r.POST("/containers", app.AddContainer) // Добавление
-	r.POST("/transportations", app.AddToTranspostation) // Добавление в заявку
+	r.PUT("/containers/:container_id/put", app.ChangeContainer)       // Изменение
+	r.POST("/containers", app.AddContainer)                           // Добавление
+	r.POST("/transportations", app.AddToTranspostation)               // Добавление в заявку
 
 	// Заявки (перевозки)
-	r.GET("/transportations", app.GetAllTransportations)// Список (отфильтровать по дате формирования и статусу)
-	r.GET("/transportations/:transportation_id", app.TranspostationComposition) // Одна заявка
+	r.GET("/transportations", app.GetAllTransportations)                                               // Список (отфильтровать по дате формирования и статусу)
+	r.GET("/transportations/:transportation_id", app.TranspostationComposition)                        // Одна заявка
 	r.DELETE("/transportations/:transportation_id/:container_id/delete", app.DeleteFromTransportation) // Изменеие (удаление услуг)
-	r.PUT("/transportations/:transportation_id/put", app.UpdateTransportation) // Изменение (добавление транспорта)
-	r.DELETE("/transportations/:transportation_id/delete", app.DeleteTransportation) //Удаление
+	r.PUT("/transportations/:transportation_id/put", app.UpdateTransportation)                         // Изменение (добавление транспорта)
+	r.DELETE("/transportations/:transportation_id/delete", app.DeleteTransportation)                   //Удаление
 	// Сформировать создателем
 	// Завершить отклонить модератором
 
 	r.Static("/image", "./static/image")
 	r.Static("/css", "./static/css")
 
-	r.Run()
+	r.Run(fmt.Sprintf("%s:%d", app.config.ServiceHost, app.config.ServicePort))
 
 	log.Println("Server down")
 }

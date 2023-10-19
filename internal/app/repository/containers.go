@@ -1,10 +1,9 @@
 package repository
 
 import (
-	"errors"
-	"gorm.io/gorm"
 	"strings"
 
+	// "gorm.io/gorm"
 	"bmstu-web-backend/internal/app/ds"
 )
 
@@ -14,9 +13,6 @@ func (r *Repository) GetContainerByID(id string) (*ds.Container, error) {
 		First(container).
 		Error
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
-		}
 		return nil, err
 	}
 	return container, nil
@@ -41,4 +37,13 @@ func (r *Repository) GetContainersByType(containerType string) ([]ds.Container, 
 		return nil, err
 	}
 	return containers, nil
+}
+
+func (r *Repository) SaveContainer(container *ds.Container) error {
+	err := r.db.Save(container).Error
+	// err := r.db.Session(&gorm.Session{FullSaveAssociations: true}).Save(&container).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

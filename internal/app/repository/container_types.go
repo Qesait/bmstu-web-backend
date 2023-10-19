@@ -13,3 +13,13 @@ func (r *Repository) GetAllContainerTypes() ([]ds.ContainerType, error) {
 	}
 	return types, nil
 }
+
+func (r *Repository) GetContainerType(id string) (*ds.ContainerType, error) {
+	containerType := &ds.ContainerType{UUID: id}
+
+	err := r.db.First(&containerType).Error
+	if err != nil {
+		return nil, err
+	}
+	return containerType, nil
+}

@@ -12,13 +12,14 @@ type GetAllContainersRequest struct {
 	ContainerType string `form:"type"`
 }
 
-type AddContainerRequest struct {
-	TypeId       string    `json:"type_id"`
-	ImageURL     string    `json:"image_url"`
-	PurchaseDate time.Time `json:"purchase_date"`
-	Cargo        string    `json:"cargo"`
-	Weight       int       `json:"weight"`
-	Marking      string    `json:"marking"`
+type ChangeContainerRequest struct {
+	ContainerId  string     `uri:"container_id" binding:"required,uuid"`
+	TypeId       *string    `json:"type_id" binding:"omitempty,uuid"`
+	ImageURL     *string    `json:"image_url"`
+	PurchaseDate *time.Time `json:"purchase_date"`
+	Cargo        *string    `json:"cargo"`
+	Weight       *int       `json:"weight"`
+	Marking      *string    `json:"marking"`
 }
 
 type AddToTransportationRequest struct {
