@@ -14,6 +14,7 @@ type TypeRequest struct {
 
 type GetAllContainersRequest struct {
 	ContainerType string `form:"type"`
+	FormationDate *time.Time `from:"formation_date" time_format:"2006-01-02"`
 }
 
 type ChangeContainerRequest struct {
@@ -27,7 +28,7 @@ type ChangeContainerRequest struct {
 }
 
 type AddToTransportationRequest struct {
-	ContainerId string `json:"container_id" binding:"required,uuid"`
+	ContainerId string `uri:"container_id" binding:"required,uuid"`
 }
 
 type GetAllTransportationsRequst struct {
@@ -36,7 +37,7 @@ type GetAllTransportationsRequst struct {
 }
 
 type TranspostationRequest struct {
-	Transpostationid string `uri:"transportation_id" binding:"required,uuid"`
+	TransportationId string `uri:"transportation_id" binding:"required,uuid"`
 }
 
 type UpdateTransportationRequest struct {
@@ -45,6 +46,15 @@ type UpdateTransportationRequest struct {
 }
 
 type DeleteFromTransportationRequest struct {
-	Transpostationid string `uri:"transportation_id" binding:"required,uuid"`
+	TransportationId string `uri:"transportation_id" binding:"required,uuid"`
 	ContainerId      string `uri:"container_id" binding:"required,uuid"`
+}
+
+type UserConfirmRequest struct {
+	TransportationId string `uri:"transportation_id" binding:"required,uuid"`
+}
+
+type ModeratorConfirmRequest struct {
+	TransportationId string `uri:"transportation_id" binding:"required,uuid"`
+	Status           string `json:"status" binding:"required,oneof=завершён отклонён"`
 }

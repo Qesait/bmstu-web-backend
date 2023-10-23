@@ -11,12 +11,18 @@ import (
 	"bmstu-web-backend/internal/app/ds"
 )
 
-// TODO: Как-то фильтровать по дате формирования
-func (r *Repository) GetAllTransportations(_ *time.Time, status string) ([]ds.Transportation, error) {
+func (r *Repository) GetAllTransportations(formationDate *time.Time, status string) ([]ds.Transportation, error) {
 	var transportations []ds.Transportation
+	var err error
 
-	err := r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
-		Find(&transportations).Error
+	if formationDate != nil {
+		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+			Where("formation_date = ?", formationDate).
+			Find(&transportations).Error
+	} else {
+		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+			Find(&transportations).Error
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -41,12 +47,12 @@ func (r *Repository) DeleteContainer(id string) error {
 
 func (r *Repository) GetEditableTransportation(customerId string) (*ds.Transportation, error) {
 	transportation := &ds.Transportation{}
-	err := r.db.First(transportation, ds.Transportation{Status: "введён", CustomerId: &customerId}).Error
+	err := r.db.First(transportation, ds.Transportation{Status: ds.DRAFT, CustomerId: customerId}).Error
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, err
 		}
-		transportation = &ds.Transportation{CreationDate: time.Now(), CustomerId: &customerId}
+		transportation = &ds.Transportation{CreationDate: time.Now(), CustomerId: customerId, Status: ds.DRAFT}
 		err := r.db.Create(transportation).Error
 		if err != nil {
 			return nil, err
@@ -57,7 +63,7 @@ func (r *Repository) GetEditableTransportation(customerId string) (*ds.Transport
 
 func (r *Repository) GetTransportationById(transportationId, customerId string) (*ds.Transportation, error) {
 	transportation := &ds.Transportation{}
-	err := r.db.First(transportation, ds.Transportation{UUID: transportationId, CustomerId: &customerId}).Error
+	err := r.db.First(transportation, ds.Transportation{UUID: transportationId, CustomerId: customerId}).Error
 	if err != nil {
 		return nil, err
 	}
@@ -121,8 +127,8 @@ func (r *Repository) SaveTransportation(transportation *ds.Transportation) error
 	return nil
 }
 
-func (r *Repository) DeleteTransportation(transportationId, customerId string) error {
-	transportation := &ds.Transportation{UUID: transportationId, CustomerId: &customerId}
+func (r *Repository) UpdateTransportationStatus(transportationId, customerId, status string) error {
+	transportation := &ds.Transportation{UUID: transportationId, CustomerId: customerId}
 	var err error
 
 	err = r.db.First(transportation).Error
@@ -130,7 +136,7 @@ func (r *Repository) DeleteTransportation(transportationId, customerId string) e
 		return err
 	}
 
-	transportation.Status = "удалён"
+	transportation.Status = status
 	err = r.db.Save(transportation).Error
 	if err != nil {
 		return err

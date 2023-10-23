@@ -34,19 +34,26 @@ type Container struct {
 	ContainerType ContainerType `gorm:"foreignKey:TypeId" json:"container_type" binding:"-"`
 }
 
+const DRAFT string = "черновик"
+const FORMED string = "сформирован"
+const COMPELTED string = "заввершён"
+const REJECTED string = "отклонён"
+const DELETED string = "удалён"
+
 type Transportation struct {
 	UUID           string     `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"uuid"`
-	Status         string     `gorm:"size:20;not null;default:'введён'" json:"status"` // введён, в работе, завершён, отменён, удалён
+	Status         string     `gorm:"size:20;not null" json:"status"`
 	CreationDate   time.Time  `gorm:"not null;type:date" json:"creation_date"`
 	FormationDate  *time.Time `gorm:"type:date" json:"formation_date"`
 	CompletionDate *time.Time `gorm:"type:date" json:"completion_date"`
 	ModeratorId    *string    `json:"moderator_id"`
-	CustomerId     *string    `json:"customer_id"`
+	CustomerId     string    `json:"customer_id"`
 	Transport      string     `gorm:"size:50;not null" json:"transport"`
 
 	Moderator User `gorm:"foreignKey:ModeratorId" json:"-"`
 	Customer  User `gorm:"foreignKey:CustomerId" json:"-"`
 }
+
 
 type TransportationComposition struct {
 	TransportationId string `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"transportation_id"`

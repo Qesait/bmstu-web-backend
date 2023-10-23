@@ -3,8 +3,10 @@ package app
 import (
 	"bmstu-web-backend/internal/app/ds"
 	"bmstu-web-backend/internal/app/schemes"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,8 +18,7 @@ func (app *Application) getUser() string {
 func (app *Application) GetAllContainerTypes(c *gin.Context) {
 	types, err := app.repo.GetAllContainerTypes()
 	if err != nil {
-		log.Println("can't get container types from db", err)
-		c.Status(http.StatusInternalServerError)
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get container types from db: %s", err))
 		return
 	}
 	c.JSON(http.StatusOK, schemes.AllContainerTypesResponse{ContainerTypes: types})
@@ -26,15 +27,13 @@ func (app *Application) GetAllContainerTypes(c *gin.Context) {
 func (app *Application) GetContainer(c *gin.Context) {
 	var request schemes.ContainerRequest
 	if err := c.ShouldBindUri(&request); err != nil {
-		log.Println("can't parse request path params", err)
-		c.Status(http.StatusBadRequest)
+		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("can't parse request path params: %s", err))
 		return
 	}
 
 	container, err := app.repo.GetContainerByID(request.ContainerId)
 	if err != nil {
-		log.Println("can't get container by id", err)
-		c.Status(http.StatusInternalServerError)
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("can't get container by id: %s", err))
 		return
 	}
 	c.JSON(http.StatusOK, schemes.GetContainerResponse{Container: *container})
@@ -83,7 +82,7 @@ func (app *Application) DeleteContainer(c *gin.Context) {
 
 func (app *Application) AddContainer(c *gin.Context) {
 	container := &ds.Container{}
-	if err := c.BindJSON(container); err != nil {
+	if err := c.ShouldBindJSON(container); err != nil {
 		log.Println("can't parse requst body", err)
 		c.Status(http.StatusBadRequest)
 		return
@@ -141,8 +140,6 @@ func (app *Application) ChangeContainer(c *gin.Context) {
 		container.Marking = *request.Marking
 	}
 
-	log.Println(*container)
-
 	if err := app.repo.SaveContainer(container); err != nil {
 		log.Printf("can't save container %v", err)
 		c.Status(http.StatusInternalServerError)
@@ -154,7 +151,7 @@ func (app *Application) ChangeContainer(c *gin.Context) {
 
 func (app *Application) AddToTranspostation(c *gin.Context) {
 	var request schemes.AddToTransportationRequest
-	if err := c.BindJSON(&request); err != nil {
+	if err := c.ShouldBindUri(&request); err != nil {
 		log.Println("can't parse requst body", err)
 		c.Status(http.StatusBadRequest)
 		return
@@ -193,7 +190,6 @@ func (app *Application) GetAllTransportations(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	log.Println(request)
 
 	transportations, err := app.repo.GetAllTransportations(request.FormationDate, request.Status)
 	if err != nil {
@@ -213,14 +209,14 @@ func (app *Application) TranspostationComposition(c *gin.Context) {
 		return
 	}
 
-	transportation, err := app.repo.GetTransportationById(request.Transpostationid, app.getUser())
+	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getUser())
 	if err != nil {
 		log.Printf("can't get transportation by id %v", err)
 		c.Status(http.StatusInternalServerError)
 		return
 	}
 
-	containers, err := app.repo.GetTransportatioinComposition(request.Transpostationid)
+	containers, err := app.repo.GetTransportatioinComposition(request.TransportationId)
 	if err != nil {
 		log.Printf("can't get transportation composition by id %v", err)
 		c.Status(http.StatusInternalServerError)
@@ -272,7 +268,7 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 		return
 	}
 
-	err := app.repo.DeleteTransportation(request.Transpostationid, app.getUser())
+	err := app.repo.UpdateTransportationStatus(request.TransportationId, app.getUser(), "удалён")
 	if err != nil {
 		log.Println("can't delete transportation from db", err)
 		c.Status(http.StatusInternalServerError)
@@ -290,7 +286,7 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 		return
 	}
 
-	if err := app.repo.DeleteFromTransportation(request.Transpostationid, request.ContainerId); err != nil {
+	if err := app.repo.DeleteFromTransportation(request.TransportationId, request.ContainerId); err != nil {
 		log.Println("can't delete container from transportation in db", err)
 		c.Status(http.StatusInternalServerError)
 		return
@@ -314,4 +310,63 @@ func (app *Application) GetContainerType(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, schemes.GetTypeResponse{ContainerType: *containerType})
+}
+
+func (app *Application) UserConfirm(c *gin.Context) {
+	var request schemes.UserConfirmRequest
+	if err := c.ShouldBindUri(&request); err != nil {
+		log.Println("can't parse request path params", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	err := app.repo.UpdateTransportationStatus(request.TransportationId, app.getUser(), "сформирован")
+	if err != nil {
+		log.Println("can't update transportation in db", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+func (app *Application) ModeratorConfirm(c *gin.Context) {
+	var request schemes.ModeratorConfirmRequest
+	if err := c.ShouldBindUri(&request); err != nil {
+		log.Println("can't parse request path params", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		log.Println("can't parse request json params", err)
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getUser())
+	if err != nil {
+		log.Println("can't get transportation from db", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	if transportation.Status != ds.FORMED {
+		log.Println("transportation not formed yet", err)
+		c.Status(http.StatusMethodNotAllowed)
+		return
+	}
+
+	transportation.Status = request.Status
+	if request.Status == ds.COMPELTED {
+		now := time.Now()
+		transportation.CompletionDate = &now
+	}
+
+	if err := app.repo.SaveTransportation(transportation); err != nil {
+		log.Println("can't save transportation", err)
+		c.Status(http.StatusMethodNotAllowed)
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
