@@ -2,8 +2,9 @@ package repository
 
 import (
 	"strings"
+	"errors"
 
-	// "gorm.io/gorm"
+	"gorm.io/gorm"
 	"bmstu-web-backend/internal/app/ds"
 )
 
@@ -13,6 +14,9 @@ func (r *Repository) GetContainerByID(id string) (*ds.Container, error) {
 		First(container).
 		Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return container, nil

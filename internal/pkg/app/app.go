@@ -35,10 +35,10 @@ func (app *Application) Run() {
 	r.POST("/containers/:container_id/add_to_transportation", app.AddToTranspostation) // Добавление в заявку
 
 	// Заявки (перевозки)
-	r.GET("/transportations", app.GetAllTransportations)                                                         // Список (отфильтровать по дате формирования и статусу)
-	r.GET("/transportations/:transportation_id", app.TranspostationComposition)                                  // Одна заявка
-	r.PUT("/transportations/:transportation_id/update", app.UpdateTransportation)                                // Изменение (добавление транспорта)
-	r.DELETE("/transportations/:transportation_id/delete", app.DeleteTransportation)                             //Удаление
+	r.GET("/transportations", app.GetAllTransportations)                             // Список (отфильтровать по дате формирования и статусу)
+	r.GET("/transportations/:transportation_id", app.TranspostationComposition)      // Одна заявка
+	r.PUT("/transportations/:transportation_id/update", app.UpdateTransportation)    // Изменение (добавление транспорта)
+	r.DELETE("/transportations/:transportation_id/delete", app.DeleteTransportation) //Удаление
 	r.DELETE("/transportations/:transportation_id/delete_container/:container_id", app.DeleteFromTransportation) // Изменеие (удаление услуг)
 	r.PUT("/transportations/:transportation_id/user_confirm", app.UserConfirm)                                   // Сформировать создателем
 	r.PUT("transportations/:transportation_id/moderator_confirm", app.ModeratorConfirm)                          // Завершить отклонить модератором
@@ -68,13 +68,13 @@ func New() (*Application, error) {
 }
 
 func ErrorHandler() gin.HandlerFunc {
-    return func(c *gin.Context) {
-        c.Next()
-        
-        for _, err := range c.Errors {
-            log.Println(err.Err)
-        }
+	return func(c *gin.Context) {
+		c.Next()
 
-        c.Status(-1)
-    }
+		for _, err := range c.Errors {
+			log.Println(err.Err)
+		}
+
+		c.Status(-1)
+	}
 }

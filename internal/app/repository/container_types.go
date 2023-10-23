@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"errors"
+	"gorm.io/gorm"
 	"bmstu-web-backend/internal/app/ds"
 )
 
@@ -19,6 +21,9 @@ func (r *Repository) GetContainerType(id string) (*ds.ContainerType, error) {
 
 	err := r.db.First(&containerType).Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return containerType, nil
