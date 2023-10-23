@@ -56,5 +56,5 @@ type UserConfirmRequest struct {
 
 type ModeratorConfirmRequest struct {
 	TransportationId string `uri:"transportation_id" binding:"required,uuid"`
-	Status           string `json:"status" binding:"required,oneof=завершён отклонён"`
+	Status           string `json:"status" binding:"required"`
 }

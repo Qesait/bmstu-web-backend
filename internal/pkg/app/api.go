@@ -3,6 +3,7 @@ package app
 import (
 	"bmstu-web-backend/internal/app/ds"
 	"bmstu-web-backend/internal/app/schemes"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -286,12 +287,23 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		return
 	}
 
-	err := app.repo.UpdateTransportationStatus(request.TransportationId, app.getUser(), "сформирован")
+	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getUser())
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+	if transportation.Status != ds.DRAFT {
+		c.AbortWithError(http.StatusMethodNotAllowed, err)
+		return
+	}
+	transportation.Status = ds.FORMED
+	now := time.Now()
+	transportation.FormationDate = &now
 
+	if err := app.repo.SaveTransportation(transportation); err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 	c.Status(http.StatusOK)
 }
 
@@ -306,17 +318,20 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		return
 	}
 
+	if request.Status != ds.COMPELTED && request.Status != ds.REJECTED {
+		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("status %s not allowed", request.Status))
+		return
+	}
+
 	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getUser())
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-
 	if transportation.Status != ds.FORMED {
 		c.AbortWithError(http.StatusMethodNotAllowed, err)
 		return
 	}
-
 	transportation.Status = request.Status
 	if request.Status == ds.COMPELTED {
 		now := time.Now()
@@ -327,6 +342,5 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-
 	c.Status(http.StatusOK)
 }
