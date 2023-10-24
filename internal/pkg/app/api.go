@@ -4,14 +4,37 @@ import (
 	"bmstu-web-backend/internal/app/ds"
 	"bmstu-web-backend/internal/app/schemes"
 	"fmt"
-	"log"
 	"net/http"
-	"time"
 	"path/filepath"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
+	"mime/multipart"
 )
+
+func (app *Application) uploadImage(c *gin.Context, image *multipart.FileHeader, UUID string) (*string, error) {
+	src, err := image.Open()
+	if err != nil {
+		return nil, err
+	}
+	defer src.Close()
+
+	extension := filepath.Ext(image.Filename)
+	if extension != ".jpg" && extension != ".jpeg" {
+		return nil, fmt.Errorf("only jpeg images allowed")
+	}
+	imageName := UUID + extension
+
+	_, err = app.minioClient.PutObject(c, app.config.BucketName, imageName, src, image.Size, minio.PutObjectOptions{
+		ContentType: "image/jpeg",
+	})
+	if err != nil {
+		return nil, err
+	}
+	imageURL := fmt.Sprintf("%s/%s/%s", app.config.MinioEndpoint, app.config.BucketName, imageName)
+	return &imageURL, nil
+}
 
 func (app *Application) getCustomer() string {
 	return "5f58c307-a3f2-4b13-b888-c80ad08d5ed3"
@@ -20,34 +43,6 @@ func (app *Application) getCustomer() string {
 func (app *Application) getModerator() *string {
 	moderaorId := "796c70e1-5f27-4433-a415-95e7272effa5"
 	return &moderaorId
-}
-
-func (app *Application) GetAllContainerTypes(c *gin.Context) {
-	types, err := app.repo.GetAllContainerTypes()
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	c.JSON(http.StatusOK, schemes.AllContainerTypesResponse{ContainerTypes: types})
-}
-
-func (app *Application) GetContainer(c *gin.Context) {
-	var request schemes.ContainerRequest
-	if err := c.ShouldBindUri(&request); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	container, err := app.repo.GetContainerByID(request.ContainerId)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	if container == nil || container.IsDeleted {
-		c.AbortWithError(http.StatusNotFound, fmt.Errorf("container is deleted"))
-		return
-	}
-	c.JSON(http.StatusOK, schemes.GetContainerResponse{Container: *container})
 }
 
 func (app *Application) GetAllContainers(c *gin.Context) {
@@ -65,6 +60,25 @@ func (app *Application) GetAllContainers(c *gin.Context) {
 	c.JSON(http.StatusOK, schemes.AllContainersResponse{Containers: containers})
 }
 
+func (app *Application) GetContainer(c *gin.Context) {
+	var request schemes.ContainerRequest
+	if err := c.ShouldBindUri(&request); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	container, err := app.repo.GetContainerByID(request.ContainerId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	if container == nil {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("container not found"))
+		return
+	}
+	c.JSON(http.StatusOK, container)
+}
+
 func (app *Application) DeleteContainer(c *gin.Context) {
 	var request schemes.ContainerRequest
 	if err := c.ShouldBindUri(&request); err != nil {
@@ -72,7 +86,13 @@ func (app *Application) DeleteContainer(c *gin.Context) {
 		return
 	}
 
-	if err := app.repo.DeleteContainer(request.ContainerId); err != nil {
+	container, err := app.repo.GetContainerByID(request.ContainerId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	container.IsDeleted = true
+	if err := app.repo.SaveContainer(container); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -81,89 +101,88 @@ func (app *Application) DeleteContainer(c *gin.Context) {
 }
 
 func (app *Application) AddContainer(c *gin.Context) {
-	container := &ds.Container{}
-	if err := c.ShouldBindJSON(container); err != nil {
+	// for key := range c.Request.PostForm {
+	//     values, _ := c.GetPostFormArray(key)
+	//     for _, value := range values {
+	//         fmt.Printf("Field: %s, Value: %s\n", key, value)
+	//     }
+	// }
+	// fmt.Println(c.Params)
+	// c.Status(http.StatusTeapot)
+	// return
+
+	var request schemes.AddContainerRequest
+	if err := c.ShouldBind(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	if err := app.repo.AddContainer(container); err != nil {
+
+	container := ds.Container(request.Container)
+	if err := app.repo.AddContainer(&container); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+
+	if request.Image != nil {
+		imageURL, err := app.uploadImage(c, request.Image, container.UUID)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		container.ImageURL = imageURL
+	}
+	if err := app.repo.SaveContainer(&container); err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	c.Status(http.StatusOK)
 }
 
 func (app *Application) ChangeContainer(c *gin.Context) {
 	var request schemes.ChangeContainerRequest
-	log.Println("hello1?")
 	if err := c.ShouldBindUri(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	log.Println("hello2?")
 	if err := c.ShouldBind(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	log.Println("hello3?")
 
 	container, err := app.repo.GetContainerByID(request.ContainerId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	///////////////////////////////////////////
-	log.Println("hello?")
-	if request.Image != nil {
-		src, err := request.Image.Open()
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		defer src.Close()
-	
-		log.Println(request.Image.Filename)
-		extension := filepath.Ext(request.Image.Filename)
-		if extension != ".jpg" && extension != ".jpeg" {
-			c.AbortWithError(http.StatusBadRequest, fmt.Errorf("only jpeg images allowed"))
-			return
-		}
-	
-		objectName := container.UUID + extension
-	
-		_, err = app.minioClient.PutObject(c, app.config.BucketName, objectName, src, request.Image.Size, minio.PutObjectOptions{
-			ContentType: "image/jpeg",
-		})
-		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-		container.ImageURL = fmt.Sprintf("%s/%s/%s", app.config.MinioEndpoint, app.config.BucketName, objectName)
-	} else {
-		log.Println("image is nil")
+	if request.Marking != nil {
+		container.Marking = *request.Marking
 	}
-	///////////////////////////////////////////
-	if request.TypeId != nil {
-		container.TypeId = *request.TypeId
-		containerType, err := app.repo.GetContainerType(*request.TypeId)
-		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-		container.ContainerType = *containerType
+	if request.Type != nil {
+		container.Type = *request.Type
 	}
-	if request.PurchaseDate != nil {
-		container.PurchaseDate = *request.PurchaseDate
+	if request.Length != nil {
+		container.Length = *request.Length
+	}
+	if request.Height != nil {
+		container.Height = *request.Height
+	}
+	if request.Width != nil {
+		container.Width = *request.Width
 	}
 	if request.Cargo != nil {
-		log.Println(request.Cargo)
-		// container.Cargo = *request.Cargo
+		container.Cargo = *request.Cargo
 	}
 	if request.Weight != nil {
 		container.Weight = *request.Weight
 	}
-	if request.Marking != nil {
-		container.Marking = *request.Marking
+	if request.Image != nil {
+		imageURL, err := app.uploadImage(c, request.Image, container.UUID)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		container.ImageURL = imageURL
 	}
 
 	if err := app.repo.SaveContainer(container); err != nil {
@@ -171,7 +190,7 @@ func (app *Application) ChangeContainer(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.GetContainerResponse{Container: *container})
+	c.JSON(http.StatusOK, container)
 }
 
 func (app *Application) AddToTranspostation(c *gin.Context) {
@@ -183,7 +202,7 @@ func (app *Application) AddToTranspostation(c *gin.Context) {
 	var err error
 
 	var transportation *ds.Transportation
-	transportation, err = app.repo.GetEditableTransportation(app.getCustomer())
+	transportation, err = app.repo.GetDraftTransportation(app.getCustomer())
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -201,7 +220,7 @@ func (app *Application) AddToTranspostation(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.TransportationResponse{Transportation: *transportation, Containers: containers})
+	c.JSON(http.StatusOK, schemes.AllContainersResponse{Containers: containers})
 }
 
 func (app *Application) GetAllTransportations(c *gin.Context) {
@@ -220,7 +239,7 @@ func (app *Application) GetAllTransportations(c *gin.Context) {
 	c.JSON(http.StatusOK, schemes.AllTransportationsResponse{Transportations: transportations})
 }
 
-func (app *Application) TranspostationComposition(c *gin.Context) {
+func (app *Application) GetTranspostation(c *gin.Context) {
 	var request schemes.TranspostationRequest
 	if err := c.ShouldBindUri(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
@@ -230,6 +249,10 @@ func (app *Application) TranspostationComposition(c *gin.Context) {
 	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getCustomer())
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	if transportation == nil {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("transportation not found"))
 		return
 	}
 
@@ -243,17 +266,21 @@ func (app *Application) TranspostationComposition(c *gin.Context) {
 
 func (app *Application) UpdateTransportation(c *gin.Context) {
 	var request schemes.UpdateTransportationRequest
-	if err := c.ShouldBindUri(&request); err != nil {
+	if err := c.ShouldBindUri(&request.URI); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	if err := c.ShouldBindJSON(&request); err != nil {
+	if err := c.ShouldBind(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getCustomer())
+	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, app.getCustomer())
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	if transportation == nil {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("transportation not found"))
 		return
 	}
 	transportation.Transport = request.Transport
@@ -262,13 +289,7 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 		return
 	}
 
-	containers, err := app.repo.GetTransportatioinComposition(request.TransportationId)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, schemes.TransportationResponse{Transportation: *transportation, Containers: containers})
+	c.JSON(http.StatusOK, schemes.UpdateTransportationResponse{Transportation: *transportation})
 }
 
 func (app *Application) DeleteTransportation(c *gin.Context) {
@@ -281,6 +302,10 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getCustomer())
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	if transportation == nil {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("transportation not found"))
 		return
 	}
 	transportation.Status = ds.DELETED
@@ -298,6 +323,19 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
+	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getCustomer())
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	if transportation == nil {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не обнаружена"))
+		return
+	}
+	if transportation.Status != ds.DRAFT {
+		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя редактировать перевозку со статусом: %s", transportation.Status))
+		return
+	}
 
 	if err := app.repo.DeleteFromTransportation(request.TransportationId, request.ContainerId); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -313,25 +351,6 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 	c.JSON(http.StatusOK, schemes.AllContainersResponse{Containers: containers})
 }
 
-func (app *Application) GetContainerType(c *gin.Context) {
-	var request schemes.TypeRequest
-	if err := c.ShouldBindUri(&request); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	containerType, err := app.repo.GetContainerType(request.TypeId)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	if containerType == nil {
-		c.AbortWithError(http.StatusNotFound, fmt.Errorf("container type not found"))
-		return
-	}
-	c.JSON(http.StatusOK, schemes.GetTypeResponse{ContainerType: *containerType})
-}
-
 func (app *Application) UserConfirm(c *gin.Context) {
 	var request schemes.UserConfirmRequest
 	if err := c.ShouldBindUri(&request); err != nil {
@@ -344,8 +363,12 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+	if transportation == nil {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("transportation not found"))
+		return
+	}
 	if transportation.Status != ds.DRAFT {
-		c.AbortWithError(http.StatusMethodNotAllowed, err)
+		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("methon can not be called on transportation with status %s", transportation.Status))
 		return
 	}
 	transportation.Status = ds.FORMED
@@ -361,11 +384,11 @@ func (app *Application) UserConfirm(c *gin.Context) {
 
 func (app *Application) ModeratorConfirm(c *gin.Context) {
 	var request schemes.ModeratorConfirmRequest
-	if err := c.ShouldBindUri(&request); err != nil {
+	if err := c.ShouldBindUri(&request.URI); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	if err := c.ShouldBindJSON(&request); err != nil {
+	if err := c.ShouldBind(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
@@ -375,13 +398,17 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		return
 	}
 
-	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getCustomer())
+	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, app.getCustomer())
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+	if transportation == nil {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("transportation not found"))
+		return
+	}
 	if transportation.Status != ds.FORMED {
-		c.AbortWithError(http.StatusMethodNotAllowed, err)
+		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("methon can not be called on transportation with status %s", transportation.Status))
 		return
 	}
 	transportation.Status = request.Status

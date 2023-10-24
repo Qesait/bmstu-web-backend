@@ -18,7 +18,6 @@ func main() {
 
 	err = db.AutoMigrate(
 		&ds.User{},
-		&ds.ContainerType{},
 		&ds.Container{},
 		&ds.Transportation{},
 		&ds.TransportationComposition{},

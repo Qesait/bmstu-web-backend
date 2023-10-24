@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
@@ -26,9 +27,7 @@ func (app *Application) Run() {
 
 	r.Use(ErrorHandler())
 
-	// Типы контейнеров
-	r.GET("/container_types", app.GetAllContainerTypes)      // Список типов
-	r.GET("/container_types/:type_id", app.GetContainerType) // один тип
+	// TODO: ошибки на русском
 	// Услуги (контейнеры)
 	r.GET("/containers", app.GetAllContainers)                                         // Список с поиском
 	r.GET("/containers/:container_id", app.GetContainer)                               // Одна услуга
@@ -39,7 +38,7 @@ func (app *Application) Run() {
 
 	// Заявки (перевозки)
 	r.GET("/transportations", app.GetAllTransportations)                                                         // Список (отфильтровать по дате формирования и статусу)
-	r.GET("/transportations/:transportation_id", app.TranspostationComposition)                                  // Одна заявка
+	r.GET("/transportations/:transportation_id", app.GetTranspostation)                                  // Одна заявка
 	r.PUT("/transportations/:transportation_id/update", app.UpdateTransportation)                                // Изменение (добавление транспорта)
 	r.DELETE("/transportations/:transportation_id/delete", app.DeleteTransportation)                             //Удаление
 	r.DELETE("/transportations/:transportation_id/delete_container/:container_id", app.DeleteFromTransportation) // Изменеие (удаление услуг)
@@ -85,7 +84,18 @@ func ErrorHandler() gin.HandlerFunc {
 		for _, err := range c.Errors {
 			log.Println(err.Err)
 		}
-
-		c.Status(-1)
+		lastError := c.Errors.Last()
+		if lastError != nil {
+			switch c.Writer.Status() {
+			case http.StatusBadRequest:
+				c.JSON(-1, gin.H{"error": "wrong request"})
+			case http.StatusNotFound:
+				c.JSON(-1, gin.H{"error": lastError.Error()})
+			case http.StatusMethodNotAllowed:
+				c.JSON(-1, gin.H{"error": lastError.Error()})
+			default:
+				c.Status(-1)
+			}
+		}
 	}
 }

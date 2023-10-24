@@ -10,9 +10,7 @@ import (
 
 func (r *Repository) GetContainerByID(id string) (*ds.Container, error) {
 	container := &ds.Container{UUID: id}
-	err := r.db.Preload("ContainerType").
-		First(container).
-		Error
+	err := r.db.First(container, "is_deleted = ?", false).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -33,8 +31,7 @@ func (r *Repository) AddContainer(container *ds.Container) error {
 func (r *Repository) GetContainersByType(containerType string) ([]ds.Container, error) {
 	var containers []ds.Container
 
-	err := r.db.Joins("ContainerType").
-		Where("LOWER(name) LIKE ?", "%"+strings.ToLower(containerType)+"%").
+	err := r.db.Where("LOWER(type) LIKE ?", "%"+strings.ToLower(containerType)+"%").
 		Where("is_deleted = ?", false).
 		Find(&containers).Error
 	if err != nil {
@@ -45,7 +42,15 @@ func (r *Repository) GetContainersByType(containerType string) ([]ds.Container, 
 
 func (r *Repository) SaveContainer(container *ds.Container) error {
 	err := r.db.Save(container).Error
-	// err := r.db.Session(&gorm.Session{FullSaveAssociations: true}).Save(&container).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *Repository) AddToTransportation(transportationId, containerId string) error {
+	tComposition := ds.TransportationComposition{TransportationId: transportationId, ContainerId: containerId}
+	err := r.db.Create(&tComposition).Error
 	if err != nil {
 		return err
 	}
