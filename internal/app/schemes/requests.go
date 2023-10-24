@@ -1,6 +1,7 @@
 package schemes
 
 import (
+	"mime/multipart"
 	"time"
 )
 
@@ -17,13 +18,13 @@ type GetAllContainersRequest struct {
 }
 
 type ChangeContainerRequest struct {
-	ContainerId  string     `uri:"container_id" binding:"required,uuid"`
-	TypeId       *string    `json:"type_id" binding:"omitempty,uuid"`
-	ImageURL     *string    `json:"image_url"`
-	PurchaseDate *time.Time `json:"purchase_date"`
-	Cargo        *string    `json:"cargo"`
-	Weight       *int       `json:"weight"`
-	Marking      *string    `json:"marking"`
+	ContainerId  string                `uri:"container_id" binding:"required,uuid"`
+	TypeId       *string               `form:"type_id" json:"type_id" binding:"omitempty,uuid"`
+	Image        *multipart.FileHeader `form:"image"`
+	PurchaseDate *time.Time            `form:"purchase_date" json:"purchase_date"`
+	Cargo        *string               `form:"cargo" json:"cargo"`
+	Weight       *int                  `form:"weight" json:"weight"`
+	Marking      *string               `form:"marking" json:"marking"`
 }
 
 type AddToTransportationRequest struct {

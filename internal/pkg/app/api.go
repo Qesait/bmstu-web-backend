@@ -4,10 +4,13 @@ import (
 	"bmstu-web-backend/internal/app/ds"
 	"bmstu-web-backend/internal/app/schemes"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"github.com/minio/minio-go/v7"
 )
 
 func (app *Application) getCustomer() string {
@@ -92,20 +95,54 @@ func (app *Application) AddContainer(c *gin.Context) {
 
 func (app *Application) ChangeContainer(c *gin.Context) {
 	var request schemes.ChangeContainerRequest
+	log.Println("hello1?")
 	if err := c.ShouldBindUri(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	if err := c.ShouldBindJSON(&request); err != nil {
+	log.Println("hello2?")
+	if err := c.ShouldBind(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
+	log.Println("hello3?")
 
 	container, err := app.repo.GetContainerByID(request.ContainerId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+	///////////////////////////////////////////
+	log.Println("hello?")
+	if request.Image != nil {
+		src, err := request.Image.Open()
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		defer src.Close()
+	
+		log.Println(request.Image.Filename)
+		extension := filepath.Ext(request.Image.Filename)
+		if extension != ".jpg" && extension != ".jpeg" {
+			c.AbortWithError(http.StatusBadRequest, fmt.Errorf("only jpeg images allowed"))
+			return
+		}
+	
+		objectName := container.UUID + extension
+	
+		_, err = app.minioClient.PutObject(c, app.config.BucketName, objectName, src, request.Image.Size, minio.PutObjectOptions{
+			ContentType: "image/jpeg",
+		})
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+		container.ImageURL = fmt.Sprintf("%s/%s/%s", app.config.MinioEndpoint, app.config.BucketName, objectName)
+	} else {
+		log.Println("image is nil")
+	}
+	///////////////////////////////////////////
 	if request.TypeId != nil {
 		container.TypeId = *request.TypeId
 		containerType, err := app.repo.GetContainerType(*request.TypeId)
@@ -115,14 +152,12 @@ func (app *Application) ChangeContainer(c *gin.Context) {
 		}
 		container.ContainerType = *containerType
 	}
-	if request.ImageURL != nil {
-		container.ImageURL = *request.ImageURL
-	}
 	if request.PurchaseDate != nil {
 		container.PurchaseDate = *request.PurchaseDate
 	}
 	if request.Cargo != nil {
-		container.Cargo = *request.Cargo
+		log.Println(request.Cargo)
+		// container.Cargo = *request.Cargo
 	}
 	if request.Weight != nil {
 		container.Weight = *request.Weight
@@ -181,7 +216,7 @@ func (app *Application) GetAllTransportations(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, schemes.AllTransportationsResponse{Transportations: transportations})
 }
 

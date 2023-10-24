@@ -5,6 +5,8 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 
 	"bmstu-web-backend/internal/app/config"
 	"bmstu-web-backend/internal/app/dsn"
@@ -12,8 +14,9 @@ import (
 )
 
 type Application struct {
-	repo   *repository.Repository
-	config *config.Config
+	repo        *repository.Repository
+	minioClient *minio.Client
+	config      *config.Config
 }
 
 func (app *Application) Run() {
@@ -35,10 +38,10 @@ func (app *Application) Run() {
 	r.POST("/containers/:container_id/add_to_transportation", app.AddToTranspostation) // Добавление в заявку
 
 	// Заявки (перевозки)
-	r.GET("/transportations", app.GetAllTransportations)                             // Список (отфильтровать по дате формирования и статусу)
-	r.GET("/transportations/:transportation_id", app.TranspostationComposition)      // Одна заявка
-	r.PUT("/transportations/:transportation_id/update", app.UpdateTransportation)    // Изменение (добавление транспорта)
-	r.DELETE("/transportations/:transportation_id/delete", app.DeleteTransportation) //Удаление
+	r.GET("/transportations", app.GetAllTransportations)                                                         // Список (отфильтровать по дате формирования и статусу)
+	r.GET("/transportations/:transportation_id", app.TranspostationComposition)                                  // Одна заявка
+	r.PUT("/transportations/:transportation_id/update", app.UpdateTransportation)                                // Изменение (добавление транспорта)
+	r.DELETE("/transportations/:transportation_id/delete", app.DeleteTransportation)                             //Удаление
 	r.DELETE("/transportations/:transportation_id/delete_container/:container_id", app.DeleteFromTransportation) // Изменеие (удаление услуг)
 	r.PUT("/transportations/:transportation_id/user_confirm", app.UserConfirm)                                   // Сформировать создателем
 	r.PUT("transportations/:transportation_id/moderator_confirm", app.ModeratorConfirm)                          // Завершить отклонить модератором
@@ -60,6 +63,14 @@ func New() (*Application, error) {
 	}
 
 	app.repo, err = repository.New(dsn.FromEnv())
+	if err != nil {
+		return nil, err
+	}
+
+	app.minioClient, err = minio.New(app.config.MinioEndpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4("", "", ""),
+		Secure: false,
+	})
 	if err != nil {
 		return nil, err
 	}
