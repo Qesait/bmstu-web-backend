@@ -36,8 +36,9 @@ type AddToTransportationRequest struct {
 }
 
 type GetAllTransportationsRequst struct {
-	FormationDate *time.Time `form:"formation_date" time_format:"2006-01-02"`
-	Status        string     `form:"status"`
+	FormationDateStart *time.Time `form:"formation_date_start" json:"formation_date_start" time_format:"2006-01-02"`
+	FormationDateEnd   *time.Time `form:"formation_date_end" json:"formation_date_end" time_format:"2006-01-02"`
+	Status             string     `form:"status" json:"status"`
 }
 
 type TranspostationRequest struct {

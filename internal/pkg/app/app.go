@@ -28,7 +28,6 @@ func (app *Application) Run() {
 
 	r.Use(ErrorHandler())
 
-	// TODO: ошибки на русском
 	// Услуги (контейнеры)
 	r.GET("/containers", app.GetAllContainers)                                         // Список с поиском
 	r.GET("/containers/:container_id", app.GetContainer)                               // Одна услуга

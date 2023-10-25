@@ -245,7 +245,7 @@ func (app *Application) GetAllTransportations(c *gin.Context) {
 		return
 	}
 
-	transportations, err := app.repo.GetAllTransportations(request.FormationDate, request.Status)
+	transportations, err := app.repo.GetAllTransportations(request.FormationDateStart, request.FormationDateEnd, request.Status)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return

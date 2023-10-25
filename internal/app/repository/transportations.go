@@ -10,19 +10,25 @@ import (
 	"bmstu-web-backend/internal/app/ds"
 )
 
-func (r *Repository) GetAllTransportations(formationDate *time.Time, status string) ([]ds.Transportation, error) {
+func (r *Repository) GetAllTransportations(formationDateStart, formationDateEnd *time.Time, status string) ([]ds.Transportation, error) {
 	var transportations []ds.Transportation
 	var err error
 
-	if formationDate != nil {
+	if formationDateStart != nil && formationDateEnd != nil {
 		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
-			Where("formation_date = ?", formationDate).
+			Where("formation_date BETWEEN ? AND ?", *formationDateStart, *formationDateEnd).
 			Find(&transportations).Error
-	} else if status != "" {
+	} else if formationDateStart != nil {
 		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+			Where("formation_date >= ?", *formationDateStart).
+			Find(&transportations).Error
+	} else if formationDateEnd != nil {
+		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+			Where("formation_date <= ?", *formationDateEnd).
 			Find(&transportations).Error
 	} else {
-		err = r.db.Find(&transportations).Error
+		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+			Find(&transportations).Error
 	}
 	if err != nil {
 		return nil, err
