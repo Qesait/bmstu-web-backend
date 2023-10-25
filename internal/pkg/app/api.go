@@ -8,9 +8,10 @@ import (
 	"path/filepath"
 	"time"
 
+	"mime/multipart"
+
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
-	"mime/multipart"
 )
 
 func (app *Application) uploadImage(c *gin.Context, image *multipart.FileHeader, UUID string) (*string, error) {
@@ -22,7 +23,7 @@ func (app *Application) uploadImage(c *gin.Context, image *multipart.FileHeader,
 
 	extension := filepath.Ext(image.Filename)
 	if extension != ".jpg" && extension != ".jpeg" {
-		return nil, fmt.Errorf("only jpeg images allowed")
+		return nil, fmt.Errorf("разрешены только jpeg изображения")
 	}
 	imageName := UUID + extension
 
@@ -73,7 +74,7 @@ func (app *Application) GetContainer(c *gin.Context) {
 		return
 	}
 	if container == nil {
-		c.AbortWithError(http.StatusNotFound, fmt.Errorf("container not found"))
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("контейнер не найдена"))
 		return
 	}
 	c.JSON(http.StatusOK, container)
@@ -252,7 +253,7 @@ func (app *Application) GetTranspostation(c *gin.Context) {
 		return
 	}
 	if transportation == nil {
-		c.AbortWithError(http.StatusNotFound, fmt.Errorf("transportation not found"))
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не найдена"))
 		return
 	}
 
@@ -280,7 +281,7 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 		return
 	}
 	if transportation == nil {
-		c.AbortWithError(http.StatusNotFound, fmt.Errorf("transportation not found"))
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не найдена"))
 		return
 	}
 	transportation.Transport = request.Transport
@@ -305,7 +306,7 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 		return
 	}
 	if transportation == nil {
-		c.AbortWithError(http.StatusNotFound, fmt.Errorf("transportation not found"))
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не найдена"))
 		return
 	}
 	transportation.Status = ds.DELETED
@@ -329,7 +330,7 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 		return
 	}
 	if transportation == nil {
-		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не обнаружена"))
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не найдена"))
 		return
 	}
 	if transportation.Status != ds.DRAFT {
@@ -364,11 +365,11 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		return
 	}
 	if transportation == nil {
-		c.AbortWithError(http.StatusNotFound, fmt.Errorf("transportation not found"))
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не найдена"))
 		return
 	}
 	if transportation.Status != ds.DRAFT {
-		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("methon can not be called on transportation with status %s", transportation.Status))
+		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя сформировать перевозку со статусом %s", transportation.Status))
 		return
 	}
 	transportation.Status = ds.FORMED
@@ -404,11 +405,11 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		return
 	}
 	if transportation == nil {
-		c.AbortWithError(http.StatusNotFound, fmt.Errorf("transportation not found"))
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не найдена"))
 		return
 	}
 	if transportation.Status != ds.FORMED {
-		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("methon can not be called on transportation with status %s", transportation.Status))
+		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя изменить статус с %s на %s", transportation.Status, request.Status))
 		return
 	}
 	transportation.Status = request.Status
