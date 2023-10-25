@@ -423,7 +423,7 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		return
 	}
 	if transportation.Status != ds.FORMED {
-		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя изменить статус с %s на %s", transportation.Status, request.Status))
+		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя изменить статус с \"%s\" на \"%s\"", transportation.Status, request.Status))
 		return
 	}
 	transportation.Status = request.Status

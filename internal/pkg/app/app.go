@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
@@ -55,6 +56,8 @@ func (app *Application) Run() {
 
 func New() (*Application, error) {
 	var err error
+	loc, _ := time.LoadLocation("UTC")
+    time.Local = loc
 	app := Application{}
 	app.config, err = config.NewConfig()
 	if err != nil {
