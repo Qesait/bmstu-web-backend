@@ -58,7 +58,14 @@ func (app *Application) GetAllContainers(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, schemes.AllContainersResponse{Containers: containers})
+
+	draftTransportation, err := app.repo.GetDraftTransportation(app.getCustomer())
+	fmt.Println(draftTransportation)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, schemes.GetAllContainersResponse{DraftTransportation: draftTransportation, Containers: containers})
 }
 
 func (app *Application) GetContainer(c *gin.Context) {
@@ -207,6 +214,13 @@ func (app *Application) AddToTranspostation(c *gin.Context) {
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
+	}
+	if transportation == nil {
+		transportation, err = app.repo.CreateDraftTransportation(app.getCustomer())
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
 	}
 
 	if err = app.repo.AddToTransportation(transportation.UUID, request.ContainerId); err != nil {

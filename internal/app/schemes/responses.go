@@ -8,6 +8,11 @@ type AllContainersResponse struct {
 	Containers []ds.Container `json:"containers"`
 }
 
+type GetAllContainersResponse struct {
+	DraftTransportation *ds.Transportation `json:"draft_transportation"`
+	Containers          []ds.Container     `json:"containers"`
+}
+
 type AllTransportationsResponse struct {
 	Transportations []ds.Transportation `json:"transportations"`
 }

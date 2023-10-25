@@ -34,14 +34,19 @@ func (r *Repository) GetDraftTransportation(customerId string) (*ds.Transportati
 	transportation := &ds.Transportation{}
 	err := r.db.First(transportation, ds.Transportation{Status: ds.DRAFT, CustomerId: customerId}).Error
 	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
 		}
-		transportation = &ds.Transportation{CreationDate: time.Now(), CustomerId: customerId, Status: ds.DRAFT}
-		err := r.db.Create(transportation).Error
-		if err != nil {
-			return nil, err
-		}
+		return nil, err
+	}
+	return transportation, nil
+}
+
+func (r *Repository) CreateDraftTransportation(customerId string) (*ds.Transportation, error) {
+	transportation := &ds.Transportation{CreationDate: time.Now(), CustomerId: customerId, Status: ds.DRAFT}
+	err := r.db.Create(transportation).Error
+	if err != nil {
+		return nil, err
 	}
 	return transportation, nil
 }
