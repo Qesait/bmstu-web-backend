@@ -16,7 +16,7 @@ type GetAllContainersRequest struct {
 
 type AddContainerRequest struct {
 	ds.Container
-	Image *multipart.FileHeader `form:"image"`
+	Image *multipart.FileHeader `form:"image" json:"image" binding:"required"`
 }
 
 type ChangeContainerRequest struct {
@@ -26,7 +26,7 @@ type ChangeContainerRequest struct {
 	Length      *int                  `form:"length" json:"length"`
 	Height      *int                  `form:"height" json:"height"`
 	Width       *int                  `form:"width" json:"width"`
-	Image       *multipart.FileHeader `form:"image"`
+	Image       *multipart.FileHeader `form:"image" json:"image"`
 	Cargo       *string               `form:"cargo" json:"cargo" binding:"omitempty,max=50"`
 	Weight      *int                  `form:"weight" json:"weight"`
 }

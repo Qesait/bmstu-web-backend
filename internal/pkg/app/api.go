@@ -260,7 +260,7 @@ func (app *Application) GetTranspostation(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-
+	// TODO: Только id перевозки
 	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getCustomer())
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)

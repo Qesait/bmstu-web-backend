@@ -20,7 +20,7 @@ type Container struct {
 	Height    int     `gorm:"not null" form:"height" json:"height" binding:"required"`
 	Width     int     `gorm:"not null" form:"width" json:"width" binding:"required"`
 	ImageURL  *string `gorm:"size:100" json:"image_url" binding:"-"`
-	IsDeleted bool    `gorm:"not null;default:false" binding:"-"`
+	IsDeleted bool    `gorm:"not null;default:false" json:"-" binding:"-"`
 	Cargo     string  `gorm:"size:50;not null" form:"cargo" json:"cargo" binding:"required,max=50"`
 	Weight    int     `gorm:"not null" form:"weight" json:"weight" binding:"required"`
 }
