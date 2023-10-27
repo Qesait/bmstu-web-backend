@@ -9,19 +9,56 @@ type AllContainersResponse struct {
 }
 
 type GetAllContainersResponse struct {
-	DraftTransportation *ds.Transportation `json:"draft_transportation"`
-	Containers          []ds.Container     `json:"containers"`
+	DraftTransportationId *string        `json:"draft_transportation_id"`
+	Containers            []ds.Container `json:"containers"`
 }
 
 type AllTransportationsResponse struct {
-	Transportations []ds.Transportation `json:"transportations"`
+	Transportations []TransportationOutput `json:"transportations"`
 }
 
 type TransportationResponse struct {
-	Transportation ds.Transportation `json:"transportation"`
-	Containers     []ds.Container    `json:"containers"`
+	Transportation TransportationOutput `json:"transportation"`
+	Containers     []ds.Container       `json:"containers"`
 }
 
 type UpdateTransportationResponse struct {
-	Transportation ds.Transportation `json:"transportation"`
+	Transportation TransportationOutput `json:"transportation"`
+}
+
+type TransportationOutput struct {
+	UUID           string  `json:"uuid"`
+	Status         string  `json:"status"`
+	CreationDate   string  `json:"creation_date"`
+	FormationDate  *string `json:"formation_date"`
+	CompletionDate *string `json:"completion_date"`
+	Moderator      *string `json:"moderator"`
+	Customer       string  `json:"customer"`
+	Transport      string  `json:"transport"`
+}
+
+func ConvertTransportation(transportation *ds.Transportation) TransportationOutput {
+	output := TransportationOutput{
+		UUID:         transportation.UUID,
+		Status:       transportation.Status,
+		CreationDate: transportation.CreationDate.Format("2006-01-02"),
+		Transport:    transportation.Transport,
+		Customer:     transportation.Customer.Name,
+	}
+
+	if transportation.FormationDate != nil {
+		formationDate := transportation.FormationDate.Format("2006-01-02")
+		output.FormationDate = &formationDate
+	}
+
+	if transportation.CompletionDate != nil {
+		completionDate := transportation.CompletionDate.Format("2006-01-02")
+		output.CompletionDate = &completionDate
+	}
+
+	if transportation.Moderator != nil {
+		output.Moderator = &transportation.Moderator.Name
+	}
+
+	return output
 }

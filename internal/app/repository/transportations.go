@@ -15,19 +15,23 @@ func (r *Repository) GetAllTransportations(formationDateStart, formationDateEnd 
 	var err error
 
 	if formationDateStart != nil && formationDateEnd != nil {
-		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+		err = r.db.Preload("Customer").Preload("Moderator").
+			Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
 			Where("formation_date BETWEEN ? AND ?", *formationDateStart, *formationDateEnd).
 			Find(&transportations).Error
 	} else if formationDateStart != nil {
-		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+		err = r.db.Preload("Customer").Preload("Moderator").
+			Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
 			Where("formation_date >= ?", *formationDateStart).
 			Find(&transportations).Error
 	} else if formationDateEnd != nil {
-		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+		err = r.db.Preload("Customer").Preload("Moderator").
+			Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
 			Where("formation_date <= ?", *formationDateEnd).
 			Find(&transportations).Error
 	} else {
-		err = r.db.Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
+		err = r.db.Preload("Customer").Preload("Moderator").
+			Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
 			Find(&transportations).Error
 	}
 	if err != nil {
@@ -59,7 +63,7 @@ func (r *Repository) CreateDraftTransportation(customerId string) (*ds.Transport
 
 func (r *Repository) GetTransportationById(transportationId, customerId string) (*ds.Transportation, error) {
 	transportation := &ds.Transportation{}
-	err := r.db.First(transportation, ds.Transportation{UUID: transportationId, CustomerId: customerId}).Error
+	err := r.db.Preload("Moderator").Preload("Customer").First(transportation, ds.Transportation{UUID: transportationId, CustomerId: customerId}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil

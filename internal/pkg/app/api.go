@@ -65,7 +65,11 @@ func (app *Application) GetAllContainers(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, schemes.GetAllContainersResponse{DraftTransportation: draftTransportation, Containers: containers})
+	var draftTransportationId *string = nil
+	if draftTransportation != nil {
+		draftTransportationId = &draftTransportation.UUID
+	}
+	c.JSON(http.StatusOK, schemes.GetAllContainersResponse{DraftTransportationId: draftTransportationId, Containers: containers})
 }
 
 func (app *Application) GetContainer(c *gin.Context) {
@@ -109,16 +113,6 @@ func (app *Application) DeleteContainer(c *gin.Context) {
 }
 
 func (app *Application) AddContainer(c *gin.Context) {
-	// for key := range c.Request.PostForm {
-	//     values, _ := c.GetPostFormArray(key)
-	//     for _, value := range values {
-	//         fmt.Printf("Field: %s, Value: %s\n", key, value)
-	//     }
-	// }
-	// fmt.Println(c.Params)
-	// c.Status(http.StatusTeapot)
-	// return
-
 	var request schemes.AddContainerRequest
 	if err := c.ShouldBind(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
@@ -251,7 +245,11 @@ func (app *Application) GetAllTransportations(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.AllTransportationsResponse{Transportations: transportations})
+	outputTransportations := make([]schemes.TransportationOutput, len(transportations))
+	for i, transportation := range transportations {
+		outputTransportations[i] = schemes.ConvertTransportation(&transportation)
+	}
+	c.JSON(http.StatusOK, schemes.AllTransportationsResponse{Transportations: outputTransportations})
 }
 
 func (app *Application) GetTranspostation(c *gin.Context) {
@@ -260,7 +258,7 @@ func (app *Application) GetTranspostation(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	// TODO: Только id перевозки
+
 	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getCustomer())
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -270,13 +268,14 @@ func (app *Application) GetTranspostation(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не найдена"))
 		return
 	}
+	fmt.Println(transportation.Moderator)
 
 	containers, err := app.repo.GetTransportatioinComposition(request.TransportationId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, schemes.TransportationResponse{Transportation: *transportation, Containers: containers})
+	c.JSON(http.StatusOK, schemes.TransportationResponse{Transportation: schemes.ConvertTransportation(transportation), Containers: containers})
 }
 
 func (app *Application) UpdateTransportation(c *gin.Context) {
@@ -304,7 +303,7 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.UpdateTransportationResponse{Transportation: *transportation})
+	c.JSON(http.StatusOK, schemes.UpdateTransportationResponse{Transportation: schemes.ConvertTransportation(transportation)})
 }
 
 func (app *Application) DeleteTransportation(c *gin.Context) {
