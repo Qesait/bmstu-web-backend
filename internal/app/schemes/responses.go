@@ -8,9 +8,14 @@ type AllContainersResponse struct {
 	Containers []ds.Container `json:"containers"`
 }
 
+type TransportationShort struct {
+	UUID           string `json:"uuid"`
+	ContainerCount int    `json:"container_count"`
+}
+
 type GetAllContainersResponse struct {
-	DraftTransportationId *string        `json:"draft_transportation_id"`
-	Containers            []ds.Container `json:"containers"`
+	DraftTransportation *TransportationShort `json:"draft_transportation"`
+	Containers          []ds.Container       `json:"containers"`
 }
 
 type AllTransportationsResponse struct {

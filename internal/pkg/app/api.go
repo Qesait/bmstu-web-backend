@@ -60,16 +60,21 @@ func (app *Application) GetAllContainers(c *gin.Context) {
 	}
 
 	draftTransportation, err := app.repo.GetDraftTransportation(app.getCustomer())
-	fmt.Println(draftTransportation)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	var draftTransportationId *string = nil
+	response := schemes.GetAllContainersResponse{DraftTransportation: nil, Containers: containers}
 	if draftTransportation != nil {
-		draftTransportationId = &draftTransportation.UUID
+		response.DraftTransportation = &schemes.TransportationShort{UUID: draftTransportation.UUID}
+		containers, err := app.repo.GetTransportatioinComposition(draftTransportation.UUID)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		response.DraftTransportation.ContainerCount = len(containers)
 	}
-	c.JSON(http.StatusOK, schemes.GetAllContainersResponse{DraftTransportationId: draftTransportationId, Containers: containers})
+	c.JSON(http.StatusOK, response)
 }
 
 func (app *Application) GetContainer(c *gin.Context) {
@@ -268,7 +273,6 @@ func (app *Application) GetTranspostation(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не найдена"))
 		return
 	}
-	fmt.Println(transportation.Moderator)
 
 	containers, err := app.repo.GetTransportatioinComposition(request.TransportationId)
 	if err != nil {
