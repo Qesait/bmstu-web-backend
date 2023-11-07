@@ -90,7 +90,7 @@ func (app *Application) GetContainer(c *gin.Context) {
 		return
 	}
 	if container == nil {
-		c.AbortWithError(http.StatusNotFound, fmt.Errorf("контейнер не найдена"))
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("контейнер не найден"))
 		return
 	}
 	c.JSON(http.StatusOK, container)
@@ -106,6 +106,10 @@ func (app *Application) DeleteContainer(c *gin.Context) {
 	container, err := app.repo.GetContainerByID(request.ContainerId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	if container == nil {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("контейнер не найден"))
 		return
 	}
 	container.IsDeleted = true
@@ -162,6 +166,10 @@ func (app *Application) ChangeContainer(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+	if container == nil {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("контейнер не найден"))
+		return
+	}
 	if request.Marking != nil {
 		container.Marking = *request.Marking
 	}
@@ -208,6 +216,18 @@ func (app *Application) AddToTranspostation(c *gin.Context) {
 	}
 	var err error
 
+	// Проверить существует ли контейнер
+	container, err := app.repo.GetContainerByID(request.ContainerId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	if container == nil {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("контейнер не найден"))
+		return
+	}
+
+	// Получить черновую заявку
 	var transportation *ds.Transportation
 	transportation, err = app.repo.GetDraftTransportation(app.getCustomer())
 	if err != nil {
@@ -222,11 +242,13 @@ func (app *Application) AddToTranspostation(c *gin.Context) {
 		}
 	}
 
+	// Создать связь меджду перевозкой и контейнером
 	if err = app.repo.AddToTransportation(transportation.UUID, request.ContainerId); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
+	// Вернуть список всех контейнеров в перевозке
 	var containers []ds.Container
 	containers, err = app.repo.GetTransportatioinComposition(transportation.UUID)
 	if err != nil {
