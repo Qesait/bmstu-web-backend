@@ -29,21 +29,21 @@ func (app *Application) Run() {
 	r.Use(ErrorHandler())
 
 	// Услуги (контейнеры)
-	r.GET("/containers", app.GetAllContainers)                                         // Список с поиском
-	r.GET("/containers/:container_id", app.GetContainer)                               // Одна услуга
-	r.DELETE("/containers/:container_id", app.DeleteContainer)                         // Удаление
-	r.PUT("/containers/:container_id", app.ChangeContainer)                            // Изменение
-	r.POST("/containers", app.AddContainer)                                            // Добавление
-	r.POST("/containers/:container_id/add_to_transportation", app.AddToTranspostation) // Добавление в заявку
+	r.GET("/api/containers", app.GetAllContainers)                                         // Список с поиском
+	r.GET("/api/containers/:container_id", app.GetContainer)                               // Одна услуга
+	r.DELETE("/api/containers/:container_id", app.DeleteContainer)                         // Удаление
+	r.PUT("/api/containers/:container_id", app.ChangeContainer)                            // Изменение
+	r.POST("/api/containers", app.AddContainer)                                            // Добавление
+	r.POST("/api/containers/:container_id/add_to_transportation", app.AddToTranspostation) // Добавление в заявку
 
 	// Заявки (перевозки)
-	r.GET("/transportations", app.GetAllTransportations)                                                         // Список (отфильтровать по дате формирования и статусу)
-	r.GET("/transportations/:transportation_id", app.GetTranspostation)                                          // Одна заявка
-	r.PUT("/transportations/:transportation_id/update", app.UpdateTransportation)                                // Изменение (добавление транспорта)
-	r.DELETE("/transportations/:transportation_id", app.DeleteTransportation)                                    //Удаление
-	r.DELETE("/transportations/:transportation_id/delete_container/:container_id", app.DeleteFromTransportation) // Изменеие (удаление услуг)
-	r.PUT("/transportations/:transportation_id/user_confirm", app.UserConfirm)                                   // Сформировать создателем
-	r.PUT("transportations/:transportation_id/moderator_confirm", app.ModeratorConfirm)                          // Завершить отклонить модератором
+	r.GET("/api/transportations", app.GetAllTransportations)                                                         // Список (отфильтровать по дате формирования и статусу)
+	r.GET("/api/transportations/:transportation_id", app.GetTranspostation)                                          // Одна заявка
+	r.PUT("/api/transportations/:transportation_id/update", app.UpdateTransportation)                                // Изменение (добавление транспорта)
+	r.DELETE("/api/transportations/:transportation_id", app.DeleteTransportation)                                    //Удаление
+	r.DELETE("/api/transportations/:transportation_id/delete_container/:container_id", app.DeleteFromTransportation) // Изменеие (удаление услуг)
+	r.PUT("/api/transportations/:transportation_id/user_confirm", app.UserConfirm)                                   // Сформировать создателем
+	r.PUT("/api/transportations/:transportation_id/moderator_confirm", app.ModeratorConfirm)                          // Завершить отклонить модератором
 
 	r.Static("/image", "./static/image")
 	r.Static("/css", "./static/css")

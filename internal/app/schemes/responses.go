@@ -46,18 +46,18 @@ func ConvertTransportation(transportation *ds.Transportation) TransportationOutp
 	output := TransportationOutput{
 		UUID:         transportation.UUID,
 		Status:       transportation.Status,
-		CreationDate: transportation.CreationDate.Format("2006-01-02"),
+		CreationDate: transportation.CreationDate.Format("2006-01-02 15:04:05"),
 		Transport:    transportation.Transport,
 		Customer:     transportation.Customer.Name,
 	}
 
 	if transportation.FormationDate != nil {
-		formationDate := transportation.FormationDate.Format("2006-01-02")
+		formationDate := transportation.FormationDate.Format("2006-01-02 15:04:05")
 		output.FormationDate = &formationDate
 	}
 
 	if transportation.CompletionDate != nil {
-		completionDate := transportation.CompletionDate.Format("2006-01-02")
+		completionDate := transportation.CompletionDate.Format("2006-01-02 15:04:05")
 		output.CompletionDate = &completionDate
 	}
 
