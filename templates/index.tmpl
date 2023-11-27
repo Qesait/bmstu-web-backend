@@ -18,8 +18,7 @@
                 <div class="image-container card-image" style="background-image: url('/image/{{$value.ImageURL}}');"></div>
                 <div class="card-content">
                     <h5 class="title">{{$value.Marking}}</h5>
-                    <p class="info"><b>Тип:</b> {{$value.ContainerType.Name}}</p>
-                    <p class="info"><b>Введенён в эксплутацию:</b> {{$value.PurchaseDate.Format "02.01.2006"}}</p>
+                    <p class="info"><b>Тип:</b> {{$value.Type}}</p>
                     <p class="info"><b>Груз:</b> {{$value.Cargo}}</p>
                 </div>
                 {{if not .IsDeleted}}

@@ -9,15 +9,13 @@
         <div class="image-container item-image" style="background-image: url('/image/{{.ImageURL}}');"></div>
         <div class="panel">
             <h4 class="title">Контейнер №{{.Marking}}</h4>
-            <p class="info"><b>Дата введения в эксплутацию:</b> {{.PurchaseDate.Format "02.01.2006"}}</p>
             {{if .IsDeleted}}
                 <p class="info"><b>Списан</b></p>
             {{end}}
-            <p class="info"><b>Тип:</b> {{.ContainerType.Name}}</p>
-            <p class="info"><b>Длина:</b> {{.ContainerType.Length}} мм</p>
-            <p class="info"><b>Ширина:</b> {{.ContainerType.Width}} мм</p>
-            <p class="info"><b>Высота:</b> {{.ContainerType.Height}} мм</p>
-            <p class="info"><b>Максимальная масса брутто:</b> {{.ContainerType.MaxGross}} кг</p>
+            <p class="info"><b>Тип:</b> {{.Type}}</p>
+            <p class="info"><b>Длина:</b> {{.Length}} мм</p>
+            <p class="info"><b>Ширина:</b> {{.Width}} мм</p>
+            <p class="info"><b>Высота:</b> {{.Height}} мм</p>
         </div>
         <div class="cargo-content">
             <div class="panel">

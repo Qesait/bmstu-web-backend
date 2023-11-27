@@ -49,7 +49,7 @@ func (app *Application) GetContainers(c *gin.Context) {
 func (app *Application) DecommissionContainer(c *gin.Context) {
 	id := c.PostForm("delete")
 
-	app.repo.DecommissionContainer(id)
+	app.repo.DeleteContainer(id)
 
 	containers, err := app.repo.GetContainersByType("")
 	if err != nil {

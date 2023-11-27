@@ -27,7 +27,8 @@ func New(dsn string) (*Repository, error) {
 func (r *Repository) GetContainerByID(id string) (*ds.Container, error) {
 	container := &ds.Container{}
 	err := r.db.Where("container_id = ?", id).
-		Preload("ContainerType").First(container).Error
+		Where("is_deleted = ?", false).
+		First(container).Error
 	if err != nil {
 		return nil, err
 	}
@@ -38,20 +39,16 @@ func (r *Repository) GetContainerByID(id string) (*ds.Container, error) {
 func (r *Repository) GetContainersByType(containerType string) ([]ds.Container, error) {
 	var containers []ds.Container
 
-	err := r.db.Preload("ContainerType").
-		Joins("JOIN container_types ON containers.type_id = container_types.container_type_id").
-		Where("LOWER(container_types.name) LIKE ?", "%"+strings.ToLower(containerType)+"%").
+	err := r.db.Where("LOWER(type) LIKE ?", "%"+strings.ToLower(containerType)+"%").
 		Where("is_deleted = ?", false).
 		Find(&containers).Error
-
 	if err != nil {
 		return nil, err
 	}
-
 	return containers, nil
 }
 
-func (r *Repository) DecommissionContainer(id string) error {
+func (r *Repository) DeleteContainer(id string) error {
 	err := r.db.Exec("UPDATE containers SET is_deleted = ? WHERE container_id = ?", true, id).Error
 	if err != nil {
 		return err
