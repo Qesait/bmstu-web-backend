@@ -58,12 +58,15 @@ type DeleteFromTransportationRequest struct {
 }
 
 type UserConfirmRequest struct {
-	TransportationId string `uri:"transportation_id" binding:"required,uuid"`
+	URI struct {
+		TransportationId string `uri:"transportation_id" binding:"required,uuid"`
+	}
+	Confirm bool `form:"confirm" binding:"required"`
 }
 
 type ModeratorConfirmRequest struct {
 	URI struct {
 		TransportationId string `uri:"transportation_id" binding:"required,uuid"`
 	}
-	Status string `form:"status" json:"status" binding:"required"`
+	Confirm bool `form:"confirm" binding:"required"`
 }

@@ -143,12 +143,16 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 
 func (app *Application) UserConfirm(c *gin.Context) {
 	var request schemes.UserConfirmRequest
-	if err := c.ShouldBindUri(&request); err != nil {
+	if err := c.ShouldBindUri(&request.URI); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	if err := c.ShouldBind(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getCustomer())
+	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, app.getCustomer())
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -161,9 +165,14 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя сформировать перевозку со статусом %s", transportation.Status))
 		return
 	}
-	transportation.Status = ds.FORMED
-	now := time.Now()
-	transportation.FormationDate = &now
+
+	if request.Confirm {
+		transportation.Status = ds.FORMED
+		now := time.Now()
+		transportation.FormationDate = &now
+	} else {
+		transportation.Status = ds.DELETED
+	}
 
 	if err := app.repo.SaveTransportation(transportation); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -183,11 +192,6 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		return
 	}
 
-	if request.Status != ds.COMPELTED && request.Status != ds.REJECTED {
-		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("status %s not allowed", request.Status))
-		return
-	}
-
 	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, app.getCustomer())
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -198,15 +202,18 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		return
 	}
 	if transportation.Status != ds.FORMED {
-		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя изменить статус с \"%s\" на \"%s\"", transportation.Status, request.Status))
+		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя изменить статус с \"%s\" на \"%s\"", transportation.Status, ds.FORMED))
 		return
 	}
-	transportation.Status = request.Status
-	transportation.ModeratorId = app.getModerator()
-	if request.Status == ds.COMPELTED {
+
+	if request.Confirm {
+		transportation.Status = ds.COMPELTED
 		now := time.Now()
 		transportation.CompletionDate = &now
+	} else {
+		transportation.Status = ds.REJECTED
 	}
+	transportation.ModeratorId = app.getModerator()
 
 	if err := app.repo.SaveTransportation(transportation); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
