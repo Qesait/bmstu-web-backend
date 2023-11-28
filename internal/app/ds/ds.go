@@ -2,6 +2,7 @@ package ds
 
 import (
 	"time"
+	"bmstu-web-backend/internal/app/role"
 )
 
 type User struct {
@@ -10,6 +11,7 @@ type User struct {
 	Password  string `gorm:"size:30;not null" json:"-"`
 	Name      string `gorm:"size:50;not null" json:"name"`
 	Moderator bool   `gorm:"not null" json:"-"`
+	Role role.Role `sql:"type:string;"`
 }
 
 type Container struct {

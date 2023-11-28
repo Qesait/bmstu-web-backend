@@ -1,8 +1,11 @@
 package config
 
 import (
+	"errors"
 	"os"
+	"time"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -13,6 +16,14 @@ type Config struct {
 	ServicePort   int
 	MinioEndpoint string
 	BucketName    string
+
+	JWT JWTConfig
+}
+
+type JWTConfig struct {
+	Token         string
+	SigningMethod jwt.SigningMethod
+	ExpiresIn     time.Duration
 }
 
 func NewConfig() (*Config, error) {
@@ -39,6 +50,11 @@ func NewConfig() (*Config, error) {
 	err = viper.Unmarshal(cfg)
 	if err != nil {
 		return nil, err
+	}
+	if os.Getenv("JWT_TOKEN") != "" {
+		cfg.JWT.Token = os.Getenv("JWT_TOKEN")
+	} else {
+		return nil, errors.New("JWT_TOKEN env variable not provided")
 	}
 
 	log.Info("config parsed")
