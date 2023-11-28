@@ -1,17 +1,16 @@
 package ds
 
 import (
-	"time"
 	"bmstu-web-backend/internal/app/role"
+	"time"
 )
 
 type User struct {
-	UUID      string `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"-"`
-	Login     string `gorm:"size:30;not null" json:"-"`
-	Password  string `gorm:"size:30;not null" json:"-"`
-	Name      string `gorm:"size:50;not null" json:"name"`
-	Moderator bool   `gorm:"not null" json:"-"`
-	Role role.Role `sql:"type:string;"`
+	UUID      string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"-"`
+	Role      role.Role `sql:"type:string;"`
+	Login     string    `gorm:"size:30;not null" json:"-"`
+	Password  string    `gorm:"size:40;not null" json:"-"`
+	// The SHA-1 hash is 20 bytes. When encoded in hexadecimal, each byte is represented by two characters. Therefore, the resulting hash string will be 40 characters long
 }
 
 type Container struct {

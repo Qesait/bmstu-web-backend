@@ -23,20 +23,20 @@ func (app *Application) uploadImage(c *gin.Context, image *multipart.FileHeader,
 	}
 	imageName := UUID + extension
 
-	_, err = app.minioClient.PutObject(c, app.config.BucketName, imageName, src, image.Size, minio.PutObjectOptions{
+	_, err = app.minioClient.PutObject(c, app.config.Minio.BucketName, imageName, src, image.Size, minio.PutObjectOptions{
 		ContentType: "image/jpeg",
 	})
 	if err != nil {
 		return nil, err
 	}
-	imageURL := fmt.Sprintf("%s/%s/%s", app.config.MinioEndpoint, app.config.BucketName, imageName)
+	imageURL := fmt.Sprintf("%s/%s/%s", app.config.Minio.Endpoint, app.config.Minio.BucketName, imageName)
 	return &imageURL, nil
 }
 
 func (app *Application) deleteImage(c *gin.Context, UUID string) error {
 	imageName := UUID + ".jpg"
 	fmt.Println(imageName)
-	err := app.minioClient.RemoveObject(c, app.config.BucketName, imageName, minio.RemoveObjectOptions{})
+	err := app.minioClient.RemoveObject(c, app.config.Minio.BucketName, imageName, minio.RemoveObjectOptions{})
 	if err != nil {
 		return err
 	}

@@ -48,7 +48,7 @@ func ConvertTransportation(transportation *ds.Transportation) TransportationOutp
 		Status:       transportation.Status,
 		CreationDate: transportation.CreationDate.Format("2006-01-02 15:04:05"),
 		Transport:    transportation.Transport,
-		Customer:     transportation.Customer.Name,
+		Customer:     transportation.Customer.Login,
 	}
 
 	if transportation.FormationDate != nil {
@@ -62,7 +62,7 @@ func ConvertTransportation(transportation *ds.Transportation) TransportationOutp
 	}
 
 	if transportation.Moderator != nil {
-		output.Moderator = &transportation.Moderator.Name
+		output.Moderator = &transportation.Moderator.Login
 	}
 
 	return output

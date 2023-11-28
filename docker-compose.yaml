@@ -34,6 +34,7 @@ services:
   minio1:
     <<: *minio-common
     hostname: minio1 # указываем что адрес внутри подсети docker будет http://minio1:9000/ и на порту 9001 для админки соотвественно
+    container_name: minio1
     volumes: # куда физически переадресовать* память(в какие разделы) из виртуальной(в докере) на вашу машину. по сути это работает как хард линк на файл/папку
       - data1-1:/data1
       - data1-2:/data2
@@ -41,6 +42,7 @@ services:
   minio2: # аналогично ставим 2-4 ноды
     <<: *minio-common
     hostname: minio2
+    container_name: minio2
     volumes:
       - data2-1:/data1
       - data2-2:/data2

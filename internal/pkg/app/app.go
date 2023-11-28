@@ -13,6 +13,7 @@ import (
 	"bmstu-web-backend/internal/app/config"
 	"bmstu-web-backend/internal/app/dsn"
 	"bmstu-web-backend/internal/app/repository"
+	"bmstu-web-backend/internal/app/role"
 )
 
 type Application struct {
@@ -45,11 +46,13 @@ func (app *Application) Run() {
 	r.PUT("/api/transportations/:transportation_id/user_confirm", app.UserConfirm)                                   // Сформировать создателем
 	r.PUT("/api/transportations/:transportation_id/moderator_confirm", app.ModeratorConfirm)                         // Завершить отклонить модератором
 
+	r.POST("/api/sign_up", app.Register)
+	r.POST("/api/login", app.Login) // там где мы ранее уже заводили эндпоинты
 	// никто не имеет доступа
-	r.Use(app.WithAuthCheck()).GET("/ping", app.Ping)
+	r.GET("/api/ping", app.WithAuthCheck(role.Moderator), app.Ping)
 	// или ниженаписанное значит что доступ имеют менеджер и админ
 	// r.Use(a.WithAuthCheck(role.Manager, role.Admin)).GET("/ping", a.Ping)
-	r.POST("/sign_up", app.Register)
+
 
 	r.Static("/image", "./static/image")
 	r.Static("/css", "./static/css")
@@ -57,23 +60,6 @@ func (app *Application) Run() {
 	r.Run(fmt.Sprintf("%s:%d", app.config.ServiceHost, app.config.ServicePort))
 
 	log.Println("Server down")
-}
-
-type pingReq struct{}
-type pingResp struct {
-	Status string `json:"status"`
-}
-
-// Ping godoc
-// @Summary      Show hello text
-// @Description  very very friendly response
-// @Tags         Tests
-// @Produce      json
-// @Success      200  {object}  pingResp
-// @Router       /ping/{name} [get]
-func (a *Application) Ping(gCtx *gin.Context) {
-	name := gCtx.Param("name")
-	gCtx.String(http.StatusOK, "Hello %s", name)
 }
 
 func New() (*Application, error) {
@@ -91,7 +77,7 @@ func New() (*Application, error) {
 		return nil, err
 	}
 
-	app.minioClient, err = minio.New(app.config.MinioEndpoint, &minio.Options{
+	app.minioClient, err = minio.New(app.config.Minio.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4("", "", ""),
 		Secure: false,
 	})

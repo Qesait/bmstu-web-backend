@@ -6,7 +6,7 @@ import (
 )
 
 type JWTClaims struct {
-	jwt.StandardClaims        // все что точно необходимо по RFC
-	UserUUID           string `json:"user_uuid"` // наши данные - uuid этого пользователя в базе данных
-	Role               role.Role
+	jwt.StandardClaims
+	UserUUID string `json:"user_uuid"`
+	Role     role.Role
 }

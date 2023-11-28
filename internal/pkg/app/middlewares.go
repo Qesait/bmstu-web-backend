@@ -13,12 +13,11 @@ import (
 const jwtPrefix = "Bearer "
 
 func (a *Application) WithAuthCheck(assignedRoles ...role.Role) func(ctx *gin.Context) {
-	return func(gCtx *gin.Context) {
-		jwtStr := gCtx.GetHeader("Authorization")
+	return func(c *gin.Context) {
+		jwtStr := c.GetHeader("Authorization")
 		if !strings.HasPrefix(jwtStr, jwtPrefix) { // если нет префикса то нас дурят!
-			gCtx.AbortWithStatus(http.StatusForbidden) // отдаем что нет доступа
-
-			return // завершаем обработку
+			c.AbortWithStatus(http.StatusForbidden) // отдаем что нет доступа
+			return                                  // завершаем обработку
 		}
 
 		// отрезаем префикс
@@ -28,9 +27,8 @@ func (a *Application) WithAuthCheck(assignedRoles ...role.Role) func(ctx *gin.Co
 			return []byte(a.config.JWT.Token), nil
 		})
 		if err != nil {
-			gCtx.AbortWithStatus(http.StatusForbidden)
+			c.AbortWithStatus(http.StatusForbidden)
 			log.Println(err)
-
 			return
 		}
 
@@ -38,13 +36,11 @@ func (a *Application) WithAuthCheck(assignedRoles ...role.Role) func(ctx *gin.Co
 
 		for _, oneOfAssignedRole := range assignedRoles {
 			if myClaims.Role == oneOfAssignedRole {
-				gCtx.AbortWithStatus(http.StatusForbidden)
-				log.Printf("role %s is not assigned in %s", myClaims.Role, assignedRoles)
-
 				return
 			}
 		}
-
+		c.AbortWithStatus(http.StatusForbidden)
+		log.Println("role is not assigned")
 	}
 
 }

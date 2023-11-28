@@ -12,18 +12,22 @@ import (
 )
 
 type Config struct {
-	ServiceHost   string
-	ServicePort   int
-	MinioEndpoint string
-	BucketName    string
+	ServiceHost string
+	ServicePort int
 
-	JWT JWTConfig
+	JWT   JWTConfig   `mapstructure:"jwt"`
+	Minio MinioConfig `mapstructure:"minio"`
+}
+
+type MinioConfig struct {
+	Endpoint string
+	BucketName    string
 }
 
 type JWTConfig struct {
 	Token         string
-	SigningMethod jwt.SigningMethod
 	ExpiresIn     time.Duration
+	SigningMethod jwt.SigningMethod `mapstructure:"-"`
 }
 
 func NewConfig() (*Config, error) {
@@ -56,6 +60,7 @@ func NewConfig() (*Config, error) {
 	} else {
 		return nil, errors.New("JWT_TOKEN env variable not provided")
 	}
+	cfg.JWT.SigningMethod = jwt.SigningMethodHS256
 
 	log.Info("config parsed")
 
