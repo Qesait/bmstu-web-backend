@@ -30,21 +30,27 @@ func (app *Application) Run() {
 	r.Use(ErrorHandler())
 
 	// Услуги (контейнеры)
-	r.GET("/api/containers", app.GetAllContainers)                                         // Список с поиском
-	r.GET("/api/containers/:container_id", app.GetContainer)                               // Одна услуга
-	r.DELETE("/api/containers/:container_id", app.DeleteContainer)                         // Удаление
-	r.PUT("/api/containers/:container_id", app.ChangeContainer)                            // Изменение
-	r.POST("/api/containers", app.AddContainer)                                            // Добавление
-	r.POST("/api/containers/:container_id/add_to_transportation", app.AddToTranspostation) // Добавление в заявку
+	containers := r.Group("/api/containers")
+	{
+		containers.GET("/", app.GetAllContainers)                                        // Список с поиском
+		containers.GET("/:container_id", app.GetContainer)                               // Одна услуга
+		containers.DELETE("/:container_id", app.DeleteContainer)                         // Удаление
+		containers.PUT("/:container_id", app.ChangeContainer)                            // Изменение
+		containers.POST("/", app.AddContainer)                                           // Добавление
+		containers.POST("/:container_id/add_to_transportation", app.AddToTranspostation) // Добавление в заявку
+	}
 
 	// Заявки (перевозки)
-	r.GET("/api/transportations", app.GetAllTransportations)                                                         // Список (отфильтровать по дате формирования и статусу)
-	r.GET("/api/transportations/:transportation_id", app.GetTranspostation)                                          // Одна заявка
-	r.PUT("/api/transportations/:transportation_id/update", app.UpdateTransportation)                                // Изменение (добавление транспорта)
-	r.DELETE("/api/transportations/:transportation_id", app.DeleteTransportation)                                    //Удаление
-	r.DELETE("/api/transportations/:transportation_id/delete_container/:container_id", app.DeleteFromTransportation) // Изменеие (удаление услуг)
-	r.PUT("/api/transportations/:transportation_id/user_confirm", app.UserConfirm)                                   // Сформировать создателем
-	r.PUT("/api/transportations/:transportation_id/moderator_confirm", app.ModeratorConfirm)                         // Завершить отклонить модератором
+	transportations := r.Group("/api/transportations")
+	{
+		transportations.GET("/", app.GetAllTransportations)                                                        // Список (отфильтровать по дате формирования и статусу)
+		transportations.GET("/:transportation_id", app.GetTranspostation)                                          // Одна заявка
+		transportations.PUT("/:transportation_id/update", app.UpdateTransportation)                                // Изменение (добавление транспорта)
+		transportations.DELETE("/:transportation_id", app.DeleteTransportation)                                    //Удаление
+		transportations.DELETE("/:transportation_id/delete_container/:container_id", app.DeleteFromTransportation) // Изменеие (удаление услуг)
+		transportations.PUT("/:transportation_id/user_confirm", app.UserConfirm)                                   // Сформировать создателем
+		transportations.PUT("/:transportation_id/moderator_confirm", app.ModeratorConfirm)                         // Завершить отклонить модератором
+	}
 
 	r.POST("/api/sign_up", app.Register)
 	r.POST("/api/login", app.Login) // там где мы ранее уже заводили эндпоинты
@@ -52,7 +58,6 @@ func (app *Application) Run() {
 	r.GET("/api/ping", app.WithAuthCheck(role.Moderator), app.Ping)
 	// или ниженаписанное значит что доступ имеют менеджер и админ
 	// r.Use(a.WithAuthCheck(role.Manager, role.Admin)).GET("/ping", a.Ping)
-
 
 	r.Static("/image", "./static/image")
 	r.Static("/css", "./static/css")
