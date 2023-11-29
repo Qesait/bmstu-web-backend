@@ -3,17 +3,15 @@ package app
 import (
 	"crypto/sha1"
 	"fmt"
+	"log"
 	"net/http"
+	"strings"
 	"time"
 
-	"github.com/gin-gonic/gin"
-
-	// "bmstu-web-backend/internal/app/config"
-	// "bmstu-web-backend/internal/app/dsn"
-	// "bmstu-web-backend/internal/app/repository"
 	"bmstu-web-backend/internal/app/ds"
 	"bmstu-web-backend/internal/app/role"
 	"encoding/hex"
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -28,15 +26,15 @@ type loginResp struct {
 	TokenType   string        `json:"token_type"`
 }
 
-func (a *Application) Login(c *gin.Context) {
-	JWTConfig := a.config.JWT
+func (app *Application) Login(c *gin.Context) {
+	JWTConfig := app.config.JWT
 	request := &loginReq{}
 	if err := c.ShouldBind(request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	user, err := a.repo.GetUserByLogin(request.Login)
+	user, err := app.repo.GetUserByLogin(request.Login)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -85,7 +83,7 @@ type registerResp struct {
 	Ok bool `json:"ok"`
 }
 
-func (a *Application) Register(c *gin.Context) {
+func (app *Application) Register(c *gin.Context) {
 	request := &registerReq{}
 	if err := c.ShouldBind(request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
@@ -102,7 +100,7 @@ func (a *Application) Register(c *gin.Context) {
 		return
 	}
 
-	if err := a.repo.AddUser(&ds.User{
+	if err := app.repo.AddUser(&ds.User{
 		Role:     role.Customer,
 		Login:    request.Login,
 		Password: generateHashString(request.Password),
@@ -134,7 +132,29 @@ func (a *Application) Ping(gCtx *gin.Context) {
 	gCtx.String(http.StatusOK, "Hello %s", name)
 }
 
-// type pingReq struct{}
-// type pingResp struct {
-// 	Status string `json:"status"`
-// }
+func (app *Application) Logout(c *gin.Context) {
+	jwtStr := c.GetHeader("Authorization")
+	if !strings.HasPrefix(jwtStr, jwtPrefix) {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	jwtStr = jwtStr[len(jwtPrefix):]
+
+	_, err := jwt.ParseWithClaims(jwtStr, &ds.JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(app.config.JWT.Token), nil
+	})
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		log.Println(err)
+		return
+	}
+
+	err = app.redisClient.WriteJWTToBlacklist(c.Request.Context(), jwtStr, app.config.JWT.ExpiresIn)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.Status(http.StatusOK)
+}

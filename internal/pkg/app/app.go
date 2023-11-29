@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"log"
-	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -12,6 +11,7 @@ import (
 
 	"bmstu-web-backend/internal/app/config"
 	"bmstu-web-backend/internal/app/dsn"
+	"bmstu-web-backend/internal/app/redis"
 	"bmstu-web-backend/internal/app/repository"
 	"bmstu-web-backend/internal/app/role"
 )
@@ -20,6 +20,7 @@ type Application struct {
 	repo        *repository.Repository
 	minioClient *minio.Client
 	config      *config.Config
+	redisClient *redis.Client
 }
 
 func (app *Application) Run() {
@@ -53,14 +54,9 @@ func (app *Application) Run() {
 	}
 
 	r.POST("/api/sign_up", app.Register)
-	r.POST("/api/login", app.Login) // там где мы ранее уже заводили эндпоинты
-	// никто не имеет доступа
+	r.POST("/api/login", app.Login)
+	r.POST("/api/logout", app.Logout)
 	r.GET("/api/ping", app.WithAuthCheck(role.Moderator), app.Ping)
-	// или ниженаписанное значит что доступ имеют менеджер и админ
-	// r.Use(a.WithAuthCheck(role.Manager, role.Admin)).GET("/ping", a.Ping)
-
-	r.Static("/image", "./static/image")
-	r.Static("/css", "./static/css")
 
 	r.Run(fmt.Sprintf("%s:%d", app.config.ServiceHost, app.config.ServicePort))
 
@@ -90,28 +86,10 @@ func New() (*Application, error) {
 		return nil, err
 	}
 
-	return &app, nil
-}
-
-func ErrorHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Next()
-
-		for _, err := range c.Errors {
-			log.Println(err.Err)
-		}
-		lastError := c.Errors.Last()
-		if lastError != nil {
-			switch c.Writer.Status() {
-			case http.StatusBadRequest:
-				c.JSON(-1, gin.H{"error": "wrong request"})
-			case http.StatusNotFound:
-				c.JSON(-1, gin.H{"error": lastError.Error()})
-			case http.StatusMethodNotAllowed:
-				c.JSON(-1, gin.H{"error": lastError.Error()})
-			default:
-				c.Status(-1)
-			}
-		}
+	app.redisClient, err = redis.New(app.config.Redis)
+	if err != nil {
+		return nil, err
 	}
+
+	return &app, nil
 }
