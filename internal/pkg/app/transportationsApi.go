@@ -16,7 +16,8 @@ func (app *Application) GetAllTransportations(c *gin.Context) {
 		return
 	}
 
-	transportations, err := app.repo.GetAllTransportations(request.FormationDateStart, request.FormationDateEnd, request.Status)
+	userId, _ := c.Get("userId")
+	transportations, err := app.repo.GetAllTransportations(userId.(string), request.FormationDateStart, request.FormationDateEnd, request.Status)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -36,7 +37,8 @@ func (app *Application) GetTranspostation(c *gin.Context) {
 		return
 	}
 
-	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getCustomer())
+	userId, _ := c.Get("userId")
+	transportation, err := app.repo.GetTransportationById(request.TransportationId, userId.(string))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -64,7 +66,9 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, app.getCustomer())
+
+	userId, _ := c.Get("userId")
+	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, userId.(string))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -89,7 +93,8 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 		return
 	}
 
-	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getCustomer())
+	userId, _ := c.Get("userId")
+	transportation, err := app.repo.GetTransportationById(request.TransportationId, userId.(string))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -113,7 +118,9 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	transportation, err := app.repo.GetTransportationById(request.TransportationId, app.getCustomer())
+
+	userId, _ := c.Get("userId")
+	transportation, err := app.repo.GetTransportationById(request.TransportationId, userId.(string))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -152,7 +159,8 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		return
 	}
 
-	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, app.getCustomer())
+	userId, _ := c.Get("userId")
+	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, userId.(string))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -192,7 +200,8 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		return
 	}
 
-	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, app.getCustomer())
+	userId, _ := c.Get("userId")
+	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, userId.(string))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -206,6 +215,7 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		return
 	}
 
+	userIdStr := userId.(string)
 	if request.Confirm {
 		transportation.Status = ds.COMPELTED
 		now := time.Now()
@@ -213,7 +223,7 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 	} else {
 		transportation.Status = ds.REJECTED
 	}
-	transportation.ModeratorId = app.getModerator()
+	transportation.ModeratorId = &userIdStr
 
 	if err := app.repo.SaveTransportation(transportation); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)

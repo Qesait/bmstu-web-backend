@@ -21,10 +21,13 @@ func (app *Application) GetAllContainers(c *gin.Context) {
 		return
 	}
 
-	draftTransportation, err := app.repo.GetDraftTransportation(app.getCustomer())
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
+	var draftTransportation *ds.Transportation = nil
+	if userId, exists := c.Get("userId"); exists{
+		draftTransportation, err = app.repo.GetDraftTransportation(userId.(string))
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
 	}
 	response := schemes.GetAllContainersResponse{DraftTransportation: nil, Containers: containers}
 	if draftTransportation != nil {
@@ -202,13 +205,14 @@ func (app *Application) AddToTranspostation(c *gin.Context) {
 
 	// Получить черновую заявку
 	var transportation *ds.Transportation
-	transportation, err = app.repo.GetDraftTransportation(app.getCustomer())
+	userId, _ := c.Get("userId")
+	transportation, err = app.repo.GetDraftTransportation(userId.(string))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 	if transportation == nil {
-		transportation, err = app.repo.CreateDraftTransportation(app.getCustomer())
+		transportation, err = app.repo.CreateDraftTransportation(userId.(string))
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return

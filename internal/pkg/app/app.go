@@ -33,24 +33,24 @@ func (app *Application) Run() {
 	// Услуги (контейнеры)
 	containers := r.Group("/api/containers")
 	{
-		containers.GET("/", app.GetAllContainers)                                        // Список с поиском
-		containers.GET("/:container_id", app.GetContainer)                               // Одна услуга
-		containers.DELETE("/:container_id", app.DeleteContainer)                         // Удаление
-		containers.PUT("/:container_id", app.ChangeContainer)                            // Изменение
-		containers.POST("/", app.AddContainer)                                           // Добавление
-		containers.POST("/:container_id/add_to_transportation", app.AddToTranspostation) // Добавление в заявку
+		containers.GET("/", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetAllContainers)                    // Список с поиском
+		containers.GET("/:container_id", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetContainer)           // Одна услуга
+		containers.DELETE("/:container_id", app.WithAuthCheck(role.Moderator), app.DeleteContainer)                                        // Удаление
+		containers.PUT("/:container_id", app.WithAuthCheck(role.Moderator), app.ChangeContainer)                                           // Изменение
+		containers.POST("/", app.WithAuthCheck(role.Moderator), app.AddContainer)                                                          // Добавление
+		containers.POST("/:container_id/add_to_transportation", app.WithAuthCheck(role.Customer, role.Moderator), app.AddToTranspostation) // Добавление в заявку
 	}
 
 	// Заявки (перевозки)
 	transportations := r.Group("/api/transportations")
 	{
-		transportations.GET("/", app.GetAllTransportations)                                                        // Список (отфильтровать по дате формирования и статусу)
-		transportations.GET("/:transportation_id", app.GetTranspostation)                                          // Одна заявка
-		transportations.PUT("/:transportation_id/update", app.UpdateTransportation)                                // Изменение (добавление транспорта)
-		transportations.DELETE("/:transportation_id", app.DeleteTransportation)                                    //Удаление
-		transportations.DELETE("/:transportation_id/delete_container/:container_id", app.DeleteFromTransportation) // Изменеие (удаление услуг)
-		transportations.PUT("/:transportation_id/user_confirm", app.UserConfirm)                                   // Сформировать создателем
-		transportations.PUT("/:transportation_id/moderator_confirm", app.ModeratorConfirm)                         // Завершить отклонить модератором
+		transportations.GET("/", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllTransportations)                                                        // Список (отфильтровать по дате формирования и статусу)
+		transportations.GET("/:transportation_id", app.WithAuthCheck(role.Customer, role.Moderator), app.GetTranspostation)                                          // Одна заявка
+		transportations.PUT("/:transportation_id/update", app.WithAuthCheck(role.Customer), app.UpdateTransportation)                                // Изменение (добавление транспорта)
+		transportations.DELETE("/:transportation_id", app.WithAuthCheck(role.Moderator), app.DeleteTransportation)                                    //Удаление
+		transportations.DELETE("/:transportation_id/delete_container/:container_id", app.WithAuthCheck(role.Customer), app.DeleteFromTransportation) // Изменеие (удаление услуг)
+		transportations.PUT("/:transportation_id/user_confirm", app.WithAuthCheck(role.Customer), app.UserConfirm)                                   // Сформировать создателем
+		transportations.PUT("/:transportation_id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                         // Завершить отклонить модератором
 	}
 
 	r.POST("/api/sign_up", app.Register)

@@ -18,6 +18,13 @@ func (app *Application) WithAuthCheck(assignedRoles ...role.Role) func(ctx *gin.
 	return func(c *gin.Context) {
 		jwtStr := c.GetHeader("Authorization")
 		if !strings.HasPrefix(jwtStr, jwtPrefix) {
+			for _, oneOfAssignedRole := range assignedRoles {
+				if role.NotAuthorized == oneOfAssignedRole {
+					c.Set("userId", nil)
+					c.Set("userRole", role.NotAuthorized)
+					return
+				}
+			}
 			c.AbortWithStatus(http.StatusForbidden)
 			return
 		}
@@ -47,6 +54,8 @@ func (app *Application) WithAuthCheck(assignedRoles ...role.Role) func(ctx *gin.
 
 		for _, oneOfAssignedRole := range assignedRoles {
 			if myClaims.Role == oneOfAssignedRole {
+				c.Set("userId", myClaims.UserUUID)
+				c.Set("userRole", myClaims.Role)
 				return
 			}
 		}
