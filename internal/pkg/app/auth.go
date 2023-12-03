@@ -15,7 +15,7 @@ import (
 )
 
 // @Summary		Регистрация
-// @Tags		auth
+// @Tags		Авторизация
 // @Description	Регистрация нового пользователя
 // @Accept		json
 // @Produce		json
@@ -55,7 +55,7 @@ func (app *Application) Register(c *gin.Context) {
 }
 
 // @Summary		Авторизация
-// @Tags		auth
+// @Tags		Авторизация
 // @Description	Авторизует пользователя по логиню, паролю и отдаёт jwt токен для дальнейших запросов
 // @Accept		json
 // @Produce		json
@@ -109,7 +109,7 @@ func (app *Application) Login(c *gin.Context) {
 }
 
 // @Summary		Выйти из аккаунта
-// @Tags		auth
+// @Tags		Авторизация
 // @Description	Выход из аккаунта
 // @Accept		json
 // @Produce		json

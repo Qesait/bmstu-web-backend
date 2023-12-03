@@ -12,7 +12,7 @@ import (
 )
 
 // @Summary		Получить все перевозки
-// @Tags		transportations
+// @Tags		Перевозки
 // @Description	Возвращает все перевозки с фильтрацией по статусу и дате формирования
 // @Produce		json
 // @Param		status query string false "статус перевозки"
@@ -50,7 +50,7 @@ func (app *Application) GetAllTransportations(c *gin.Context) {
 }
 
 // @Summary		Получить одну перевозку
-// @Tags		transportations
+// @Tags		Перевозки
 // @Description	Возвращает подробную информацию о перевозке и её составе
 // @Produce		json
 // @Param		transportation_id path string true "id перевозки"
@@ -83,7 +83,7 @@ func (app *Application) GetTranspostation(c *gin.Context) {
 }
 
 // @Summary		Указать транспорт перевозки
-// @Tags		transportations
+// @Tags		Перевозки
 // @Description	Позволяет изменить транспорт перевозки и возвращает обновлённые данные
 // @Access		json
 // @Produce		json
@@ -122,7 +122,7 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 }
 
 // @Summary		Удалить перевозку
-// @Tags		transportations
+// @Tags		Перевозки
 // @Description	Удаляет первозку по id
 // @Param		transportation_id path string true "id перевозки"
 // @Success		200
@@ -154,7 +154,7 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 }
 
 // @Summary		Удалить контейнер из перевозки
-// @Tags		transportations
+// @Tags		Перевозки
 // @Description	Удалить контейнер из перевозки
 // @Produce		json
 // @Param		transportation_id path string true "id перевозки"
@@ -198,7 +198,7 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 }
 
 // @Summary		Сформировать перевозку
-// @Tags		transportations
+// @Tags		Перевозки
 // @Description	Сформировать или удалить перевозку перевозку пользователем
 // @Produce		json
 // @Param		transportation_id path string true "id перевозки"
@@ -247,7 +247,7 @@ func (app *Application) UserConfirm(c *gin.Context) {
 }
 
 // @Summary		Подтвердить перевозку
-// @Tags		transportations
+// @Tags		Перевозки
 // @Description	Подтвердить или отменить перевозку модератором
 // @Produce		json
 // @Param		transportation_id path string true "id перевозки"

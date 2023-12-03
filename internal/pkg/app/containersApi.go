@@ -10,7 +10,7 @@ import (
 )
 
 // @Summary		Получить все контейнеры
-// @Tags		containers
+// @Tags		Контейнеры
 // @Description	Возвращает все доступные контейнеры с опциональной фильтрацией по типу
 // @Produce		json
 // @Param		type query string false "тип контейнера для фильтрации"
@@ -51,7 +51,7 @@ func (app *Application) GetAllContainers(c *gin.Context) {
 }
 
 // @Summary		Получить один контейнер
-// @Tags		containers
+// @Tags		Контейнеры
 // @Description	Возвращает более подробную информацию об одном контейнере
 // @Produce		json
 // @Param		container_id path string true "id контейнера"
@@ -77,7 +77,7 @@ func (app *Application) GetContainer(c *gin.Context) {
 }
 
 // @Summary		Удалить контейнер
-// @Tags		containers
+// @Tags		Контейнеры
 // @Description	Удаляет контейнер по id
 // @Param		container_id path string true "id контейнера"
 // @Success		200
@@ -113,7 +113,7 @@ func (app *Application) DeleteContainer(c *gin.Context) {
 }
 
 // @Summary		Добавить контейнер
-// @Tags		containers
+// @Tags		Контейнеры
 // @Description	Добавить новый контейнер
 // @Accept		mpfd
 // @Param		image formData file false "Изображение контейнера"
@@ -156,7 +156,7 @@ func (app *Application) AddContainer(c *gin.Context) {
 }
 
 // @Summary		Изменить котейнер
-// @Tags		containers
+// @Tags		Контейнеры
 // @Description	Изменить данные полей о контейнере
 // @Accept		mpfd
 // @Produce		json
@@ -235,7 +235,7 @@ func (app *Application) ChangeContainer(c *gin.Context) {
 }
 
 // @Summary		Добавить в перевозку
-// @Tags		containers
+// @Tags		Контейнеры
 // @Description	Добавить выбранный контейнер в черновик перевозки
 // @Produce		json
 // @Param		container_id path string true "id контейнера"

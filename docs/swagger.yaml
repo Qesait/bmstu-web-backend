@@ -133,7 +133,7 @@ paths:
             $ref: '#/definitions/schemes.GetAllContainersResponse'
       summary: Получить все контейнеры
       tags:
-      - containers
+      - Контейнеры
   /api/containers/{container_id}:
     delete:
       description: Удаляет контейнер по id
@@ -148,7 +148,7 @@ paths:
           description: OK
       summary: Удалить контейнер
       tags:
-      - containers
+      - Контейнеры
     get:
       description: Возвращает более подробную информацию об одном контейнере
       parameters:
@@ -166,7 +166,7 @@ paths:
             $ref: '#/definitions/ds.Container'
       summary: Получить один контейнер
       tags:
-      - containers
+      - Контейнеры
     post:
       consumes:
       - multipart/form-data
@@ -216,7 +216,7 @@ paths:
           description: OK
       summary: Добавить контейнер
       tags:
-      - containers
+      - Контейнеры
     put:
       consumes:
       - multipart/form-data
@@ -264,7 +264,7 @@ paths:
       responses: {}
       summary: Изменить котейнер
       tags:
-      - containers
+      - Контейнеры
   /api/containers/{container_id}/add_to_transportation:
     post:
       description: Добавить выбранный контейнер в черновик перевозки
@@ -283,7 +283,7 @@ paths:
             $ref: '#/definitions/schemes.AllContainersResponse'
       summary: Добавить в перевозку
       tags:
-      - containers
+      - Контейнеры
   /api/transportations:
     get:
       description: Возвращает все перевозки с фильтрацией по статусу и дате формирования
@@ -309,7 +309,7 @@ paths:
             $ref: '#/definitions/schemes.AllTransportationsResponse'
       summary: Получить все перевозки
       tags:
-      - transportations
+      - Перевозки
   /api/transportations/{transportation_id}:
     delete:
       description: Удаляет первозку по id
@@ -324,7 +324,7 @@ paths:
           description: OK
       summary: Удалить перевозку
       tags:
-      - transportations
+      - Перевозки
     get:
       description: Возвращает подробную информацию о перевозке и её составе
       parameters:
@@ -342,7 +342,7 @@ paths:
             $ref: '#/definitions/schemes.TransportationResponse'
       summary: Получить одну перевозку
       tags:
-      - transportations
+      - Перевозки
     put:
       description: Позволяет изменить транспорт перевозки и возвращает обновлённые
         данные
@@ -366,7 +366,7 @@ paths:
             $ref: '#/definitions/schemes.UpdateTransportationResponse'
       summary: Указать транспорт перевозки
       tags:
-      - transportations
+      - Перевозки
   /api/transportations/{transportation_id}/delete_container/{container_id}:
     delete:
       description: Удалить контейнер из перевозки
@@ -390,7 +390,7 @@ paths:
             $ref: '#/definitions/schemes.AllContainersResponse'
       summary: Удалить контейнер из перевозки
       tags:
-      - transportations
+      - Перевозки
   /api/transportations/{transportation_id}/moderator_confirm:
     put:
       description: Подтвердить или отменить перевозку модератором
@@ -412,7 +412,7 @@ paths:
           description: OK
       summary: Подтвердить перевозку
       tags:
-      - transportations
+      - Перевозки
   /api/transportations/{transportation_id}/user_confirm:
     put:
       description: Сформировать или удалить перевозку перевозку пользователем
@@ -434,7 +434,7 @@ paths:
           description: OK
       summary: Сформировать перевозку
       tags:
-      - transportations
+      - Перевозки
   /auth/login/:
     post:
       consumes:
@@ -461,7 +461,7 @@ paths:
             $ref: '#/definitions/schemes.SwaggerLoginResp'
       summary: Авторизация
       tags:
-      - auth
+      - Авторизация
   /auth/loguot/:
     post:
       consumes:
@@ -474,7 +474,7 @@ paths:
           description: OK
       summary: Выйти из аккаунта
       tags:
-      - auth
+      - Авторизация
   /auth/sign_up/:
     post:
       consumes:
@@ -500,7 +500,7 @@ paths:
             $ref: '#/definitions/schemes.RegisterResp'
       summary: Регистрация
       tags:
-      - auth
+      - Авторизация
 schemes:
 - http
 swagger: "2.0"

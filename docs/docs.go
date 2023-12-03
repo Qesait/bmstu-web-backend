@@ -22,7 +22,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "containers"
+                    "Контейнеры"
                 ],
                 "summary": "Получить все контейнеры",
                 "parameters": [
@@ -50,7 +50,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "containers"
+                    "Контейнеры"
                 ],
                 "summary": "Получить один контейнер",
                 "parameters": [
@@ -80,7 +80,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "containers"
+                    "Контейнеры"
                 ],
                 "summary": "Изменить котейнер",
                 "parameters": [
@@ -148,7 +148,7 @@ const docTemplate = `{
                     "multipart/form-data"
                 ],
                 "tags": [
-                    "containers"
+                    "Контейнеры"
                 ],
                 "summary": "Добавить контейнер",
                 "parameters": [
@@ -217,7 +217,7 @@ const docTemplate = `{
             "delete": {
                 "description": "Удаляет контейнер по id",
                 "tags": [
-                    "containers"
+                    "Контейнеры"
                 ],
                 "summary": "Удалить контейнер",
                 "parameters": [
@@ -243,7 +243,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "containers"
+                    "Контейнеры"
                 ],
                 "summary": "Добавить в перевозку",
                 "parameters": [
@@ -272,7 +272,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "transportations"
+                    "Перевозки"
                 ],
                 "summary": "Получить все перевозки",
                 "parameters": [
@@ -312,7 +312,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "transportations"
+                    "Перевозки"
                 ],
                 "summary": "Получить одну перевозку",
                 "parameters": [
@@ -339,7 +339,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "transportations"
+                    "Перевозки"
                 ],
                 "summary": "Указать транспорт перевозки",
                 "parameters": [
@@ -370,7 +370,7 @@ const docTemplate = `{
             "delete": {
                 "description": "Удаляет первозку по id",
                 "tags": [
-                    "transportations"
+                    "Перевозки"
                 ],
                 "summary": "Удалить перевозку",
                 "parameters": [
@@ -396,7 +396,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "transportations"
+                    "Перевозки"
                 ],
                 "summary": "Удалить контейнер из перевозки",
                 "parameters": [
@@ -432,7 +432,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "transportations"
+                    "Перевозки"
                 ],
                 "summary": "Подтвердить перевозку",
                 "parameters": [
@@ -465,7 +465,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "transportations"
+                    "Перевозки"
                 ],
                 "summary": "Сформировать перевозку",
                 "parameters": [
@@ -501,7 +501,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Авторизация"
                 ],
                 "summary": "Авторизация",
                 "parameters": [
@@ -540,7 +540,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Авторизация"
                 ],
                 "summary": "Выйти из аккаунта",
                 "responses": {
@@ -560,7 +560,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Авторизация"
                 ],
                 "summary": "Регистрация",
                 "parameters": [

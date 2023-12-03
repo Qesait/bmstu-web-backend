@@ -18,7 +18,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "containers"
+                    "Контейнеры"
                 ],
                 "summary": "Получить все контейнеры",
                 "parameters": [
@@ -46,7 +46,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "containers"
+                    "Контейнеры"
                 ],
                 "summary": "Получить один контейнер",
                 "parameters": [
@@ -76,7 +76,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "containers"
+                    "Контейнеры"
                 ],
                 "summary": "Изменить котейнер",
                 "parameters": [
@@ -144,7 +144,7 @@
                     "multipart/form-data"
                 ],
                 "tags": [
-                    "containers"
+                    "Контейнеры"
                 ],
                 "summary": "Добавить контейнер",
                 "parameters": [
@@ -213,7 +213,7 @@
             "delete": {
                 "description": "Удаляет контейнер по id",
                 "tags": [
-                    "containers"
+                    "Контейнеры"
                 ],
                 "summary": "Удалить контейнер",
                 "parameters": [
@@ -239,7 +239,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "containers"
+                    "Контейнеры"
                 ],
                 "summary": "Добавить в перевозку",
                 "parameters": [
@@ -268,7 +268,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "transportations"
+                    "Перевозки"
                 ],
                 "summary": "Получить все перевозки",
                 "parameters": [
@@ -308,7 +308,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "transportations"
+                    "Перевозки"
                 ],
                 "summary": "Получить одну перевозку",
                 "parameters": [
@@ -335,7 +335,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "transportations"
+                    "Перевозки"
                 ],
                 "summary": "Указать транспорт перевозки",
                 "parameters": [
@@ -366,7 +366,7 @@
             "delete": {
                 "description": "Удаляет первозку по id",
                 "tags": [
-                    "transportations"
+                    "Перевозки"
                 ],
                 "summary": "Удалить перевозку",
                 "parameters": [
@@ -392,7 +392,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "transportations"
+                    "Перевозки"
                 ],
                 "summary": "Удалить контейнер из перевозки",
                 "parameters": [
@@ -428,7 +428,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "transportations"
+                    "Перевозки"
                 ],
                 "summary": "Подтвердить перевозку",
                 "parameters": [
@@ -461,7 +461,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "transportations"
+                    "Перевозки"
                 ],
                 "summary": "Сформировать перевозку",
                 "parameters": [
@@ -497,7 +497,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Авторизация"
                 ],
                 "summary": "Авторизация",
                 "parameters": [
@@ -536,7 +536,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Авторизация"
                 ],
                 "summary": "Выйти из аккаунта",
                 "responses": {
@@ -556,7 +556,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Авторизация"
                 ],
                 "summary": "Регистрация",
                 "parameters": [
