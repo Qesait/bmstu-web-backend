@@ -9,6 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
 	"bmstu-web-backend/internal/app/role"
+	"encoding/hex"
+	"crypto/sha1"
 )
 
 func (app *Application) uploadImage(c *gin.Context, image *multipart.FileHeader, UUID string) (*string, error) {
@@ -54,11 +56,8 @@ func getUserRole(c *gin.Context) role.Role {
 	return userRole.(role.Role)
 }
 
-// func (app *Application) getCustomer() string {
-// 	return "5f58c307-a3f2-4b13-b888-c80ad08d5ed3"
-// }
-
-// func (app *Application) getModerator() *string {
-// 	moderaorId := "796c70e1-5f27-4433-a415-95e7272effa5"
-// 	return &moderaorId
-// }
+func generateHashString(s string) string {
+	h := sha1.New()
+	h.Write([]byte(s))
+	return hex.EncodeToString(h.Sum(nil))
+}

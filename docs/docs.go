@@ -22,7 +22,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "api"
+                    "containers"
                 ],
                 "summary": "Получить все контейнеры",
                 "parameters": [
@@ -50,7 +50,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "api"
+                    "containers"
                 ],
                 "summary": "Получить один контейнер",
                 "parameters": [
@@ -80,7 +80,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "api"
+                    "containers"
                 ],
                 "summary": "Изменить котейнер",
                 "parameters": [
@@ -148,7 +148,7 @@ const docTemplate = `{
                     "multipart/form-data"
                 ],
                 "tags": [
-                    "api"
+                    "containers"
                 ],
                 "summary": "Добавить контейнер",
                 "parameters": [
@@ -217,7 +217,7 @@ const docTemplate = `{
             "delete": {
                 "description": "Удаляет контейнер по id",
                 "tags": [
-                    "api"
+                    "containers"
                 ],
                 "summary": "Удалить контейнер",
                 "parameters": [
@@ -243,7 +243,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "api"
+                    "containers"
                 ],
                 "summary": "Добавить в перевозку",
                 "parameters": [
@@ -263,6 +263,104 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/ds.Container"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/login/": {
+            "post": {
+                "description": "Авторизует пользователя по логиню, паролю и отдаёт jwt токен для дальнейших запросов",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Авторизация",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User login",
+                        "name": "login",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User password",
+                        "name": "password",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.SwaggerLoginResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/loguot/": {
+            "post": {
+                "description": "Выход из аккаунта",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Выйти из аккаунта",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/auth/sign_up/": {
+            "post": {
+                "description": "Регистрация нового пользователя",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Регистрация",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User login",
+                        "name": "login",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User password",
+                        "name": "password",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.RegisterResp"
                         }
                     }
                 }
@@ -325,6 +423,28 @@ const docTemplate = `{
                 },
                 "draft_transportation": {
                     "$ref": "#/definitions/schemes.TransportationShort"
+                }
+            }
+        },
+        "schemes.RegisterResp": {
+            "type": "object",
+            "properties": {
+                "ok": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "schemes.SwaggerLoginResp": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_in": {
+                    "type": "integer"
+                },
+                "token_type": {
+                    "type": "string"
                 }
             }
         },

@@ -75,6 +75,12 @@ type LoginResp struct {
 	TokenType   string        `json:"token_type"`
 }
 
+type SwaggerLoginResp struct {
+	ExpiresIn   int64  `json:"expires_in"`
+	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
+}
+
 type RegisterResp struct {
 	Ok bool `json:"ok"`
 }

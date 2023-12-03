@@ -9,13 +9,13 @@ import (
 	"net/http"
 )
 
-// @Summary	Получить все контейнеры
-// @Tags	api
+// @Summary		Получить все контейнеры
+// @Tags		containers
 // @Description	Возвращает все доступные контейнеры с опциональной фильтрацией по типу
-// @Produce	json
-// @Param	type query string false "тип контейнера для фильтрации"
-// @Success	200 {object} schemes.GetAllContainersResponse
-// @Router	/api/containers [get]
+// @Produce		json
+// @Param		type query string false "тип контейнера для фильтрации"
+// @Success		200 {object} schemes.GetAllContainersResponse
+// @Router		/api/containers [get]
 func (app *Application) GetAllContainers(c *gin.Context) {
 	var request schemes.GetAllContainersRequest
 	if err := c.ShouldBindQuery(&request); err != nil {
@@ -50,13 +50,13 @@ func (app *Application) GetAllContainers(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// @Summary	Получить один контейнер
-// @Tags	api
+// @Summary		Получить один контейнер
+// @Tags		containers
 // @Description	Возвращает более подробную информацию об одном контейнере
-// @Produce	json
-// @Param	container_id path string true "id контейнера"
-// @Success	200 {object} ds.Container
-// @Router	/api/containers/{container_id} [get]
+// @Produce		json
+// @Param		container_id path string true "id контейнера"
+// @Success		200 {object} ds.Container
+// @Router		/api/containers/{container_id} [get]
 func (app *Application) GetContainer(c *gin.Context) {
 	var request schemes.ContainerRequest
 	if err := c.ShouldBindUri(&request); err != nil {
@@ -76,12 +76,12 @@ func (app *Application) GetContainer(c *gin.Context) {
 	c.JSON(http.StatusOK, container)
 }
 
-// @Summary	Удалить контейнер
-// @Tags	api
+// @Summary		Удалить контейнер
+// @Tags		containers
 // @Description	Удаляет контейнер по id
-// @Param	container_id path string true "id контейнера"
-// @Success	200
-// @Router	/api/containers/{container_id} [delete]
+// @Param		container_id path string true "id контейнера"
+// @Success		200
+// @Router		/api/containers/{container_id} [delete]
 func (app *Application) DeleteContainer(c *gin.Context) {
 	var request schemes.ContainerRequest
 	if err := c.ShouldBindUri(&request); err != nil {
@@ -112,20 +112,20 @@ func (app *Application) DeleteContainer(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// @Summary	Добавить контейнер
-// @Tags	api
+// @Summary		Добавить контейнер
+// @Tags		containers
 // @Description	Добавить новый контейнер
-// @Accept	mpfd
-// @Param     image formData file false "Изображение контейнера"
-// @Param     marking formData string true "Маркировка" format:"string" maxLength:11
-// @Param     type formData string true "Тип" format:"string" maxLength:50
-// @Param     length formData int true "Длина" format:"int"
-// @Param     height formData int true "Высота" format:"int"
-// @Param     width formData int true "Ширина" format:"int"
-// @Param     cargo formData string true "Груз" format:"string" maxLength:50
-// @Param     weight formData int true "Вес" format:"int"
-// @Success	200
-// @Router	/api/containers/{container_id} [post]
+// @Accept		mpfd
+// @Param		image formData file false "Изображение контейнера"
+// @Param		marking formData string true "Маркировка" format:"string" maxLength:11
+// @Param		type formData string true "Тип" format:"string" maxLength:50
+// @Param		length formData int true "Длина" format:"int"
+// @Param		height formData int true "Высота" format:"int"
+// @Param		width formData int true "Ширина" format:"int"
+// @Param		cargo formData string true "Груз" format:"string" maxLength:50
+// @Param		weight formData int true "Вес" format:"int"
+// @Success		200
+// @Router		/api/containers/{container_id} [post]
 func (app *Application) AddContainer(c *gin.Context) {
 	var request schemes.AddContainerRequest
 	if err := c.ShouldBind(&request); err != nil {
@@ -156,7 +156,7 @@ func (app *Application) AddContainer(c *gin.Context) {
 }
 
 // @Summary		Изменить котейнер
-// @Tags		api
+// @Tags		containers
 // @Description	Изменить данные полей о контейнере
 // @Accept		mpfd
 // @Produce		json
@@ -235,7 +235,7 @@ func (app *Application) ChangeContainer(c *gin.Context) {
 }
 
 // @Summary		Добавить в перевозку
-// @Tags		api
+// @Tags		containers
 // @Description	Добавить выбранный контейнер в черновик перевозки
 // @Produce		json
 // @Param		container_id path string true "id контейнера"

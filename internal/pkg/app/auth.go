@@ -1,7 +1,6 @@
 package app
 
 import (
-	"crypto/sha1"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,59 +10,19 @@ import (
 	"bmstu-web-backend/internal/app/ds"
 	"bmstu-web-backend/internal/app/role"
 	"bmstu-web-backend/internal/app/schemes"
-	"encoding/hex"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
-func (app *Application) Login(c *gin.Context) {
-	JWTConfig := app.config.JWT
-	request := &schemes.LoginReq{}
-	if err := c.ShouldBind(request); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	user, err := app.repo.GetUserByLogin(request.Login)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	if user.Password != generateHashString(request.Password) {
-		c.AbortWithStatus(http.StatusForbidden)
-		return
-	}
-	// значит проверка пройдена
-	// генерируем ему jwt
-	token := jwt.NewWithClaims(JWTConfig.SigningMethod, &ds.JWTClaims{
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(JWTConfig.ExpiresIn).Unix(),
-			IssuedAt:  time.Now().Unix(),
-			Issuer:    "bitop-admin",
-		},
-		UserUUID: user.UUID,
-		Role:     user.Role,
-	})
-	if token == nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("token is nil"))
-		return
-	}
-
-	strToken, err := token.SignedString([]byte(JWTConfig.Token))
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("cant create str token"))
-		return
-	}
-
-	c.JSON(http.StatusOK, schemes.LoginResp{
-		ExpiresIn:   JWTConfig.ExpiresIn,
-		AccessToken: strToken,
-		TokenType:   "Bearer",
-	})
-
-}
-
+// @Summary		Регистрация
+// @Tags		auth
+// @Description	Регистрация нового пользователя
+// @Accept		json
+// @Produce		json
+// @Param		login formData string true "User login" format:"string" maxLength:30
+// @Param		password formData string true "User password" format:"string" maxLength:30
+// @Success		200 {object} schemes.RegisterResp
+// @Router		/auth/sign_up/ [post]
 func (app *Application) Register(c *gin.Context) {
 	request := &schemes.RegisterReq{}
 	if err := c.ShouldBind(request); err != nil {
@@ -95,12 +54,67 @@ func (app *Application) Register(c *gin.Context) {
 	})
 }
 
-func generateHashString(s string) string {
-	h := sha1.New()
-	h.Write([]byte(s))
-	return hex.EncodeToString(h.Sum(nil))
+// @Summary		Авторизация
+// @Tags		auth
+// @Description	Авторизует пользователя по логиню, паролю и отдаёт jwt токен для дальнейших запросов
+// @Accept		json
+// @Produce		json
+// @Param		login formData string true "User login" format:"string" maxLength:30
+// @Param		password formData string true "User password" format:"string" maxLength:30
+// @Success		200 {object} schemes.SwaggerLoginResp
+// @Router		/auth/login/ [post]
+func (app *Application) Login(c *gin.Context) {
+	JWTConfig := app.config.JWT
+	request := &schemes.LoginReq{}
+	if err := c.ShouldBind(request); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	user, err := app.repo.GetUserByLogin(request.Login)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	if user.Password != generateHashString(request.Password) {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+	token := jwt.NewWithClaims(JWTConfig.SigningMethod, &ds.JWTClaims{
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(JWTConfig.ExpiresIn).Unix(),
+			IssuedAt:  time.Now().Unix(),
+			Issuer:    "bitop-admin",
+		},
+		UserUUID: user.UUID,
+		Role:     user.Role,
+	})
+	if token == nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("token is nil"))
+		return
+	}
+
+	strToken, err := token.SignedString([]byte(JWTConfig.Token))
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("cant create str token"))
+		return
+	}
+
+	c.JSON(http.StatusOK, schemes.LoginResp{
+		ExpiresIn:   JWTConfig.ExpiresIn,
+		AccessToken: strToken,
+		TokenType:   "Bearer",
+	})
+
 }
 
+// @Summary		Выйти из аккаунта
+// @Tags		auth
+// @Description	Выход из аккаунта
+// @Accept		json
+// @Produce		json
+// @Success		200
+// @Router		/auth/loguot/ [post]
 func (app *Application) Logout(c *gin.Context) {
 	jwtStr := c.GetHeader("Authorization")
 	if !strings.HasPrefix(jwtStr, jwtPrefix) {
