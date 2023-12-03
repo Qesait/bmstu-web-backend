@@ -259,11 +259,234 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/ds.Container"
-                            }
+                            "$ref": "#/definitions/schemes.AllContainersResponse"
                         }
+                    }
+                }
+            }
+        },
+        "/api/transportations": {
+            "get": {
+                "description": "Возвращает все перевозки с фильтрацией по статусу и дате формирования",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transportations"
+                ],
+                "summary": "Получить все перевозки",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "статус перевозки",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "начальная дата формирования",
+                        "name": "formation_date_start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "конечная дата формирвания",
+                        "name": "formation_date_end",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.AllTransportationsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/transportations/{transportation_id}": {
+            "get": {
+                "description": "Возвращает подробную информацию о перевозке и её составе",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transportations"
+                ],
+                "summary": "Получить одну перевозку",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id перевозки",
+                        "name": "transportation_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.TransportationResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Позволяет изменить транспорт перевозки и возвращает обновлённые данные",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transportations"
+                ],
+                "summary": "Указать транспорт перевозки",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id перевозки",
+                        "name": "transportation_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Тип",
+                        "name": "transport",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.UpdateTransportationResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Удаляет первозку по id",
+                "tags": [
+                    "transportations"
+                ],
+                "summary": "Удалить перевозку",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id перевозки",
+                        "name": "transportation_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/transportations/{transportation_id}/delete_container/{container_id}": {
+            "delete": {
+                "description": "Удалить контейнер из перевозки",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transportations"
+                ],
+                "summary": "Удалить контейнер из перевозки",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id перевозки",
+                        "name": "transportation_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "id контейнера",
+                        "name": "container_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.AllContainersResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/transportations/{transportation_id}/moderator_confirm": {
+            "put": {
+                "description": "Подтвердить или отменить перевозку модератором",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transportations"
+                ],
+                "summary": "Подтвердить перевозку",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id перевозки",
+                        "name": "transportation_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "подтвердить",
+                        "name": "confirm",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/transportations/{transportation_id}/user_confirm": {
+            "put": {
+                "description": "Сформировать или удалить перевозку перевозку пользователем",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transportations"
+                ],
+                "summary": "Сформировать перевозку",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id перевозки",
+                        "name": "transportation_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "подтвердить",
+                        "name": "confirm",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     }
                 }
             }
@@ -412,6 +635,28 @@ const docTemplate = `{
                 }
             }
         },
+        "schemes.AllContainersResponse": {
+            "type": "object",
+            "properties": {
+                "containers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ds.Container"
+                    }
+                }
+            }
+        },
+        "schemes.AllTransportationsResponse": {
+            "type": "object",
+            "properties": {
+                "transportations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemes.TransportationOutput"
+                    }
+                }
+            }
+        },
         "schemes.GetAllContainersResponse": {
             "type": "object",
             "properties": {
@@ -448,6 +693,49 @@ const docTemplate = `{
                 }
             }
         },
+        "schemes.TransportationOutput": {
+            "type": "object",
+            "properties": {
+                "completion_date": {
+                    "type": "string"
+                },
+                "creation_date": {
+                    "type": "string"
+                },
+                "customer": {
+                    "type": "string"
+                },
+                "formation_date": {
+                    "type": "string"
+                },
+                "moderator": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "transport": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemes.TransportationResponse": {
+            "type": "object",
+            "properties": {
+                "containers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ds.Container"
+                    }
+                },
+                "transportation": {
+                    "$ref": "#/definitions/schemes.TransportationOutput"
+                }
+            }
+        },
         "schemes.TransportationShort": {
             "type": "object",
             "properties": {
@@ -456,6 +744,14 @@ const docTemplate = `{
                 },
                 "uuid": {
                     "type": "string"
+                }
+            }
+        },
+        "schemes.UpdateTransportationResponse": {
+            "type": "object",
+            "properties": {
+                "transportation": {
+                    "$ref": "#/definitions/schemes.TransportationOutput"
                 }
             }
         }

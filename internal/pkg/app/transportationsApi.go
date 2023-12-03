@@ -11,6 +11,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary		Получить все перевозки
+// @Tags		transportations
+// @Description	Возвращает все перевозки с фильтрацией по статусу и дате формирования
+// @Produce		json
+// @Param		status query string false "статус перевозки"
+// @Param		formation_date_start query string false "начальная дата формирования"
+// @Param		formation_date_end query string false "конечная дата формирвания"
+// @Success		200 {object} schemes.AllTransportationsResponse
+// @Router		/api/transportations [get]
 func (app *Application) GetAllTransportations(c *gin.Context) {
 	var request schemes.GetAllTransportationsRequst
 	var err error
@@ -40,6 +49,13 @@ func (app *Application) GetAllTransportations(c *gin.Context) {
 	c.JSON(http.StatusOK, schemes.AllTransportationsResponse{Transportations: outputTransportations})
 }
 
+// @Summary		Получить одну перевозку
+// @Tags		transportations
+// @Description	Возвращает подробную информацию о перевозке и её составе
+// @Produce		json
+// @Param		transportation_id path string true "id перевозки"
+// @Success		200 {object} schemes.TransportationResponse
+// @Router		/api/transportations/{transportation_id} [get]
 func (app *Application) GetTranspostation(c *gin.Context) {
 	var request schemes.TranspostationRequest
 	if err := c.ShouldBindUri(&request); err != nil {
@@ -66,6 +82,15 @@ func (app *Application) GetTranspostation(c *gin.Context) {
 	c.JSON(http.StatusOK, schemes.TransportationResponse{Transportation: schemes.ConvertTransportation(transportation), Containers: containers})
 }
 
+// @Summary		Указать транспорт перевозки
+// @Tags		transportations
+// @Description	Позволяет изменить транспорт перевозки и возвращает обновлённые данные
+// @Access		json
+// @Produce		json
+// @Param		transportation_id path string true "id перевозки"
+// @Param		transport formData string true "Тип" format:"string" maxLength:50
+// @Success		200 {object} schemes.UpdateTransportationResponse
+// @Router		/api/transportations/{transportation_id} [put]
 func (app *Application) UpdateTransportation(c *gin.Context) {
 	var request schemes.UpdateTransportationRequest
 	if err := c.ShouldBindUri(&request.URI); err != nil {
@@ -96,6 +121,12 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 	c.JSON(http.StatusOK, schemes.UpdateTransportationResponse{Transportation: schemes.ConvertTransportation(transportation)})
 }
 
+// @Summary		Удалить перевозку
+// @Tags		transportations
+// @Description	Удаляет первозку по id
+// @Param		transportation_id path string true "id перевозки"
+// @Success		200
+// @Router		/api/transportations/{transportation_id} [delete]
 func (app *Application) DeleteTransportation(c *gin.Context) {
 	var request schemes.TranspostationRequest
 	if err := c.ShouldBindUri(&request); err != nil {
@@ -122,6 +153,14 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+// @Summary		Удалить контейнер из перевозки
+// @Tags		transportations
+// @Description	Удалить контейнер из перевозки
+// @Produce		json
+// @Param		transportation_id path string true "id перевозки"
+// @Param		container_id path string true "id контейнера"
+// @Success		200 {object} schemes.AllContainersResponse
+// @Router		/api/transportations/{transportation_id}/delete_container/{container_id} [delete]
 func (app *Application) DeleteFromTransportation(c *gin.Context) {
 	var request schemes.DeleteFromTransportationRequest
 	if err := c.ShouldBindUri(&request); err != nil {
@@ -158,6 +197,14 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 	c.JSON(http.StatusOK, schemes.AllContainersResponse{Containers: containers})
 }
 
+// @Summary		Сформировать перевозку
+// @Tags		transportations
+// @Description	Сформировать или удалить перевозку перевозку пользователем
+// @Produce		json
+// @Param		transportation_id path string true "id перевозки"
+// @Param		confirm formData boolean true "подтвердить"
+// @Success		200
+// @Router		/api/transportations/{transportation_id}/user_confirm [put]
 func (app *Application) UserConfirm(c *gin.Context) {
 	var request schemes.UserConfirmRequest
 	if err := c.ShouldBindUri(&request.URI); err != nil {
@@ -199,6 +246,14 @@ func (app *Application) UserConfirm(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+// @Summary		Подтвердить перевозку
+// @Tags		transportations
+// @Description	Подтвердить или отменить перевозку модератором
+// @Produce		json
+// @Param		transportation_id path string true "id перевозки"
+// @Param		confirm formData boolean true "подтвердить"
+// @Success		200
+// @Router		/api/transportations/{transportation_id}/moderator_confirm [put]
 func (app *Application) ModeratorConfirm(c *gin.Context) {
 	var request schemes.ModeratorConfirmRequest
 	if err := c.ShouldBindUri(&request.URI); err != nil {

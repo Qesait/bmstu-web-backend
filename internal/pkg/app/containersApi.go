@@ -239,7 +239,7 @@ func (app *Application) ChangeContainer(c *gin.Context) {
 // @Description	Добавить выбранный контейнер в черновик перевозки
 // @Produce		json
 // @Param		container_id path string true "id контейнера"
-// @Success		200 {array} ds.Container
+// @Success		200 {object} schemes.AllContainersResponse
 // @Router		/api/containers/{container_id}/add_to_transportation [post]
 func (app *Application) AddToTranspostation(c *gin.Context) {
 	var request schemes.AddToTransportationRequest

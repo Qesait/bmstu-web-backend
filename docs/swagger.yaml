@@ -32,6 +32,20 @@ definitions:
     - weight
     - width
     type: object
+  schemes.AllContainersResponse:
+    properties:
+      containers:
+        items:
+          $ref: '#/definitions/ds.Container'
+        type: array
+    type: object
+  schemes.AllTransportationsResponse:
+    properties:
+      transportations:
+        items:
+          $ref: '#/definitions/schemes.TransportationOutput'
+        type: array
+    type: object
   schemes.GetAllContainersResponse:
     properties:
       containers:
@@ -55,12 +69,45 @@ definitions:
       token_type:
         type: string
     type: object
+  schemes.TransportationOutput:
+    properties:
+      completion_date:
+        type: string
+      creation_date:
+        type: string
+      customer:
+        type: string
+      formation_date:
+        type: string
+      moderator:
+        type: string
+      status:
+        type: string
+      transport:
+        type: string
+      uuid:
+        type: string
+    type: object
+  schemes.TransportationResponse:
+    properties:
+      containers:
+        items:
+          $ref: '#/definitions/ds.Container'
+        type: array
+      transportation:
+        $ref: '#/definitions/schemes.TransportationOutput'
+    type: object
   schemes.TransportationShort:
     properties:
       container_count:
         type: integer
       uuid:
         type: string
+    type: object
+  schemes.UpdateTransportationResponse:
+    properties:
+      transportation:
+        $ref: '#/definitions/schemes.TransportationOutput'
     type: object
 host: 127.0.0.1:8080
 info:
@@ -233,12 +280,161 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/ds.Container'
-            type: array
+            $ref: '#/definitions/schemes.AllContainersResponse'
       summary: Добавить в перевозку
       tags:
       - containers
+  /api/transportations:
+    get:
+      description: Возвращает все перевозки с фильтрацией по статусу и дате формирования
+      parameters:
+      - description: статус перевозки
+        in: query
+        name: status
+        type: string
+      - description: начальная дата формирования
+        in: query
+        name: formation_date_start
+        type: string
+      - description: конечная дата формирвания
+        in: query
+        name: formation_date_end
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.AllTransportationsResponse'
+      summary: Получить все перевозки
+      tags:
+      - transportations
+  /api/transportations/{transportation_id}:
+    delete:
+      description: Удаляет первозку по id
+      parameters:
+      - description: id перевозки
+        in: path
+        name: transportation_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      summary: Удалить перевозку
+      tags:
+      - transportations
+    get:
+      description: Возвращает подробную информацию о перевозке и её составе
+      parameters:
+      - description: id перевозки
+        in: path
+        name: transportation_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.TransportationResponse'
+      summary: Получить одну перевозку
+      tags:
+      - transportations
+    put:
+      description: Позволяет изменить транспорт перевозки и возвращает обновлённые
+        данные
+      parameters:
+      - description: id перевозки
+        in: path
+        name: transportation_id
+        required: true
+        type: string
+      - description: Тип
+        in: formData
+        name: transport
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.UpdateTransportationResponse'
+      summary: Указать транспорт перевозки
+      tags:
+      - transportations
+  /api/transportations/{transportation_id}/delete_container/{container_id}:
+    delete:
+      description: Удалить контейнер из перевозки
+      parameters:
+      - description: id перевозки
+        in: path
+        name: transportation_id
+        required: true
+        type: string
+      - description: id контейнера
+        in: path
+        name: container_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.AllContainersResponse'
+      summary: Удалить контейнер из перевозки
+      tags:
+      - transportations
+  /api/transportations/{transportation_id}/moderator_confirm:
+    put:
+      description: Подтвердить или отменить перевозку модератором
+      parameters:
+      - description: id перевозки
+        in: path
+        name: transportation_id
+        required: true
+        type: string
+      - description: подтвердить
+        in: formData
+        name: confirm
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Подтвердить перевозку
+      tags:
+      - transportations
+  /api/transportations/{transportation_id}/user_confirm:
+    put:
+      description: Сформировать или удалить перевозку перевозку пользователем
+      parameters:
+      - description: id перевозки
+        in: path
+        name: transportation_id
+        required: true
+        type: string
+      - description: подтвердить
+        in: formData
+        name: confirm
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Сформировать перевозку
+      tags:
+      - transportations
   /auth/login/:
     post:
       consumes:
