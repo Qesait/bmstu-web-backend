@@ -70,3 +70,13 @@ type ModeratorConfirmRequest struct {
 	}
 	Confirm bool `form:"confirm" binding:"required"`
 }
+
+type LoginReq struct {
+	Login    string `json:"login" binding:"required,max=30"`
+	Password string `json:"password" binding:"required,max=30"`
+}
+
+type RegisterReq struct {
+	Login    string `json:"login" binding:"required,max=30"`
+	Password string `json:"password" binding:"required,max=30"`
+}

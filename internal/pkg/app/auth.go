@@ -10,25 +10,15 @@ import (
 
 	"bmstu-web-backend/internal/app/ds"
 	"bmstu-web-backend/internal/app/role"
+	"bmstu-web-backend/internal/app/schemes"
 	"encoding/hex"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
-type loginReq struct {
-	Login    string `json:"login" binding:"required,max=30"`
-	Password string `json:"password" binding:"required,max=30"`
-}
-
-type loginResp struct {
-	ExpiresIn   time.Duration `json:"expires_in"`
-	AccessToken string        `json:"access_token"`
-	TokenType   string        `json:"token_type"`
-}
-
 func (app *Application) Login(c *gin.Context) {
 	JWTConfig := app.config.JWT
-	request := &loginReq{}
+	request := &schemes.LoginReq{}
 	if err := c.ShouldBind(request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -53,7 +43,7 @@ func (app *Application) Login(c *gin.Context) {
 			Issuer:    "bitop-admin",
 		},
 		UserUUID: user.UUID,
-		Role: user.Role,
+		Role:     user.Role,
 	})
 	if token == nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("token is nil"))
@@ -66,7 +56,7 @@ func (app *Application) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, loginResp{
+	c.JSON(http.StatusOK, schemes.LoginResp{
 		ExpiresIn:   JWTConfig.ExpiresIn,
 		AccessToken: strToken,
 		TokenType:   "Bearer",
@@ -74,17 +64,8 @@ func (app *Application) Login(c *gin.Context) {
 
 }
 
-type registerReq struct {
-	Login    string `json:"login" binding:"required,max=30"`
-	Password string `json:"password" binding:"required,max=30"`
-}
-
-type registerResp struct {
-	Ok bool `json:"ok"`
-}
-
 func (app *Application) Register(c *gin.Context) {
-	request := &registerReq{}
+	request := &schemes.RegisterReq{}
 	if err := c.ShouldBind(request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -109,7 +90,7 @@ func (app *Application) Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, &registerResp{
+	c.JSON(http.StatusOK, &schemes.RegisterResp{
 		Ok: true,
 	})
 }
@@ -118,18 +99,6 @@ func generateHashString(s string) string {
 	h := sha1.New()
 	h.Write([]byte(s))
 	return hex.EncodeToString(h.Sum(nil))
-}
-
-// Ping godoc
-// @Summary      Show hello text
-// @Description  very very friendly response
-// @Tags         Tests
-// @Produce      json
-// @Success      200  {object}  pingResp
-// @Router       /ping/{name} [get]
-func (a *Application) Ping(gCtx *gin.Context) {
-	name := gCtx.Param("name")
-	gCtx.String(http.StatusOK, "Hello %s", name)
 }
 
 func (app *Application) Logout(c *gin.Context) {

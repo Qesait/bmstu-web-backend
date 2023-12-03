@@ -2,6 +2,7 @@ package schemes
 
 import (
 	"bmstu-web-backend/internal/app/ds"
+	"time"
 )
 
 type AllContainersResponse struct {
@@ -66,4 +67,14 @@ func ConvertTransportation(transportation *ds.Transportation) TransportationOutp
 	}
 
 	return output
+}
+
+type LoginResp struct {
+	ExpiresIn   time.Duration `json:"expires_in"`
+	AccessToken string        `json:"access_token"`
+	TokenType   string        `json:"token_type"`
+}
+
+type RegisterResp struct {
+	Ok bool `json:"ok"`
 }
