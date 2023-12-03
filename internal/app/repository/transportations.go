@@ -10,13 +10,16 @@ import (
 	"bmstu-web-backend/internal/app/ds"
 )
 
-func (r *Repository) GetAllTransportations(userId string, formationDateStart, formationDateEnd *time.Time, status string) ([]ds.Transportation, error) {
+func (r *Repository) GetAllTransportations(customerId *string, formationDateStart, formationDateEnd *time.Time, status string) ([]ds.Transportation, error) {
 	var transportations []ds.Transportation
 
 	query := r.db.Preload("Customer").Preload("Moderator").
 		Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
-		Where("status != ?", ds.DELETED).
-		Where("moderator_id == ? OR customer_id == ?", userId, userId)
+		Where("status != ?", ds.DELETED)
+		
+	if customerId != nil {
+		query = query.Where("customer_id = ?", *customerId)
+	}
 	if formationDateStart != nil && formationDateEnd != nil {
 		query = query.Where("formation_date BETWEEN ? AND ?", *formationDateStart, *formationDateEnd)
 	} else if formationDateStart != nil {
@@ -56,7 +59,7 @@ func (r *Repository) GetTransportationById(transportationId, userId string) (*ds
 	transportation := &ds.Transportation{}
 	err := r.db.Preload("Moderator").Preload("Customer").
 		Where("status != ?", ds.DELETED).
-		Where("moderator_id == ? OR customer_id == ?", userId, userId).
+		Where("moderator_id = ? OR customer_id = ?", userId, userId).
 		First(transportation, ds.Transportation{UUID: transportationId}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

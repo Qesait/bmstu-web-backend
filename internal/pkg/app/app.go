@@ -46,17 +46,16 @@ func (app *Application) Run() {
 	{
 		transportations.GET("/", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllTransportations)                                                        // Список (отфильтровать по дате формирования и статусу)
 		transportations.GET("/:transportation_id", app.WithAuthCheck(role.Customer, role.Moderator), app.GetTranspostation)                                          // Одна заявка
-		transportations.PUT("/:transportation_id/update", app.WithAuthCheck(role.Customer), app.UpdateTransportation)                                // Изменение (добавление транспорта)
-		transportations.DELETE("/:transportation_id", app.WithAuthCheck(role.Moderator), app.DeleteTransportation)                                    //Удаление
-		transportations.DELETE("/:transportation_id/delete_container/:container_id", app.WithAuthCheck(role.Customer), app.DeleteFromTransportation) // Изменеие (удаление услуг)
-		transportations.PUT("/:transportation_id/user_confirm", app.WithAuthCheck(role.Customer), app.UserConfirm)                                   // Сформировать создателем
-		transportations.PUT("/:transportation_id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                         // Завершить отклонить модератором
+		transportations.PUT("/:transportation_id/update", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateTransportation)                                // Изменение (добавление транспорта)
+		transportations.DELETE("/:transportation_id", app.WithAuthCheck(role.Moderator), app.DeleteTransportation)                                                   //Удаление
+		transportations.DELETE("/:transportation_id/delete_container/:container_id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFromTransportation) // Изменеие (удаление услуг)
+		transportations.PUT("/:transportation_id/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                                   // Сформировать создателем
+		transportations.PUT("/:transportation_id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                                        // Завершить отклонить модератором
 	}
 
 	r.POST("/api/sign_up", app.Register)
 	r.POST("/api/login", app.Login)
 	r.POST("/api/logout", app.Logout)
-	r.GET("/api/ping", app.WithAuthCheck(role.Moderator), app.Ping)
 
 	r.Run(fmt.Sprintf("%s:%d", app.config.ServiceHost, app.config.ServicePort))
 

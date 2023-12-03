@@ -40,9 +40,8 @@ func (app *Application) Login(c *gin.Context) {
 		return
 	}
 
-	// TODO: сравнить логины?
 	if user.Password != generateHashString(request.Password) {
-		c.AbortWithStatus(http.StatusForbidden) // отдаем 403 ответ в знак того что доступ запрещен
+		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 	// значит проверка пройдена
@@ -53,6 +52,7 @@ func (app *Application) Login(c *gin.Context) {
 			IssuedAt:  time.Now().Unix(),
 			Issuer:    "bitop-admin",
 		},
+		UserUUID: user.UUID,
 		Role: user.Role,
 	})
 	if token == nil {

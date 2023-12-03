@@ -8,7 +8,7 @@ import (
 type User struct {
 	UUID      string    `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"-"`
 	Role      role.Role `sql:"type:string;"`
-	Login     string    `gorm:"size:30;not null" json:"-"`
+	Login     string    `gorm:"size:30;not null" json:"login"`
 	Password  string    `gorm:"size:40;not null" json:"-"`
 	// The SHA-1 hash is 20 bytes. When encoded in hexadecimal, each byte is represented by two characters. Therefore, the resulting hash string will be 40 characters long
 }

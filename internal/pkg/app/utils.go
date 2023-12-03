@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
+	"bmstu-web-backend/internal/app/role"
 )
 
 func (app *Application) uploadImage(c *gin.Context, image *multipart.FileHeader, UUID string) (*string, error) {
@@ -41,6 +42,16 @@ func (app *Application) deleteImage(c *gin.Context, UUID string) error {
 		return err
 	}
 	return nil
+}
+
+func getUserId(c *gin.Context) string {
+	userId, _ := c.Get("userId")
+	return userId.(string)
+}
+
+func getUserRole(c *gin.Context) role.Role {
+	userRole, _ := c.Get("userRole")
+	return userRole.(role.Role)
 }
 
 // func (app *Application) getCustomer() string {

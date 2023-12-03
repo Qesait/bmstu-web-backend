@@ -2,22 +2,32 @@ package app
 
 import (
 	"bmstu-web-backend/internal/app/ds"
+	"bmstu-web-backend/internal/app/role"
 	"bmstu-web-backend/internal/app/schemes"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (app *Application) GetAllTransportations(c *gin.Context) {
 	var request schemes.GetAllTransportationsRequst
-	if err := c.ShouldBindQuery(&request); err != nil {
+	var err error
+	if err = c.ShouldBindQuery(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	userId, _ := c.Get("userId")
-	transportations, err := app.repo.GetAllTransportations(userId.(string), request.FormationDateStart, request.FormationDateEnd, request.Status)
+	userId := getUserId(c)
+	userRole := getUserRole(c)
+	fmt.Println(userId, userRole)
+	var transportations []ds.Transportation
+	if userRole == role.Customer {
+		transportations, err = app.repo.GetAllTransportations(&userId, request.FormationDateStart, request.FormationDateEnd, request.Status)
+	} else {
+		transportations, err = app.repo.GetAllTransportations(nil, request.FormationDateStart, request.FormationDateEnd, request.Status)
+	}
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -37,8 +47,8 @@ func (app *Application) GetTranspostation(c *gin.Context) {
 		return
 	}
 
-	userId, _ := c.Get("userId")
-	transportation, err := app.repo.GetTransportationById(request.TransportationId, userId.(string))
+	userId := getUserId(c)
+	transportation, err := app.repo.GetTransportationById(request.TransportationId, userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -67,8 +77,8 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 		return
 	}
 
-	userId, _ := c.Get("userId")
-	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, userId.(string))
+	userId := getUserId(c)
+	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -93,8 +103,8 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 		return
 	}
 
-	userId, _ := c.Get("userId")
-	transportation, err := app.repo.GetTransportationById(request.TransportationId, userId.(string))
+	userId := getUserId(c)
+	transportation, err := app.repo.GetTransportationById(request.TransportationId, userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -119,8 +129,8 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 		return
 	}
 
-	userId, _ := c.Get("userId")
-	transportation, err := app.repo.GetTransportationById(request.TransportationId, userId.(string))
+	userId := getUserId(c)
+	transportation, err := app.repo.GetTransportationById(request.TransportationId, userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -159,8 +169,8 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		return
 	}
 
-	userId, _ := c.Get("userId")
-	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, userId.(string))
+	userId := getUserId(c)
+	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -200,8 +210,8 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		return
 	}
 
-	userId, _ := c.Get("userId")
-	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, userId.(string))
+	userId := getUserId(c)
+	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -215,7 +225,6 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		return
 	}
 
-	userIdStr := userId.(string)
 	if request.Confirm {
 		transportation.Status = ds.COMPELTED
 		now := time.Now()
@@ -223,7 +232,7 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 	} else {
 		transportation.Status = ds.REJECTED
 	}
-	transportation.ModeratorId = &userIdStr
+	transportation.ModeratorId = &userId
 
 	if err := app.repo.SaveTransportation(transportation); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)

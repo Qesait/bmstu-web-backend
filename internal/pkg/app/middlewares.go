@@ -20,8 +20,6 @@ func (app *Application) WithAuthCheck(assignedRoles ...role.Role) func(ctx *gin.
 		if !strings.HasPrefix(jwtStr, jwtPrefix) {
 			for _, oneOfAssignedRole := range assignedRoles {
 				if role.NotAuthorized == oneOfAssignedRole {
-					c.Set("userId", nil)
-					c.Set("userRole", role.NotAuthorized)
 					return
 				}
 			}
@@ -41,21 +39,19 @@ func (app *Application) WithAuthCheck(assignedRoles ...role.Role) func(ctx *gin.
 		}
 
 
-		token, err := jwt.ParseWithClaims(jwtStr, &ds.JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
+		claims := &ds.JWTClaims{}
+		token, err := jwt.ParseWithClaims(jwtStr, claims, func(token *jwt.Token) (interface{}, error) {
 			return []byte(app.config.JWT.Token), nil
 		})
-		if err != nil {
+		if err != nil || !token.Valid {
 			c.AbortWithStatus(http.StatusForbidden)
-			log.Println(err)
 			return
 		}
 
-		myClaims := token.Claims.(*ds.JWTClaims)
-
 		for _, oneOfAssignedRole := range assignedRoles {
-			if myClaims.Role == oneOfAssignedRole {
-				c.Set("userId", myClaims.UserUUID)
-				c.Set("userRole", myClaims.Role)
+			if claims.Role == oneOfAssignedRole {
+				c.Set("userId", claims.UserUUID)
+				c.Set("userRole", claims.Role)
 				return
 			}
 		}

@@ -205,14 +205,14 @@ func (app *Application) AddToTranspostation(c *gin.Context) {
 
 	// Получить черновую заявку
 	var transportation *ds.Transportation
-	userId, _ := c.Get("userId")
-	transportation, err = app.repo.GetDraftTransportation(userId.(string))
+	userId := getUserId(c)
+	transportation, err = app.repo.GetDraftTransportation(userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 	if transportation == nil {
-		transportation, err = app.repo.CreateDraftTransportation(userId.(string))
+		transportation, err = app.repo.CreateDraftTransportation(userId)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
