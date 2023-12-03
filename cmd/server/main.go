@@ -7,14 +7,11 @@ import (
 
 
 // TODO: change
-// @title BITOP
+// @title Container loginstics
 // @version 1.0
-// @description Bmstu Open IT Platform
 
-// @license.name AS IS (NO WARRANTY)
-
-// @host 127.0.0.1
-// @schemes https http
+// @host 127.0.0.1:8080
+// @schemes http
 // @BasePath /
 
 func main() {

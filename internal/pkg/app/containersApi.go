@@ -1,6 +1,7 @@
 package app
 
 import (
+	_ "bmstu-web-backend/docs"
 	"bmstu-web-backend/internal/app/ds"
 	"bmstu-web-backend/internal/app/schemes"
 	"fmt"
@@ -8,6 +9,13 @@ import (
 	"net/http"
 )
 
+// @Summary	Получить все контейнеры
+// @Tags	api
+// @Description	Возвращает все доступные контейнеры с опциональной фильтрацией по типу
+// @Produce	json
+// @Param	type query string false "тип контейнера для фильтрации"
+// @Success	200 {object} schemes.GetAllContainersResponse
+// @Router	/api/containers [get]
 func (app *Application) GetAllContainers(c *gin.Context) {
 	var request schemes.GetAllContainersRequest
 	if err := c.ShouldBindQuery(&request); err != nil {
@@ -22,7 +30,7 @@ func (app *Application) GetAllContainers(c *gin.Context) {
 	}
 
 	var draftTransportation *ds.Transportation = nil
-	if userId, exists := c.Get("userId"); exists{
+	if userId, exists := c.Get("userId"); exists {
 		draftTransportation, err = app.repo.GetDraftTransportation(userId.(string))
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
@@ -42,6 +50,13 @@ func (app *Application) GetAllContainers(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// @Summary	Получить один контейнер
+// @Tags	api
+// @Description	Возвращает более подробную информацию об одном контейнере
+// @Produce	json
+// @Param	container_id path string true "id контейнера"
+// @Success	200 {object} ds.Container
+// @Router	/api/containers/{container_id} [get]
 func (app *Application) GetContainer(c *gin.Context) {
 	var request schemes.ContainerRequest
 	if err := c.ShouldBindUri(&request); err != nil {
@@ -61,6 +76,12 @@ func (app *Application) GetContainer(c *gin.Context) {
 	c.JSON(http.StatusOK, container)
 }
 
+// @Summary	Удалить контейнер
+// @Tags	api
+// @Description	Удаляет контейнер по id
+// @Param	container_id path string true "id контейнера"
+// @Success	200
+// @Router	/api/containers/{container_id} [delete]
 func (app *Application) DeleteContainer(c *gin.Context) {
 	var request schemes.ContainerRequest
 	if err := c.ShouldBindUri(&request); err != nil {
@@ -91,6 +112,20 @@ func (app *Application) DeleteContainer(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+// @Summary	Добавить контейнер
+// @Tags	api
+// @Description	Добавить новый контейнер
+// @Accept	mpfd
+// @Param     image formData file false "Изображение контейнера"
+// @Param     marking formData string true "Маркировка" format:"string" maxLength:11
+// @Param     type formData string true "Тип" format:"string" maxLength:50
+// @Param     length formData int true "Длина" format:"int"
+// @Param     height formData int true "Высота" format:"int"
+// @Param     width formData int true "Ширина" format:"int"
+// @Param     cargo formData string true "Груз" format:"string" maxLength:50
+// @Param     weight formData int true "Вес" format:"int"
+// @Success	200
+// @Router	/api/containers/{container_id} [post]
 func (app *Application) AddContainer(c *gin.Context) {
 	var request schemes.AddContainerRequest
 	if err := c.ShouldBind(&request); err != nil {
@@ -120,6 +155,21 @@ func (app *Application) AddContainer(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+// @Summary		Изменить котейнер
+// @Tags		api
+// @Description	Изменить данные полей о контейнере
+// @Accept		mpfd
+// @Produce		json
+// @Param		container_id path string true "Идентификатор контейнера" format:"uuid"
+// @Param		marking formData string false "Маркировка" format:"string" maxLength:11
+// @Param		type formData string false "Тип" format:"string" maxLength:50
+// @Param		length formData int false "Длина" format:"int"
+// @Param		height formData int false "Высота" format:"int"
+// @Param		width formData int false "Ширина" format:"int"
+// @Param		image formData file false "Изображение контейнера"
+// @Param		cargo formData string false "Груз" format:"string" maxLength:50
+// @Param		weight formData int false "Вес" format:"int"
+// @Router		/api/containers/{container_id} [put]
 func (app *Application) ChangeContainer(c *gin.Context) {
 	var request schemes.ChangeContainerRequest
 	if err := c.ShouldBindUri(&request); err != nil {
@@ -184,6 +234,13 @@ func (app *Application) ChangeContainer(c *gin.Context) {
 	c.JSON(http.StatusOK, container)
 }
 
+// @Summary		Добавить в перевозку
+// @Tags		api
+// @Description	Добавить выбранный контейнер в черновик перевозки
+// @Produce		json
+// @Param		container_id path string true "id контейнера"
+// @Success		200 {array} ds.Container
+// @Router		/api/containers/{container_id}/add_to_transportation [post]
 func (app *Application) AddToTranspostation(c *gin.Context) {
 	var request schemes.AddToTransportationRequest
 	if err := c.ShouldBindUri(&request); err != nil {

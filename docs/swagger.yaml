@@ -1,0 +1,230 @@
+basePath: /
+definitions:
+  ds.Container:
+    properties:
+      cargo:
+        maxLength: 50
+        type: string
+      height:
+        type: integer
+      image_url:
+        type: string
+      length:
+        type: integer
+      marking:
+        maxLength: 11
+        type: string
+      type:
+        maxLength: 50
+        type: string
+      uuid:
+        type: string
+      weight:
+        type: integer
+      width:
+        type: integer
+    required:
+    - cargo
+    - height
+    - length
+    - marking
+    - type
+    - weight
+    - width
+    type: object
+  schemes.GetAllContainersResponse:
+    properties:
+      containers:
+        items:
+          $ref: '#/definitions/ds.Container'
+        type: array
+      draft_transportation:
+        $ref: '#/definitions/schemes.TransportationShort'
+    type: object
+  schemes.TransportationShort:
+    properties:
+      container_count:
+        type: integer
+      uuid:
+        type: string
+    type: object
+host: 127.0.0.1:8080
+info:
+  contact: {}
+  title: Container loginstics
+  version: "1.0"
+paths:
+  /api/containers:
+    get:
+      description: Возвращает все доступные контейнеры с опциональной фильтрацией
+        по типу
+      parameters:
+      - description: тип контейнера для фильтрации
+        in: query
+        name: type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.GetAllContainersResponse'
+      summary: Получить все контейнеры
+      tags:
+      - api
+  /api/containers/{container_id}:
+    delete:
+      description: Удаляет контейнер по id
+      parameters:
+      - description: id контейнера
+        in: path
+        name: container_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      summary: Удалить контейнер
+      tags:
+      - api
+    get:
+      description: Возвращает более подробную информацию об одном контейнере
+      parameters:
+      - description: id контейнера
+        in: path
+        name: container_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ds.Container'
+      summary: Получить один контейнер
+      tags:
+      - api
+    post:
+      consumes:
+      - multipart/form-data
+      description: Добавить новый контейнер
+      parameters:
+      - description: Изображение контейнера
+        in: formData
+        name: image
+        type: file
+      - description: Маркировка
+        in: formData
+        name: marking
+        required: true
+        type: string
+      - description: Тип
+        in: formData
+        name: type
+        required: true
+        type: string
+      - description: Длина
+        in: formData
+        name: length
+        required: true
+        type: integer
+      - description: Высота
+        in: formData
+        name: height
+        required: true
+        type: integer
+      - description: Ширина
+        in: formData
+        name: width
+        required: true
+        type: integer
+      - description: Груз
+        in: formData
+        name: cargo
+        required: true
+        type: string
+      - description: Вес
+        in: formData
+        name: weight
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+      summary: Добавить контейнер
+      tags:
+      - api
+    put:
+      consumes:
+      - multipart/form-data
+      description: Изменить данные полей о контейнере
+      parameters:
+      - description: Идентификатор контейнера
+        in: path
+        name: container_id
+        required: true
+        type: string
+      - description: Маркировка
+        in: formData
+        name: marking
+        type: string
+      - description: Тип
+        in: formData
+        name: type
+        type: string
+      - description: Длина
+        in: formData
+        name: length
+        type: integer
+      - description: Высота
+        in: formData
+        name: height
+        type: integer
+      - description: Ширина
+        in: formData
+        name: width
+        type: integer
+      - description: Изображение контейнера
+        in: formData
+        name: image
+        type: file
+      - description: Груз
+        in: formData
+        name: cargo
+        type: string
+      - description: Вес
+        in: formData
+        name: weight
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: Изменить котейнер
+      tags:
+      - api
+  /api/containers/{container_id}/add_to_transportation:
+    post:
+      description: Добавить выбранный контейнер в черновик перевозки
+      parameters:
+      - description: id контейнера
+        in: path
+        name: container_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ds.Container'
+            type: array
+      summary: Добавить в перевозку
+      tags:
+      - api
+schemes:
+- http
+swagger: "2.0"
