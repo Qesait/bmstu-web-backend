@@ -454,7 +454,7 @@ paths:
       summary: Сформировать перевозку
       tags:
       - Перевозки
-  /auth/login:
+  /api/user/login:
     post:
       consumes:
       - application/json
@@ -475,7 +475,7 @@ paths:
       summary: Авторизация
       tags:
       - Авторизация
-  /auth/loguot:
+  /api/user/loguot:
     post:
       consumes:
       - application/json
@@ -488,7 +488,7 @@ paths:
       summary: Выйти из аккаунта
       tags:
       - Авторизация
-  /auth/sign_up:
+  /api/user/sign_up:
     post:
       consumes:
       - application/json

@@ -492,7 +492,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/login": {
+        "/api/user/login": {
             "post": {
                 "description": "Авторизует пользователя по логиню, паролю и отдаёт jwt токен для дальнейших запросов",
                 "consumes": [
@@ -523,7 +523,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/loguot": {
+        "/api/user/loguot": {
             "post": {
                 "description": "Выход из аккаунта",
                 "consumes": [
@@ -543,7 +543,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/sign_up": {
+        "/api/user/sign_up": {
             "post": {
                 "description": "Регистрация нового пользователя",
                 "consumes": [

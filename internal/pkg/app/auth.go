@@ -21,7 +21,7 @@ import (
 // @Produce		json
 // @Param		user_credentials body schemes.RegisterReq true "login and password"
 // @Success		200 {object} schemes.RegisterResp
-// @Router		/auth/sign_up [post]
+// @Router		/api/user/sign_up [post]
 func (app *Application) Register(c *gin.Context) {
 	request := &schemes.RegisterReq{}
 	if err := c.ShouldBind(request); err != nil {
@@ -60,7 +60,7 @@ func (app *Application) Register(c *gin.Context) {
 // @Produce		json
 // @Param		user_credentials body schemes.LoginReq true "login and password"
 // @Success		200
-// @Router		/auth/login [post]
+// @Router		/api/user/login [post]
 // @Consumes     json
 func (app *Application) Login(c *gin.Context) {
 	JWTConfig := app.config.JWT
@@ -115,7 +115,7 @@ func (app *Application) Login(c *gin.Context) {
 // @Accept		json
 // @Produce		json
 // @Success		200
-// @Router		/auth/loguot [post]
+// @Router		/api/user/loguot [post]
 func (app *Application) Logout(c *gin.Context) {
 	jwtStr := c.GetHeader("Authorization")
 	if !strings.HasPrefix(jwtStr, jwtPrefix) {

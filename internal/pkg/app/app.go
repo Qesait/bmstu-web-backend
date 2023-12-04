@@ -57,13 +57,13 @@ func (app *Application) Run() {
 			transportations.PUT("/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                                   // Сформировать создателем
 			transportations.PUT("/:transportation_id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                                        // Завершить отклонить модератором
 		}
-
-	}
-	auth := r.Group("/auth")
-	{
-		auth.POST("/sign_up", app.Register)
-		auth.POST("/login", app.Login)
-		auth.POST("/logout", app.Logout)
+		// Пользователи (авторизация)
+		user := api.Group("/user")
+		{
+			user.POST("/sign_up", app.Register)
+			user.POST("/login", app.Login)
+			user.POST("/logout", app.Logout)
+		}
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
