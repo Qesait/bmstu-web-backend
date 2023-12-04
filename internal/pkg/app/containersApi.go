@@ -152,7 +152,7 @@ func (app *Application) AddContainer(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusOK)
+	c.Status(http.StatusCreated)
 }
 
 // @Summary		Изменить котейнер

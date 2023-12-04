@@ -307,6 +307,34 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/transportations/user_confirm": {
+            "put": {
+                "description": "Сформировать или удалить перевозку перевозку пользователем",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Перевозки"
+                ],
+                "summary": "Сформировать перевозку",
+                "parameters": [
+                    {
+                        "description": "подтвердить",
+                        "name": "confirm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/api/transportations/{transportation_id}": {
             "get": {
                 "description": "Возвращает подробную информацию о перевозке и её составе",
@@ -439,41 +467,6 @@ const docTemplate = `{
                     "Перевозки"
                 ],
                 "summary": "Подтвердить перевозку",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id перевозки",
-                        "name": "transportation_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "подтвердить",
-                        "name": "confirm",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/api/transportations/{transportation_id}/user_confirm": {
-            "put": {
-                "description": "Сформировать или удалить перевозку перевозку пользователем",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Перевозки"
-                ],
-                "summary": "Сформировать перевозку",
                 "parameters": [
                     {
                         "type": "string",
@@ -784,7 +777,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "127.0.0.1:8080",
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "Container loginstics",

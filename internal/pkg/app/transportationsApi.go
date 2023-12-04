@@ -205,23 +205,18 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 // @Tags		Перевозки
 // @Description	Сформировать или удалить перевозку перевозку пользователем
 // @Produce		json
-// @Param		transportation_id path string true "id перевозки"
 // @Param		confirm body boolean true "подтвердить"
 // @Success		200
-// @Router		/api/transportations/{transportation_id}/user_confirm [put]
+// @Router		/api/transportations/user_confirm [put]
 func (app *Application) UserConfirm(c *gin.Context) {
 	var request schemes.UserConfirmRequest
-	if err := c.ShouldBindUri(&request.URI); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
 	if err := c.ShouldBind(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
 	userId := getUserId(c)
-	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, userId)
+	transportation, err := app.repo.GetDraftTransportation(userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return

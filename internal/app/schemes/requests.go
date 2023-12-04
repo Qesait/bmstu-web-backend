@@ -58,9 +58,6 @@ type DeleteFromTransportationRequest struct {
 }
 
 type UserConfirmRequest struct {
-	URI struct {
-		TransportationId string `uri:"transportation_id" binding:"required,uuid"`
-	}
 	Confirm bool `form:"confirm" binding:"required"`
 }
 

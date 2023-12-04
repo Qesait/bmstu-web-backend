@@ -54,7 +54,7 @@ func (app *Application) Run() {
 			transportations.PUT("/:transportation_id/update", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateTransportation)                                // Изменение (добавление транспорта)
 			transportations.DELETE("/:transportation_id", app.WithAuthCheck(role.Moderator), app.DeleteTransportation)                                                   //Удаление
 			transportations.DELETE("/:transportation_id/delete_container/:container_id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFromTransportation) // Изменеие (удаление услуг)
-			transportations.PUT("/:transportation_id/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                                   // Сформировать создателем
+			transportations.PUT("/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                                   // Сформировать создателем
 			transportations.PUT("/:transportation_id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                                        // Завершить отклонить модератором
 		}
 
