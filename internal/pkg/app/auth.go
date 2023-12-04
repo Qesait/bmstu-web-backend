@@ -19,10 +19,9 @@ import (
 // @Description	Регистрация нового пользователя
 // @Accept		json
 // @Produce		json
-// @Param		login formData string true "User login" format:"string" maxLength:30
-// @Param		password formData string true "User password" format:"string" maxLength:30
+// @Param		user_credentials body schemes.RegisterReq true "login and password"
 // @Success		200 {object} schemes.RegisterResp
-// @Router		/auth/sign_up/ [post]
+// @Router		/auth/sign_up [post]
 func (app *Application) Register(c *gin.Context) {
 	request := &schemes.RegisterReq{}
 	if err := c.ShouldBind(request); err != nil {
@@ -59,10 +58,10 @@ func (app *Application) Register(c *gin.Context) {
 // @Description	Авторизует пользователя по логиню, паролю и отдаёт jwt токен для дальнейших запросов
 // @Accept		json
 // @Produce		json
-// @Param		login formData string true "User login" format:"string" maxLength:30
-// @Param		password formData string true "User password" format:"string" maxLength:30
-// @Success		200 {object} schemes.SwaggerLoginResp
-// @Router		/auth/login/ [post]
+// @Param		user_credentials body schemes.LoginReq true "login and password"
+// @Success		200
+// @Router		/auth/login [post]
+// @Consumes     json
 func (app *Application) Login(c *gin.Context) {
 	JWTConfig := app.config.JWT
 	request := &schemes.LoginReq{}
@@ -100,12 +99,14 @@ func (app *Application) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.LoginResp{
-		ExpiresIn:   JWTConfig.ExpiresIn,
-		AccessToken: strToken,
-		TokenType:   "Bearer",
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "Authorization",
+		Value:    "Bearer " + strToken,
+		Expires:  time.Now().Add(JWTConfig.ExpiresIn),
+		HttpOnly: true,
 	})
 
+	c.Status(http.StatusOK)
 }
 
 // @Summary		Выйти из аккаунта
@@ -114,7 +115,7 @@ func (app *Application) Login(c *gin.Context) {
 // @Accept		json
 // @Produce		json
 // @Success		200
-// @Router		/auth/loguot/ [post]
+// @Router		/auth/loguot [post]
 func (app *Application) Logout(c *gin.Context) {
 	jwtStr := c.GetHeader("Authorization")
 	if !strings.HasPrefix(jwtStr, jwtPrefix) {

@@ -125,7 +125,7 @@ func (app *Application) DeleteContainer(c *gin.Context) {
 // @Param		cargo formData string true "Груз" format:"string" maxLength:50
 // @Param		weight formData int true "Вес" format:"int"
 // @Success		200
-// @Router		/api/containers/{container_id} [post]
+// @Router		/api/containers/ [post]
 func (app *Application) AddContainer(c *gin.Context) {
 	var request schemes.AddContainerRequest
 	if err := c.ShouldBind(&request); err != nil {

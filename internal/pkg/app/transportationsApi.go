@@ -82,13 +82,17 @@ func (app *Application) GetTranspostation(c *gin.Context) {
 	c.JSON(http.StatusOK, schemes.TransportationResponse{Transportation: schemes.ConvertTransportation(transportation), Containers: containers})
 }
 
+
+type SwaggerUpdateTransportationRequest struct {
+	Transport string `json:"transport"`
+}
 // @Summary		Указать транспорт перевозки
 // @Tags		Перевозки
 // @Description	Позволяет изменить транспорт перевозки и возвращает обновлённые данные
 // @Access		json
 // @Produce		json
 // @Param		transportation_id path string true "id перевозки"
-// @Param		transport formData string true "Тип" format:"string" maxLength:50
+// @Param		transport body SwaggerUpdateTransportationRequest true "Транспорт"
 // @Success		200 {object} schemes.UpdateTransportationResponse
 // @Router		/api/transportations/{transportation_id} [put]
 func (app *Application) UpdateTransportation(c *gin.Context) {
@@ -202,7 +206,7 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 // @Description	Сформировать или удалить перевозку перевозку пользователем
 // @Produce		json
 // @Param		transportation_id path string true "id перевозки"
-// @Param		confirm formData boolean true "подтвердить"
+// @Param		confirm body boolean true "подтвердить"
 // @Success		200
 // @Router		/api/transportations/{transportation_id}/user_confirm [put]
 func (app *Application) UserConfirm(c *gin.Context) {
@@ -251,7 +255,7 @@ func (app *Application) UserConfirm(c *gin.Context) {
 // @Description	Подтвердить или отменить перевозку модератором
 // @Produce		json
 // @Param		transportation_id path string true "id перевозки"
-// @Param		confirm formData boolean true "подтвердить"
+// @Param		confirm body boolean true "подтвердить"
 // @Success		200
 // @Router		/api/transportations/{transportation_id}/moderator_confirm [put]
 func (app *Application) ModeratorConfirm(c *gin.Context) {

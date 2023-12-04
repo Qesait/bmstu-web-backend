@@ -72,11 +72,11 @@ type ModeratorConfirmRequest struct {
 }
 
 type LoginReq struct {
-	Login    string `json:"login" binding:"required,max=30"`
-	Password string `json:"password" binding:"required,max=30"`
+	Login    string `form:"login" binding:"required,max=30"`
+	Password string `form:"password" binding:"required,max=30"`
 }
 
 type RegisterReq struct {
-	Login    string `json:"login" binding:"required,max=30"`
-	Password string `json:"password" binding:"required,max=30"`
+	Login    string `form:"login" binding:"required,max=30"`
+	Password string `form:"password" binding:"required,max=30"`
 }

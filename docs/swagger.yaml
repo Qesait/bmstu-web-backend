@@ -1,5 +1,10 @@
 basePath: /
 definitions:
+  app.SwaggerUpdateTransportationRequest:
+    properties:
+      transport:
+        type: string
+    type: object
   ds.Container:
     properties:
       cargo:
@@ -55,19 +60,34 @@ definitions:
       draft_transportation:
         $ref: '#/definitions/schemes.TransportationShort'
     type: object
+  schemes.LoginReq:
+    properties:
+      login:
+        maxLength: 30
+        type: string
+      password:
+        maxLength: 30
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  schemes.RegisterReq:
+    properties:
+      login:
+        maxLength: 30
+        type: string
+      password:
+        maxLength: 30
+        type: string
+    required:
+    - login
+    - password
+    type: object
   schemes.RegisterResp:
     properties:
       ok:
         type: boolean
-    type: object
-  schemes.SwaggerLoginResp:
-    properties:
-      access_token:
-        type: string
-      expires_in:
-        type: integer
-      token_type:
-        type: string
     type: object
   schemes.TransportationOutput:
     properties:
@@ -109,7 +129,7 @@ definitions:
       transportation:
         $ref: '#/definitions/schemes.TransportationOutput'
     type: object
-host: 127.0.0.1:8080
+host: localhost:8080
 info:
   contact: {}
   title: Container loginstics
@@ -134,39 +154,7 @@ paths:
       summary: Получить все контейнеры
       tags:
       - Контейнеры
-  /api/containers/{container_id}:
-    delete:
-      description: Удаляет контейнер по id
-      parameters:
-      - description: id контейнера
-        in: path
-        name: container_id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-      summary: Удалить контейнер
-      tags:
-      - Контейнеры
-    get:
-      description: Возвращает более подробную информацию об одном контейнере
-      parameters:
-      - description: id контейнера
-        in: path
-        name: container_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/ds.Container'
-      summary: Получить один контейнер
-      tags:
-      - Контейнеры
+  /api/containers/:
     post:
       consumes:
       - multipart/form-data
@@ -215,6 +203,39 @@ paths:
         "200":
           description: OK
       summary: Добавить контейнер
+      tags:
+      - Контейнеры
+  /api/containers/{container_id}:
+    delete:
+      description: Удаляет контейнер по id
+      parameters:
+      - description: id контейнера
+        in: path
+        name: container_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      summary: Удалить контейнер
+      tags:
+      - Контейнеры
+    get:
+      description: Возвращает более подробную информацию об одном контейнере
+      parameters:
+      - description: id контейнера
+        in: path
+        name: container_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ds.Container'
+      summary: Получить один контейнер
       tags:
       - Контейнеры
     put:
@@ -352,11 +373,12 @@ paths:
         name: transportation_id
         required: true
         type: string
-      - description: Тип
-        in: formData
+      - description: Транспорт
+        in: body
         name: transport
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/app.SwaggerUpdateTransportationRequest'
       produces:
       - application/json
       responses:
@@ -401,10 +423,11 @@ paths:
         required: true
         type: string
       - description: подтвердить
-        in: formData
+        in: body
         name: confirm
         required: true
-        type: boolean
+        schema:
+          type: boolean
       produces:
       - application/json
       responses:
@@ -423,10 +446,11 @@ paths:
         required: true
         type: string
       - description: подтвердить
-        in: formData
+        in: body
         name: confirm
         required: true
-        type: boolean
+        schema:
+          type: boolean
       produces:
       - application/json
       responses:
@@ -435,34 +459,28 @@ paths:
       summary: Сформировать перевозку
       tags:
       - Перевозки
-  /auth/login/:
+  /auth/login:
     post:
       consumes:
       - application/json
       description: Авторизует пользователя по логиню, паролю и отдаёт jwt токен для
         дальнейших запросов
       parameters:
-      - description: User login
-        in: formData
-        name: login
+      - description: login and password
+        in: body
+        name: user_credentials
         required: true
-        type: string
-      - description: User password
-        in: formData
-        name: password
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/schemes.LoginReq'
       produces:
       - application/json
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/schemes.SwaggerLoginResp'
       summary: Авторизация
       tags:
       - Авторизация
-  /auth/loguot/:
+  /auth/loguot:
     post:
       consumes:
       - application/json
@@ -475,22 +493,18 @@ paths:
       summary: Выйти из аккаунта
       tags:
       - Авторизация
-  /auth/sign_up/:
+  /auth/sign_up:
     post:
       consumes:
       - application/json
       description: Регистрация нового пользователя
       parameters:
-      - description: User login
-        in: formData
-        name: login
+      - description: login and password
+        in: body
+        name: user_credentials
         required: true
-        type: string
-      - description: User password
-        in: formData
-        name: password
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/schemes.RegisterReq'
       produces:
       - application/json
       responses:

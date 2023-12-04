@@ -43,6 +43,80 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/containers/": {
+            "post": {
+                "description": "Добавить новый контейнер",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "Контейнеры"
+                ],
+                "summary": "Добавить контейнер",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Изображение контейнера",
+                        "name": "image",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Маркировка",
+                        "name": "marking",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Тип",
+                        "name": "type",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Длина",
+                        "name": "length",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Высота",
+                        "name": "height",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Ширина",
+                        "name": "width",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Груз",
+                        "name": "cargo",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Вес",
+                        "name": "weight",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/api/containers/{container_id}": {
             "get": {
                 "description": "Возвращает более подробную информацию об одном контейнере",
@@ -141,78 +215,6 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {}
-            },
-            "post": {
-                "description": "Добавить новый контейнер",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "tags": [
-                    "Контейнеры"
-                ],
-                "summary": "Добавить контейнер",
-                "parameters": [
-                    {
-                        "type": "file",
-                        "description": "Изображение контейнера",
-                        "name": "image",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Маркировка",
-                        "name": "marking",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Тип",
-                        "name": "type",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Длина",
-                        "name": "length",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Высота",
-                        "name": "height",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Ширина",
-                        "name": "width",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Груз",
-                        "name": "cargo",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Вес",
-                        "name": "weight",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
             },
             "delete": {
                 "description": "Удаляет контейнер по id",
@@ -351,11 +353,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "Тип",
+                        "description": "Транспорт",
                         "name": "transport",
-                        "in": "formData",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.SwaggerUpdateTransportationRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -444,11 +448,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "boolean",
                         "description": "подтвердить",
                         "name": "confirm",
-                        "in": "formData",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 ],
                 "responses": {
@@ -477,11 +483,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "boolean",
                         "description": "подтвердить",
                         "name": "confirm",
-                        "in": "formData",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 ],
                 "responses": {
@@ -491,7 +499,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/login/": {
+        "/auth/login": {
             "post": {
                 "description": "Авторизует пользователя по логиню, паролю и отдаёт jwt токен для дальнейших запросов",
                 "consumes": [
@@ -506,31 +514,23 @@ const docTemplate = `{
                 "summary": "Авторизация",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User login",
-                        "name": "login",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "User password",
-                        "name": "password",
-                        "in": "formData",
-                        "required": true
+                        "description": "login and password",
+                        "name": "user_credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemes.LoginReq"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.SwaggerLoginResp"
-                        }
+                        "description": "OK"
                     }
                 }
             }
         },
-        "/auth/loguot/": {
+        "/auth/loguot": {
             "post": {
                 "description": "Выход из аккаунта",
                 "consumes": [
@@ -550,7 +550,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/sign_up/": {
+        "/auth/sign_up": {
             "post": {
                 "description": "Регистрация нового пользователя",
                 "consumes": [
@@ -565,18 +565,13 @@ const docTemplate = `{
                 "summary": "Регистрация",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User login",
-                        "name": "login",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "User password",
-                        "name": "password",
-                        "in": "formData",
-                        "required": true
+                        "description": "login and password",
+                        "name": "user_credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemes.RegisterReq"
+                        }
                     }
                 ],
                 "responses": {
@@ -591,6 +586,14 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "app.SwaggerUpdateTransportationRequest": {
+            "type": "object",
+            "properties": {
+                "transport": {
+                    "type": "string"
+                }
+            }
+        },
         "ds.Container": {
             "type": "object",
             "required": [
@@ -671,25 +674,45 @@ const docTemplate = `{
                 }
             }
         },
+        "schemes.LoginReq": {
+            "type": "object",
+            "required": [
+                "login",
+                "password"
+            ],
+            "properties": {
+                "login": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 30
+                }
+            }
+        },
+        "schemes.RegisterReq": {
+            "type": "object",
+            "required": [
+                "login",
+                "password"
+            ],
+            "properties": {
+                "login": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 30
+                }
+            }
+        },
         "schemes.RegisterResp": {
             "type": "object",
             "properties": {
                 "ok": {
                     "type": "boolean"
-                }
-            }
-        },
-        "schemes.SwaggerLoginResp": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "expires_in": {
-                    "type": "integer"
-                },
-                "token_type": {
-                    "type": "string"
                 }
             }
         },
@@ -761,7 +784,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "127.0.0.1:8080",
+	Host:             "localhost:8080",
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "Container loginstics",
