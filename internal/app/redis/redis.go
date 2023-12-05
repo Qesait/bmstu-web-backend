@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-const servicePrefix = "container_logistics." // наш префикс сервиса
+const servicePrefix = "container_logistics."
 
 type Client struct {
 	cfg    config.RedisConfig

@@ -89,6 +89,15 @@ definitions:
       ok:
         type: boolean
     type: object
+  schemes.SwaggerLoginResp:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      token_type:
+        type: string
+    type: object
   schemes.TransportationOutput:
     properties:
       completion_date:
@@ -472,6 +481,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/schemes.SwaggerLoginResp'
       summary: Авторизация
       tags:
       - Авторизация
