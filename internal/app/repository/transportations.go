@@ -16,7 +16,7 @@ func (r *Repository) GetAllTransportations(customerId *string, formationDateStar
 	query := r.db.Preload("Customer").Preload("Moderator").
 		Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
 		Where("status != ?", ds.DELETED)
-		
+
 	if customerId != nil {
 		query = query.Where("customer_id = ?", *customerId)
 	}
@@ -99,4 +99,15 @@ func (r *Repository) DeleteFromTransportation(transportationId, ContainerId stri
 		return err
 	}
 	return nil
+}
+
+func (r *Repository) CountContainers(transportationId string) (int64, error) {
+	var count int64
+	err := r.db.Model(&ds.TransportationComposition{}).
+		Where("transportation_id = ?", transportationId).
+		Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

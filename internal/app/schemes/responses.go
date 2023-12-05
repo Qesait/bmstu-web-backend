@@ -69,6 +69,10 @@ func ConvertTransportation(transportation *ds.Transportation) TransportationOutp
 	return output
 }
 
+type AddToTranspostationResp struct {
+	ContainersCount int64 `json:"cotainer_count"`
+}
+
 type LoginResp struct {
 	ExpiresIn   time.Duration `json:"expires_in"`
 	AccessToken string        `json:"access_token"`

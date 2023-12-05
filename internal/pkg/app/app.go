@@ -8,16 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	
+
 	"bmstu-web-backend/internal/app/config"
 	"bmstu-web-backend/internal/app/dsn"
 	"bmstu-web-backend/internal/app/redis"
 	"bmstu-web-backend/internal/app/repository"
 	"bmstu-web-backend/internal/app/role"
-	
+
+	_ "bmstu-web-backend/docs"
 	"github.com/swaggo/files"       // swagger embed files
 	"github.com/swaggo/gin-swagger" // gin-swagger middleware
-	_ "bmstu-web-backend/docs"
 )
 
 type Application struct {
@@ -39,22 +39,22 @@ func (app *Application) Run() {
 		// Услуги (контейнеры)
 		containers := api.Group("/containers")
 		{
-			containers.GET("", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetAllContainers)                    // Список с поиском
+			containers.GET("", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetAllContainers)                     // Список с поиском
 			containers.GET("/:container_id", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetContainer)           // Одна услуга
 			containers.DELETE("/:container_id", app.WithAuthCheck(role.Moderator), app.DeleteContainer)                                        // Удаление
 			containers.PUT("/:container_id", app.WithAuthCheck(role.Moderator), app.ChangeContainer)                                           // Изменение
-			containers.POST("", app.WithAuthCheck(role.Moderator), app.AddContainer)                                                          // Добавление
+			containers.POST("", app.WithAuthCheck(role.Moderator), app.AddContainer)                                                           // Добавление
 			containers.POST("/:container_id/add_to_transportation", app.WithAuthCheck(role.Customer, role.Moderator), app.AddToTranspostation) // Добавление в заявку
 		}
 		// Заявки (перевозки)
 		transportations := api.Group("/transportations")
 		{
-			transportations.GET("", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllTransportations)                                                        // Список (отфильтровать по дате формирования и статусу)
+			transportations.GET("", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllTransportations)                                                         // Список (отфильтровать по дате формирования и статусу)
 			transportations.GET("/:transportation_id", app.WithAuthCheck(role.Customer, role.Moderator), app.GetTranspostation)                                          // Одна заявка
 			transportations.PUT("/:transportation_id/update", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateTransportation)                                // Изменение (добавление транспорта)
-			transportations.DELETE("/:transportation_id", app.WithAuthCheck(role.Moderator), app.DeleteTransportation)                                                   //Удаление
+			transportations.DELETE("/:transportation_id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteTransportation)                                    //Удаление
 			transportations.DELETE("/:transportation_id/delete_container/:container_id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFromTransportation) // Изменеие (удаление услуг)
-			transportations.PUT("/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                                   // Сформировать создателем
+			transportations.PUT("/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                                                      // Сформировать создателем
 			transportations.PUT("/:transportation_id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                                        // Завершить отклонить модератором
 		}
 		// Пользователи (авторизация)

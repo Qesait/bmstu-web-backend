@@ -82,10 +82,10 @@ func (app *Application) GetTranspostation(c *gin.Context) {
 	c.JSON(http.StatusOK, schemes.TransportationResponse{Transportation: schemes.ConvertTransportation(transportation), Containers: containers})
 }
 
-
 type SwaggerUpdateTransportationRequest struct {
 	Transport string `json:"transport"`
 }
+
 // @Summary		Указать транспорт перевозки
 // @Tags		Перевозки
 // @Description	Позволяет изменить транспорт перевозки и возвращает обновлённые данные
@@ -148,6 +148,12 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не найдена"))
 		return
 	}
+
+	userROle := getUserRole(c)
+	if userROle == role.Customer && transportation.Status != ds.DRAFT {
+		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("перевозка уже сформирована"))
+		return
+	}
 	transportation.Status = ds.DELETED
 
 	if err := app.repo.SaveTransportation(transportation); err != nil {
@@ -204,17 +210,9 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 // @Summary		Сформировать перевозку
 // @Tags		Перевозки
 // @Description	Сформировать или удалить перевозку перевозку пользователем
-// @Produce		json
-// @Param		confirm body boolean true "подтвердить"
 // @Success		200
 // @Router		/api/transportations/user_confirm [put]
 func (app *Application) UserConfirm(c *gin.Context) {
-	var request schemes.UserConfirmRequest
-	if err := c.ShouldBind(&request); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
 	userId := getUserId(c)
 	transportation, err := app.repo.GetDraftTransportation(userId)
 	if err != nil {
@@ -230,13 +228,9 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		return
 	}
 
-	if request.Confirm {
-		transportation.Status = ds.FORMED
-		now := time.Now()
-		transportation.FormationDate = &now
-	} else {
-		transportation.Status = ds.DELETED
-	}
+	transportation.Status = ds.FORMED
+	now := time.Now()
+	transportation.FormationDate = &now
 
 	if err := app.repo.SaveTransportation(transportation); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -248,7 +242,6 @@ func (app *Application) UserConfirm(c *gin.Context) {
 // @Summary		Подтвердить перевозку
 // @Tags		Перевозки
 // @Description	Подтвердить или отменить перевозку модератором
-// @Produce		json
 // @Param		transportation_id path string true "id перевозки"
 // @Param		confirm body boolean true "подтвердить"
 // @Success		200
