@@ -37,6 +37,11 @@ definitions:
     - weight
     - width
     type: object
+  schemes.AddToTranspostationResp:
+    properties:
+      cotainer_count:
+        type: integer
+    type: object
   schemes.AllContainersResponse:
     properties:
       containers:
@@ -310,7 +315,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schemes.AllContainersResponse'
+            $ref: '#/definitions/schemes.AddToTranspostationResp'
       summary: Добавить в перевозку
       tags:
       - Контейнеры
@@ -437,8 +442,6 @@ paths:
         required: true
         schema:
           type: boolean
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -448,15 +451,6 @@ paths:
   /api/transportations/user_confirm:
     put:
       description: Сформировать или удалить перевозку перевозку пользователем
-      parameters:
-      - description: подтвердить
-        in: body
-        name: confirm
-        required: true
-        schema:
-          type: boolean
-      produces:
-      - application/json
       responses:
         "200":
           description: OK

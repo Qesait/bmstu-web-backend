@@ -261,7 +261,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemes.AllContainersResponse"
+                            "$ref": "#/definitions/schemes.AddToTranspostationResp"
                         }
                     }
                 }
@@ -310,24 +310,10 @@ const docTemplate = `{
         "/api/transportations/user_confirm": {
             "put": {
                 "description": "Сформировать или удалить перевозку перевозку пользователем",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Перевозки"
                 ],
                 "summary": "Сформировать перевозку",
-                "parameters": [
-                    {
-                        "description": "подтвердить",
-                        "name": "confirm",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -460,9 +446,6 @@ const docTemplate = `{
         "/api/transportations/{transportation_id}/moderator_confirm": {
             "put": {
                 "description": "Подтвердить или отменить перевозку модератором",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Перевозки"
                 ],
@@ -630,6 +613,14 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "width": {
+                    "type": "integer"
+                }
+            }
+        },
+        "schemes.AddToTranspostationResp": {
+            "type": "object",
+            "properties": {
+                "cotainer_count": {
                     "type": "integer"
                 }
             }

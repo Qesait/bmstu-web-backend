@@ -55,12 +55,14 @@ func (r *Repository) CreateDraftTransportation(customerId string) (*ds.Transport
 	return transportation, nil
 }
 
-func (r *Repository) GetTransportationById(transportationId, userId string) (*ds.Transportation, error) {
+func (r *Repository) GetTransportationById(transportationId string, userId *string) (*ds.Transportation, error) {
 	transportation := &ds.Transportation{}
-	err := r.db.Preload("Moderator").Preload("Customer").
-		Where("status != ?", ds.DELETED).
-		Where("moderator_id = ? OR customer_id = ?", userId, userId).
-		First(transportation, ds.Transportation{UUID: transportationId}).Error
+	query := r.db.Preload("Moderator").Preload("Customer").
+		Where("status != ?", ds.DELETED)
+	if userId != nil {
+		query = query.Where("customer_id = ?", userId)
+	}
+	err := query.First(transportation, ds.Transportation{UUID: transportationId}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil

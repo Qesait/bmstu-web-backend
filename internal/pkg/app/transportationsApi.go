@@ -58,13 +58,20 @@ func (app *Application) GetAllTransportations(c *gin.Context) {
 // @Router		/api/transportations/{transportation_id} [get]
 func (app *Application) GetTranspostation(c *gin.Context) {
 	var request schemes.TranspostationRequest
+	var err error
 	if err := c.ShouldBindUri(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
 	userId := getUserId(c)
-	transportation, err := app.repo.GetTransportationById(request.TransportationId, userId)
+	userRole := getUserRole(c)
+	var transportation *ds.Transportation
+	if userRole == role.Moderator {
+		transportation, err = app.repo.GetTransportationById(request.TransportationId, nil)
+	} else {
+		transportation, err = app.repo.GetTransportationById(request.TransportationId, &userId)
+	}
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -107,7 +114,7 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 	}
 
 	userId := getUserId(c)
-	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, userId)
+	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, &userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -133,13 +140,20 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 // @Router		/api/transportations/{transportation_id} [delete]
 func (app *Application) DeleteTransportation(c *gin.Context) {
 	var request schemes.TranspostationRequest
+	var err error
 	if err := c.ShouldBindUri(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
 	userId := getUserId(c)
-	transportation, err := app.repo.GetTransportationById(request.TransportationId, userId)
+	userRole := getUserRole(c)
+	var transportation *ds.Transportation
+	if userRole == role.Moderator {
+		transportation, err = app.repo.GetTransportationById(request.TransportationId, nil)
+	} else {
+		transportation, err = app.repo.GetTransportationById(request.TransportationId, &userId)
+	}
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -149,8 +163,7 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 		return
 	}
 
-	userROle := getUserRole(c)
-	if userROle == role.Customer && transportation.Status != ds.DRAFT {
+	if userRole == role.Customer && transportation.Status != ds.DRAFT {
 		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("перевозка уже сформирована"))
 		return
 	}
@@ -173,13 +186,20 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 // @Router		/api/transportations/{transportation_id}/delete_container/{container_id} [delete]
 func (app *Application) DeleteFromTransportation(c *gin.Context) {
 	var request schemes.DeleteFromTransportationRequest
+	var err error
 	if err := c.ShouldBindUri(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
 	userId := getUserId(c)
-	transportation, err := app.repo.GetTransportationById(request.TransportationId, userId)
+	userRole := getUserRole(c)
+	var transportation *ds.Transportation
+	if userRole == role.Moderator {
+		transportation, err = app.repo.GetTransportationById(request.TransportationId, nil)
+	} else {
+		transportation, err = app.repo.GetTransportationById(request.TransportationId, &userId)
+	}
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -258,7 +278,7 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 	}
 
 	userId := getUserId(c)
-	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, userId)
+	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, nil)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
