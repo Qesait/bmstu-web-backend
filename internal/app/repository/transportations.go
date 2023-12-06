@@ -15,7 +15,7 @@ func (r *Repository) GetAllTransportations(customerId *string, formationDateStar
 
 	query := r.db.Preload("Customer").Preload("Moderator").
 		Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
-		Where("status != ?", ds.DELETED)
+		Where("status != ? AND status != ?", ds.DELETED, ds.DRAFT)
 
 	if customerId != nil {
 		query = query.Where("customer_id = ?", *customerId)

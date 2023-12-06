@@ -39,6 +39,7 @@ func (app *Application) Run() {
 		// Услуги (контейнеры)
 		containers := api.Group("/containers")
 		{
+			// TODO: allow access with bad tocken
 			containers.GET("", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetAllContainers)                     // Список с поиском
 			containers.GET("/:container_id", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetContainer)           // Одна услуга
 			containers.DELETE("/:container_id", app.WithAuthCheck(role.Moderator), app.DeleteContainer)                                        // Удаление
