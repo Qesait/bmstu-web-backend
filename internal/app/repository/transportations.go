@@ -15,7 +15,7 @@ func (r *Repository) GetAllTransportations(customerId *string, formationDateStar
 
 	query := r.db.Preload("Customer").Preload("Moderator").
 		Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
-		Where("status != ? AND status != ?", ds.DELETED, ds.DRAFT)
+		Where("status != ? AND status != ?", ds.StatusDeleted, ds.StatusDraft)
 
 	if customerId != nil {
 		query = query.Where("customer_id = ?", *customerId)
@@ -36,7 +36,7 @@ func (r *Repository) GetAllTransportations(customerId *string, formationDateStar
 
 func (r *Repository) GetDraftTransportation(customerId string) (*ds.Transportation, error) {
 	transportation := &ds.Transportation{}
-	err := r.db.First(transportation, ds.Transportation{Status: ds.DRAFT, CustomerId: customerId}).Error
+	err := r.db.First(transportation, ds.Transportation{Status: ds.StatusDraft, CustomerId: customerId}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -47,7 +47,7 @@ func (r *Repository) GetDraftTransportation(customerId string) (*ds.Transportati
 }
 
 func (r *Repository) CreateDraftTransportation(customerId string) (*ds.Transportation, error) {
-	transportation := &ds.Transportation{CreationDate: time.Now(), CustomerId: customerId, Status: ds.DRAFT}
+	transportation := &ds.Transportation{CreationDate: time.Now(), CustomerId: customerId, Status: ds.StatusDraft}
 	err := r.db.Create(transportation).Error
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (r *Repository) CreateDraftTransportation(customerId string) (*ds.Transport
 func (r *Repository) GetTransportationById(transportationId string, userId *string) (*ds.Transportation, error) {
 	transportation := &ds.Transportation{}
 	query := r.db.Preload("Moderator").Preload("Customer").
-		Where("status != ?", ds.DELETED)
+		Where("status != ?", ds.StatusDeleted)
 	if userId != nil {
 		query = query.Where("customer_id = ?", userId)
 	}

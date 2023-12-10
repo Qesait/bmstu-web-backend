@@ -77,3 +77,11 @@ type RegisterReq struct {
 	Login    string `form:"login" binding:"required,max=30"`
 	Password string `form:"password" binding:"required,max=30"`
 }
+
+type DeliveryReq struct {
+	URI struct {
+		TransportationId string `uri:"transportation_id" binding:"required,uuid"`
+	}
+	DeliveryStatus bool `form:"delivery_status" binding:"required"`
+	Token string `form:"token" binding:"required"`
+}

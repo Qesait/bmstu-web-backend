@@ -40,16 +40,18 @@ type TransportationOutput struct {
 	CompletionDate *string `json:"completion_date"`
 	Moderator      *string `json:"moderator"`
 	Customer       string  `json:"customer"`
-	Transport      string  `json:"transport"`
+	Transport      *string `json:"transport"`
+	DeliveryStatus *string `json:"delivery_status"`
 }
 
 func ConvertTransportation(transportation *ds.Transportation) TransportationOutput {
 	output := TransportationOutput{
-		UUID:         transportation.UUID,
-		Status:       transportation.Status,
-		CreationDate: transportation.CreationDate.Format("2006-01-02 15:04:05"),
-		Transport:    transportation.Transport,
-		Customer:     transportation.Customer.Login,
+		UUID:           transportation.UUID,
+		Status:         transportation.Status,
+		CreationDate:   transportation.CreationDate.Format("2006-01-02 15:04:05"),
+		Transport:      transportation.Transport,
+		DeliveryStatus: transportation.DeliveryStatus,
+		Customer:       transportation.Customer.Login,
 	}
 
 	if transportation.FormationDate != nil {
