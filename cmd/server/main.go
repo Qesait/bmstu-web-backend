@@ -6,7 +6,6 @@ import (
 )
 
 
-// TODO: change
 // @title Container loginstics
 // @version 1.0
 

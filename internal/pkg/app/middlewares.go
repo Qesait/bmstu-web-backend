@@ -20,6 +20,7 @@ func (app *Application) WithAuthCheck(assignedRoles ...role.Role) func(ctx *gin.
 		if !strings.HasPrefix(jwtStr, jwtPrefix) {
 			for _, oneOfAssignedRole := range assignedRoles {
 				if role.NotAuthorized == oneOfAssignedRole {
+					c.Set("userRole", role.NotAuthorized)
 					return
 				}
 			}
@@ -37,7 +38,6 @@ func (app *Application) WithAuthCheck(assignedRoles ...role.Role) func(ctx *gin.
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-
 
 		claims := &ds.JWTClaims{}
 		token, err := jwt.ParseWithClaims(jwtStr, claims, func(token *jwt.Token) (interface{}, error) {

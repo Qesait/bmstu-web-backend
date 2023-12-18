@@ -3,6 +3,7 @@ package schemes
 import (
 	"bmstu-web-backend/internal/app/ds"
 	"time"
+	"fmt"
 )
 
 type AllContainersResponse struct {
@@ -65,7 +66,9 @@ func ConvertTransportation(transportation *ds.Transportation) TransportationOutp
 	}
 
 	if transportation.Moderator != nil {
+		fmt.Println(transportation.Moderator.Login)
 		output.Moderator = &transportation.Moderator.Login
+		fmt.Println(*output.Moderator)
 	}
 
 	return output

@@ -53,9 +53,9 @@ func (app *Application) GetAllTransportations(c *gin.Context) {
 // @Tags		Перевозки
 // @Description	Возвращает подробную информацию о перевозке и её составе
 // @Produce		json
-// @Param		transportation_id path string true "id перевозки"
+// @Param		id path string true "id перевозки"
 // @Success		200 {object} schemes.TransportationResponse
-// @Router		/api/transportations/{transportation_id} [get]
+// @Router		/api/transportations/{id} [get]
 func (app *Application) GetTranspostation(c *gin.Context) {
 	var request schemes.TranspostationRequest
 	var err error
@@ -95,26 +95,24 @@ type SwaggerUpdateTransportationRequest struct {
 
 // @Summary		Указать транспорт перевозки
 // @Tags		Перевозки
-// @Description	Позволяет изменить транспорт перевозки и возвращает обновлённые данные
+// @Description	Позволяет изменить транспорт черновой перевозки и возвращает обновлённые данные
 // @Access		json
 // @Produce		json
-// @Param		transportation_id path string true "id перевозки"
 // @Param		transport body SwaggerUpdateTransportationRequest true "Транспорт"
-// @Success		200 {object} schemes.UpdateTransportationResponse
-// @Router		/api/transportations/{transportation_id} [put]
+// @Success		200 {object} schemes.TransportationOutput
+// @Router		/api/transportations [put]
 func (app *Application) UpdateTransportation(c *gin.Context) {
 	var request schemes.UpdateTransportationRequest
-	if err := c.ShouldBindUri(&request.URI); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
+	var err error
 	if err := c.ShouldBind(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
+	// Получить черновую заявку
+	var transportation *ds.Transportation
 	userId := getUserId(c)
-	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, &userId)
+	transportation, err = app.repo.GetDraftTransportation(userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -123,37 +121,29 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не найдена"))
 		return
 	}
+
+	// Добавить транспорт
 	transportation.Transport = &request.Transport
 	if app.repo.SaveTransportation(transportation); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.UpdateTransportationResponse{Transportation: schemes.ConvertTransportation(transportation)})
+	c.JSON(http.StatusOK, schemes.ConvertTransportation(transportation))
 }
 
-// @Summary		Удалить перевозку
+// @Summary		Удалить черновую первозку перевозку
 // @Tags		Перевозки
-// @Description	Удаляет первозку по id
-// @Param		transportation_id path string true "id перевозки"
+// @Description	Удаляет чернвоую перевозку первозку
 // @Success		200
-// @Router		/api/transportations/{transportation_id} [delete]
+// @Router		/api/transportations [delete]
 func (app *Application) DeleteTransportation(c *gin.Context) {
-	var request schemes.TranspostationRequest
 	var err error
-	if err := c.ShouldBindUri(&request); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
 
-	userId := getUserId(c)
-	userRole := getUserRole(c)
+	// Получить черновую заявку
 	var transportation *ds.Transportation
-	if userRole == role.Moderator {
-		transportation, err = app.repo.GetTransportationById(request.TransportationId, nil)
-	} else {
-		transportation, err = app.repo.GetTransportationById(request.TransportationId, &userId)
-	}
+	userId := getUserId(c)
+	transportation, err = app.repo.GetDraftTransportation(userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -163,10 +153,6 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 		return
 	}
 
-	if userRole == role.Customer && transportation.Status != ds.StatusDraft {
-		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("перевозка уже сформирована"))
-		return
-	}
 	transportation.Status = ds.StatusDeleted
 
 	if err := app.repo.SaveTransportation(transportation); err != nil {
@@ -176,14 +162,13 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// @Summary		Удалить контейнер из перевозки
+// @Summary		Удалить контейнер из чернвоой перевозки
 // @Tags		Перевозки
-// @Description	Удалить контейнер из перевозки
+// @Description	Удалить контейнер из черновой перевозки
 // @Produce		json
-// @Param		transportation_id path string true "id перевозки"
-// @Param		container_id path string true "id контейнера"
+// @Param		id path string true "id контейнера"
 // @Success		200 {object} schemes.AllContainersResponse
-// @Router		/api/transportations/{transportation_id}/delete_container/{container_id} [delete]
+// @Router		/api/transportations/delete_container/{id} [delete]
 func (app *Application) DeleteFromTransportation(c *gin.Context) {
 	var request schemes.DeleteFromTransportationRequest
 	var err error
@@ -192,14 +177,10 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 		return
 	}
 
-	userId := getUserId(c)
-	userRole := getUserRole(c)
+	// Получить черновую заявку
 	var transportation *ds.Transportation
-	if userRole == role.Moderator {
-		transportation, err = app.repo.GetTransportationById(request.TransportationId, nil)
-	} else {
-		transportation, err = app.repo.GetTransportationById(request.TransportationId, &userId)
-	}
+	userId := getUserId(c)
+	transportation, err = app.repo.GetDraftTransportation(userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -208,17 +189,13 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не найдена"))
 		return
 	}
-	if transportation.Status != ds.StatusDraft {
-		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя редактировать перевозку со статусом: %s", transportation.Status))
-		return
-	}
 
-	if err := app.repo.DeleteFromTransportation(request.TransportationId, request.ContainerId); err != nil {
+	if err := app.repo.DeleteFromTransportation(transportation.UUID, request.ContainerId); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	containers, err := app.repo.GetTransportatioinComposition(request.TransportationId)
+	containers, err := app.repo.GetTransportatioinComposition(transportation.UUID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -229,7 +206,7 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 
 // @Summary		Сформировать перевозку
 // @Tags		Перевозки
-// @Description	Сформировать или удалить перевозку перевозку пользователем
+// @Description	Сформировать перевозку перевозку пользователем
 // @Success		200 {object} schemes.TransportationOutput
 // @Router		/api/transportations/user_confirm [put]
 func (app *Application) UserConfirm(c *gin.Context) {
@@ -241,10 +218,6 @@ func (app *Application) UserConfirm(c *gin.Context) {
 	}
 	if transportation == nil {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не найдена"))
-		return
-	}
-	if transportation.Status != ds.StatusDraft {
-		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя сформировать перевозку со статусом %s", transportation.Status))
 		return
 	}
 
@@ -269,10 +242,10 @@ func (app *Application) UserConfirm(c *gin.Context) {
 // @Summary		Подтвердить перевозку
 // @Tags		Перевозки
 // @Description	Подтвердить или отменить перевозку модератором
-// @Param		transportation_id path string true "id перевозки"
+// @Param		id path string true "id перевозки"
 // @Param		confirm body boolean true "подтвердить"
-// @Success		200
-// @Router		/api/transportations/{transportation_id}/moderator_confirm [put]
+// @Success		200 {object} schemes.TransportationOutput
+// @Router		/api/transportations/{id}/moderator_confirm [put]
 func (app *Application) ModeratorConfirm(c *gin.Context) {
 	var request schemes.ModeratorConfirmRequest
 	if err := c.ShouldBindUri(&request.URI); err != nil {
@@ -306,13 +279,20 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 	} else {
 		transportation.Status = ds.StatusRejected
 	}
+
+	moderator, err := app.repo.GetUserById(userId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 	transportation.ModeratorId = &userId
+	transportation.Moderator = moderator
 
 	if err := app.repo.SaveTransportation(transportation); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, schemes.ConvertTransportation(transportation))
 }
 
 func (app *Application) Delivery(c *gin.Context) {
@@ -325,8 +305,6 @@ func (app *Application) Delivery(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-
-	fmt.Println(request, app.config.Token)
 
 	if request.Token != app.config.Token {
 		c.AbortWithStatus(http.StatusForbidden)

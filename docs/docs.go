@@ -41,9 +41,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/api/containers/": {
+            },
             "post": {
                 "description": "Добавить новый контейнер",
                 "consumes": [
@@ -117,7 +115,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/containers/{container_id}": {
+        "/api/containers/{id}": {
             "get": {
                 "description": "Возвращает более подробную информацию об одном контейнере",
                 "produces": [
@@ -131,7 +129,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "id контейнера",
-                        "name": "container_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -161,7 +159,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Идентификатор контейнера",
-                        "name": "container_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -226,7 +224,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "id контейнера",
-                        "name": "container_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -238,7 +236,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/containers/{container_id}/add_to_transportation": {
+        "/api/containers/{id}/add_to_transportation": {
             "post": {
                 "description": "Добавить выбранный контейнер в черновик перевозки",
                 "produces": [
@@ -252,7 +250,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "id контейнера",
-                        "name": "container_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -305,52 +303,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/api/transportations/user_confirm": {
-            "put": {
-                "description": "Сформировать или удалить перевозку перевозку пользователем",
-                "tags": [
-                    "Перевозки"
-                ],
-                "summary": "Сформировать перевозку",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/api/transportations/{transportation_id}": {
-            "get": {
-                "description": "Возвращает подробную информацию о перевозке и её составе",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Перевозки"
-                ],
-                "summary": "Получить одну перевозку",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id перевозки",
-                        "name": "transportation_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.TransportationResponse"
-                        }
-                    }
-                }
             },
             "put": {
-                "description": "Позволяет изменить транспорт перевозки и возвращает обновлённые данные",
+                "description": "Позволяет изменить транспорт черновой перевозки и возвращает обновлённые данные",
                 "produces": [
                     "application/json"
                 ],
@@ -359,13 +314,6 @@ const docTemplate = `{
                 ],
                 "summary": "Указать транспорт перевозки",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id перевозки",
-                        "name": "transportation_id",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "description": "Транспорт",
                         "name": "transport",
@@ -380,26 +328,17 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemes.UpdateTransportationResponse"
+                            "$ref": "#/definitions/schemes.TransportationOutput"
                         }
                     }
                 }
             },
             "delete": {
-                "description": "Удаляет первозку по id",
+                "description": "Удаляет чернвоую перевозку первозку",
                 "tags": [
                     "Перевозки"
                 ],
-                "summary": "Удалить перевозку",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id перевозки",
-                        "name": "transportation_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
+                "summary": "Удалить черновую первозку перевозку",
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -407,28 +346,21 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/transportations/{transportation_id}/delete_container/{container_id}": {
+        "/api/transportations/delete_container/{id}": {
             "delete": {
-                "description": "Удалить контейнер из перевозки",
+                "description": "Удалить контейнер из черновой перевозки",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Перевозки"
                 ],
-                "summary": "Удалить контейнер из перевозки",
+                "summary": "Удалить контейнер из чернвоой перевозки",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "id перевозки",
-                        "name": "transportation_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "id контейнера",
-                        "name": "container_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -443,7 +375,53 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/transportations/{transportation_id}/moderator_confirm": {
+        "/api/transportations/user_confirm": {
+            "put": {
+                "description": "Сформировать перевозку перевозку пользователем",
+                "tags": [
+                    "Перевозки"
+                ],
+                "summary": "Сформировать перевозку",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.TransportationOutput"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/transportations/{id}": {
+            "get": {
+                "description": "Возвращает подробную информацию о перевозке и её составе",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Перевозки"
+                ],
+                "summary": "Получить одну перевозку",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id перевозки",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.TransportationResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/transportations/{id}/moderator_confirm": {
             "put": {
                 "description": "Подтвердить или отменить перевозку модератором",
                 "tags": [
@@ -454,7 +432,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "id перевозки",
-                        "name": "transportation_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -470,7 +448,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.TransportationOutput"
+                        }
                     }
                 }
             }
@@ -729,6 +710,9 @@ const docTemplate = `{
                 "customer": {
                     "type": "string"
                 },
+                "delivery_status": {
+                    "type": "string"
+                },
                 "formation_date": {
                     "type": "string"
                 },
@@ -768,14 +752,6 @@ const docTemplate = `{
                 },
                 "uuid": {
                     "type": "string"
-                }
-            }
-        },
-        "schemes.UpdateTransportationResponse": {
-            "type": "object",
-            "properties": {
-                "transportation": {
-                    "$ref": "#/definitions/schemes.TransportationOutput"
                 }
             }
         }

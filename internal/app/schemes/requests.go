@@ -7,7 +7,7 @@ import (
 )
 
 type ContainerRequest struct {
-	ContainerId string `uri:"container_id" binding:"required,uuid"`
+	ContainerId string `uri:"id" binding:"required,uuid"`
 }
 
 type GetAllContainersRequest struct {
@@ -20,7 +20,7 @@ type AddContainerRequest struct {
 }
 
 type ChangeContainerRequest struct {
-	ContainerId string                `uri:"container_id" binding:"required,uuid"`
+	ContainerId string                `uri:"id" binding:"required,uuid"`
 	Marking     *string               `form:"marking" json:"marking" binding:"omitempty,max=11"`
 	Type        *string               `form:"type" json:"type" binding:"omitempty,max=50"`
 	Length      *int                  `form:"length" json:"length"`
@@ -32,7 +32,7 @@ type ChangeContainerRequest struct {
 }
 
 type AddToTransportationRequest struct {
-	ContainerId string `uri:"container_id" binding:"required,uuid"`
+	ContainerId string `uri:"id" binding:"required,uuid"`
 }
 
 type GetAllTransportationsRequst struct {
@@ -42,24 +42,20 @@ type GetAllTransportationsRequst struct {
 }
 
 type TranspostationRequest struct {
-	TransportationId string `uri:"transportation_id" binding:"required,uuid"`
+	TransportationId string `uri:"id" binding:"required,uuid"`
 }
 
 type UpdateTransportationRequest struct {
-	URI struct {
-		TransportationId string `uri:"transportation_id" binding:"required,uuid"`
-	}
 	Transport string `form:"transport" json:"transport" binding:"required,max=50"`
 }
 
 type DeleteFromTransportationRequest struct {
-	TransportationId string `uri:"transportation_id" binding:"required,uuid"`
-	ContainerId      string `uri:"container_id" binding:"required,uuid"`
+	ContainerId      string `uri:"id" binding:"required,uuid"`
 }
 
 type ModeratorConfirmRequest struct {
 	URI struct {
-		TransportationId string `uri:"transportation_id" binding:"required,uuid"`
+		TransportationId string `uri:"id" binding:"required,uuid"`
 	}
 	Confirm *bool `form:"confirm" binding:"required"`
 }
@@ -76,7 +72,7 @@ type RegisterReq struct {
 
 type DeliveryReq struct {
 	URI struct {
-		TransportationId string `uri:"transportation_id" binding:"required,uuid"`
+		TransportationId string `uri:"id" binding:"required,uuid"`
 	}
 	DeliveryStatus *bool `json:"delivery_status" form:"delivery_status" binding:"required"`
 	Token string `json:"token" form:"token" binding:"required"`

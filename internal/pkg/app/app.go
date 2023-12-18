@@ -39,29 +39,29 @@ func (app *Application) Run() {
 		// Услуги (контейнеры)
 		c := api.Group("/containers")
 		{
-			// TODO: allow access with bad tocken
-			c.GET("", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetAllContainers)                     // Список с поиском
-			c.GET("/:container_id", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetContainer)           // Одна услуга
-			c.DELETE("/:container_id", app.WithAuthCheck(role.Moderator), app.DeleteContainer)                                        // Удаление
-			c.PUT("/:container_id", app.WithAuthCheck(role.Moderator), app.ChangeContainer)                                           // Изменение
-			c.POST("", app.WithAuthCheck(role.Moderator), app.AddContainer)                                                           // Добавление
-			c.POST("/:container_id/add_to_transportation", app.WithAuthCheck(role.Customer, role.Moderator), app.AddToTranspostation) // Добавление в заявку
+			c.GET("", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetAllContainers)           // Список с поиском
+			c.GET("/:id", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetContainer)           // Одна услуга
+			c.DELETE("/:id", app.WithAuthCheck(role.Moderator), app.DeleteContainer)                                        // Удаление
+			c.PUT("/:id", app.WithAuthCheck(role.Moderator), app.ChangeContainer)                                           // Изменение
+			c.POST("", app.WithAuthCheck(role.Moderator), app.AddContainer)                                                 // Добавление
+			c.POST("/:id/add_to_transportation", app.WithAuthCheck(role.Customer, role.Moderator), app.AddToTranspostation) // Добавление в заявку
 		}
 		// Заявки (перевозки)
 		t := api.Group("/transportations")
 		{
-			t.GET("", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllTransportations)                                                         // Список (отфильтровать по дате формирования и статусу)
-			t.GET("/:transportation_id", app.WithAuthCheck(role.Customer, role.Moderator), app.GetTranspostation)                                          // Одна заявка
-			t.PUT("/:transportation_id/update", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateTransportation)                                // Изменение (добавление транспорта)
-			t.DELETE("/:transportation_id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteTransportation)                                    //Удаление
-			t.DELETE("/:transportation_id/delete_container/:container_id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFromTransportation) // Изменеие (удаление услуг)
-			t.PUT("/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                                                      // Сформировать создателем
-			t.PUT("/:transportation_id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                                        // Завершить отклонить модератором
-			t.PUT("/:transportation_id/delivery", app.Delivery)
+			t.GET("", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllTransportations)   // Список (отфильтровать по дате формирования и статусу)
+			t.GET("/:id", app.WithAuthCheck(role.Customer, role.Moderator), app.GetTranspostation)   // Одна заявка
+			t.PUT("", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateTransportation)    // Изменение (добавление транспорта)
+			t.DELETE("", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteTransportation) //Удаление
+			t.DELETE("/delete_container/:id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFromTransportation) // Изменеие (удаление услуг)
+			t.PUT("/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                         // Сформировать создателем
+			t.PUT("/:id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                          // Завершить отклонить модератором
+			t.PUT("/:id/delivery", app.Delivery)
 		}
 		// Пользователи (авторизация)
 		u := api.Group("/user")
 		{
+			// TODO: /me
 			u.POST("/sign_up", app.Register)
 			u.POST("/login", app.Login)
 			u.POST("/logout", app.Logout)

@@ -65,7 +65,7 @@ func generateHashString(s string) string {
 }
 
 func deliveryRequest(transportation_id string) error {
-	url := "http://localhost:8000/"
+	url := "http://localhost:8000/api/delivery/"
 	payload := fmt.Sprintf(`{"transportation_id": "%s"}`, transportation_id)
 
 	resp, err := http.Post(url, "application/json", bytes.NewBufferString(payload))

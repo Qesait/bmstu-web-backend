@@ -111,6 +111,8 @@ definitions:
         type: string
       customer:
         type: string
+      delivery_status:
+        type: string
       formation_date:
         type: string
       moderator:
@@ -138,11 +140,6 @@ definitions:
       uuid:
         type: string
     type: object
-  schemes.UpdateTransportationResponse:
-    properties:
-      transportation:
-        $ref: '#/definitions/schemes.TransportationOutput'
-    type: object
 host: 127.0.0.1:8080
 info:
   contact: {}
@@ -168,7 +165,6 @@ paths:
       summary: Получить все контейнеры
       tags:
       - Контейнеры
-  /api/containers/:
     post:
       consumes:
       - multipart/form-data
@@ -219,13 +215,13 @@ paths:
       summary: Добавить контейнер
       tags:
       - Контейнеры
-  /api/containers/{container_id}:
+  /api/containers/{id}:
     delete:
       description: Удаляет контейнер по id
       parameters:
       - description: id контейнера
         in: path
-        name: container_id
+        name: id
         required: true
         type: string
       responses:
@@ -239,7 +235,7 @@ paths:
       parameters:
       - description: id контейнера
         in: path
-        name: container_id
+        name: id
         required: true
         type: string
       produces:
@@ -259,7 +255,7 @@ paths:
       parameters:
       - description: Идентификатор контейнера
         in: path
-        name: container_id
+        name: id
         required: true
         type: string
       - description: Маркировка
@@ -300,13 +296,13 @@ paths:
       summary: Изменить котейнер
       tags:
       - Контейнеры
-  /api/containers/{container_id}/add_to_transportation:
+  /api/containers/{id}/add_to_transportation:
     post:
       description: Добавить выбранный контейнер в черновик перевозки
       parameters:
       - description: id контейнера
         in: path
-        name: container_id
+        name: id
         required: true
         type: string
       produces:
@@ -320,6 +316,14 @@ paths:
       tags:
       - Контейнеры
   /api/transportations:
+    delete:
+      description: Удаляет чернвоую перевозку первозку
+      responses:
+        "200":
+          description: OK
+      summary: Удалить черновую первозку перевозку
+      tags:
+      - Перевозки
     get:
       description: Возвращает все перевозки с фильтрацией по статусу и дате формирования
       parameters:
@@ -345,48 +349,10 @@ paths:
       summary: Получить все перевозки
       tags:
       - Перевозки
-  /api/transportations/{transportation_id}:
-    delete:
-      description: Удаляет первозку по id
-      parameters:
-      - description: id перевозки
-        in: path
-        name: transportation_id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-      summary: Удалить перевозку
-      tags:
-      - Перевозки
-    get:
-      description: Возвращает подробную информацию о перевозке и её составе
-      parameters:
-      - description: id перевозки
-        in: path
-        name: transportation_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/schemes.TransportationResponse'
-      summary: Получить одну перевозку
-      tags:
-      - Перевозки
     put:
-      description: Позволяет изменить транспорт перевозки и возвращает обновлённые
+      description: Позволяет изменить транспорт черновой перевозки и возвращает обновлённые
         данные
       parameters:
-      - description: id перевозки
-        in: path
-        name: transportation_id
-        required: true
-        type: string
       - description: Транспорт
         in: body
         name: transport
@@ -399,22 +365,17 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schemes.UpdateTransportationResponse'
+            $ref: '#/definitions/schemes.TransportationOutput'
       summary: Указать транспорт перевозки
       tags:
       - Перевозки
-  /api/transportations/{transportation_id}/delete_container/{container_id}:
-    delete:
-      description: Удалить контейнер из перевозки
+  /api/transportations/{id}:
+    get:
+      description: Возвращает подробную информацию о перевозке и её составе
       parameters:
       - description: id перевозки
         in: path
-        name: transportation_id
-        required: true
-        type: string
-      - description: id контейнера
-        in: path
-        name: container_id
+        name: id
         required: true
         type: string
       produces:
@@ -423,17 +384,17 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schemes.AllContainersResponse'
-      summary: Удалить контейнер из перевозки
+            $ref: '#/definitions/schemes.TransportationResponse'
+      summary: Получить одну перевозку
       tags:
       - Перевозки
-  /api/transportations/{transportation_id}/moderator_confirm:
+  /api/transportations/{id}/moderator_confirm:
     put:
       description: Подтвердить или отменить перевозку модератором
       parameters:
       - description: id перевозки
         in: path
-        name: transportation_id
+        name: id
         required: true
         type: string
       - description: подтвердить
@@ -445,15 +406,38 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/schemes.TransportationOutput'
       summary: Подтвердить перевозку
+      tags:
+      - Перевозки
+  /api/transportations/delete_container/{id}:
+    delete:
+      description: Удалить контейнер из черновой перевозки
+      parameters:
+      - description: id контейнера
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.AllContainersResponse'
+      summary: Удалить контейнер из чернвоой перевозки
       tags:
       - Перевозки
   /api/transportations/user_confirm:
     put:
-      description: Сформировать или удалить перевозку перевозку пользователем
+      description: Сформировать перевозку перевозку пользователем
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/schemes.TransportationOutput'
       summary: Сформировать перевозку
       tags:
       - Перевозки
