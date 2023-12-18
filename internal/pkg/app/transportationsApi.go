@@ -299,7 +299,7 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		return
 	}
 
-	if request.Confirm {
+	if *request.Confirm {
 		transportation.Status = ds.StatusCompleted
 		now := time.Now()
 		transportation.CompletionDate = &now
@@ -326,6 +326,8 @@ func (app *Application) Delivery(c *gin.Context) {
 		return
 	}
 
+	fmt.Println(request, app.config.Token)
+
 	if request.Token != app.config.Token {
 		c.AbortWithStatus(http.StatusForbidden)
 		return
@@ -340,13 +342,13 @@ func (app *Application) Delivery(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не найдена"))
 		return
 	}
-	if transportation.Status != ds.StatusFormed || *transportation.DeliveryStatus != ds.DeliveryStarted {
-		c.AbortWithStatus(http.StatusMethodNotAllowed)
-		return
-	}
+	// if transportation.Status != ds.StatusFormed || *transportation.DeliveryStatus != ds.DeliveryStarted {
+	// 	c.AbortWithStatus(http.StatusMethodNotAllowed)
+	// 	return
+	// }
 
 	var deliveryStatus string
-	if request.DeliveryStatus {
+	if *request.DeliveryStatus {
 		deliveryStatus = ds.DeliveryCompleted
 	} else {
 		deliveryStatus = ds.DeliveryFailed

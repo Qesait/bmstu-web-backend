@@ -57,15 +57,11 @@ type DeleteFromTransportationRequest struct {
 	ContainerId      string `uri:"container_id" binding:"required,uuid"`
 }
 
-type UserConfirmRequest struct {
-	Confirm bool `form:"confirm" binding:"required"`
-}
-
 type ModeratorConfirmRequest struct {
 	URI struct {
 		TransportationId string `uri:"transportation_id" binding:"required,uuid"`
 	}
-	Confirm bool `form:"confirm" binding:"required"`
+	Confirm *bool `form:"confirm" binding:"required"`
 }
 
 type LoginReq struct {
@@ -82,6 +78,6 @@ type DeliveryReq struct {
 	URI struct {
 		TransportationId string `uri:"transportation_id" binding:"required,uuid"`
 	}
-	DeliveryStatus bool `form:"delivery_status" binding:"required"`
-	Token string `form:"token" binding:"required"`
+	DeliveryStatus *bool `json:"delivery_status" form:"delivery_status" binding:"required"`
+	Token string `json:"token" form:"token" binding:"required"`
 }
