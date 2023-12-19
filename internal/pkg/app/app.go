@@ -61,7 +61,6 @@ func (app *Application) Run() {
 		// Пользователи (авторизация)
 		u := api.Group("/user")
 		{
-			// TODO: /me
 			u.POST("/sign_up", app.Register)
 			u.POST("/login", app.Login)
 			u.POST("/logout", app.Logout)

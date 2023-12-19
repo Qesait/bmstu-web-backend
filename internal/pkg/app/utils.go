@@ -11,6 +11,7 @@ import (
 	"bmstu-web-backend/internal/app/role"
 	"crypto/sha1"
 	"encoding/hex"
+
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
 )
@@ -34,7 +35,7 @@ func (app *Application) uploadImage(c *gin.Context, image *multipart.FileHeader,
 	if err != nil {
 		return nil, err
 	}
-	imageURL := fmt.Sprintf("%s/%s/%s", app.config.Minio.Endpoint, app.config.Minio.BucketName, imageName)
+	imageURL := fmt.Sprintf("http://%s/%s/%s", app.config.Minio.Endpoint, app.config.Minio.BucketName, imageName)
 	return &imageURL, nil
 }
 
