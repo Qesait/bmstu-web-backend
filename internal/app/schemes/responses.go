@@ -2,8 +2,9 @@ package schemes
 
 import (
 	"bmstu-web-backend/internal/app/ds"
-	"time"
+	"bmstu-web-backend/internal/app/role"
 	"fmt"
+	"time"
 )
 
 type AllContainersResponse struct {
@@ -78,18 +79,17 @@ type AddToTranspostationResp struct {
 	ContainersCount int64 `json:"cotainer_count"`
 }
 
-type LoginResp struct {
+type AuthResp struct {
 	ExpiresIn   time.Duration `json:"expires_in"`
 	AccessToken string        `json:"access_token"`
+	Role        role.Role     `json:"role"`
 	TokenType   string        `json:"token_type"`
 }
 
 type SwaggerLoginResp struct {
 	ExpiresIn   int64  `json:"expires_in"`
 	AccessToken string `json:"access_token"`
+	Role        int    `json:"role"`
 	TokenType   string `json:"token_type"`
 }
 
-type RegisterResp struct {
-	Ok bool `json:"ok"`
-}
