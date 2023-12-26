@@ -27,14 +27,14 @@ type Container struct {
 }
 
 const StatusDraft string = "черновик"
-const StatusFormed string = "сформирован"
-const StatusCompleted string = "завершён"
-const StatusRejected string = "отклонён"
-const StatusDeleted string = "удалён"
+const StatusFormed string = "сформирована"
+const StatusCompleted string = "завершёна"
+const StatusRejected string = "отклонена"
+const StatusDeleted string = "удалёна"
 
-const DeliveryCompleted string = "доставлен"
+const DeliveryCompleted string = "доставлена"
 const DeliveryFailed string = "отменена"
-const DeliveryStarted string = "отправлен в доставку"
+const DeliveryStarted string = "отправлена в доставку"
 
 type Transportation struct {
 	UUID           string     `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`

@@ -45,7 +45,7 @@ func (app *Application) Register(c *gin.Context) {
 		return
 	}
 	if existing_user != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
@@ -84,6 +84,7 @@ func (app *Application) Register(c *gin.Context) {
 		ExpiresIn:   JWTConfig.ExpiresIn,
 		AccessToken: strToken,
 		Role:        user.Role,
+		Login:       user.Login,
 		TokenType:   "Bearer",
 	})
 }
@@ -138,6 +139,7 @@ func (app *Application) Login(c *gin.Context) {
 		ExpiresIn:   JWTConfig.ExpiresIn,
 		AccessToken: strToken,
 		Role:        user.Role,
+		Login:       user.Login,
 		TokenType:   "Bearer",
 	})
 }
@@ -152,7 +154,7 @@ func (app *Application) Login(c *gin.Context) {
 func (app *Application) Logout(c *gin.Context) {
 	jwtStr := c.GetHeader("Authorization")
 	if !strings.HasPrefix(jwtStr, jwtPrefix) {
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithError(http.StatusBadRequest, fmt.Errorf(jwtStr))
 		return
 	}
 

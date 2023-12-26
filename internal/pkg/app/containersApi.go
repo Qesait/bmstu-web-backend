@@ -45,7 +45,7 @@ func (app *Application) GetAllContainers(c *gin.Context) {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		response.DraftTransportation.ContainerCount = int(containersCount)
+		response.DraftTransportation.ContainerCount = containersCount
 	}
 	c.JSON(http.StatusOK, response)
 }
@@ -241,7 +241,7 @@ func (app *Application) ChangeContainer(c *gin.Context) {
 // @Description	Добавить выбранный контейнер в черновик перевозки
 // @Produce		json
 // @Param		id path string true "id контейнера"
-// @Success		200 {object} schemes.AddToTranspostationResp
+// @Success		200 {object} schemes.TransportationShort
 // @Router		/api/containers/{id}/add_to_transportation [post]
 func (app *Application) AddToTranspostation(c *gin.Context) {
 	var request schemes.AddToTransportationRequest
@@ -290,5 +290,5 @@ func (app *Application) AddToTranspostation(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.AddToTranspostationResp{ContainersCount: containersCount})
+	c.JSON(http.StatusOK, schemes.TransportationShort{UUID: transportation.UUID, ContainerCount: containersCount})
 }
