@@ -99,7 +99,7 @@ type SwaggerUpdateTransportationRequest struct {
 // @Access		json
 // @Produce		json
 // @Param		transport body SwaggerUpdateTransportationRequest true "Транспорт"
-// @Success		200 {object} schemes.TransportationOutput
+// @Success		200
 // @Router		/api/transportations [put]
 func (app *Application) UpdateTransportation(c *gin.Context) {
 	var request schemes.UpdateTransportationRequest
@@ -129,7 +129,7 @@ func (app *Application) UpdateTransportation(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.ConvertTransportation(transportation))
+	c.Status(http.StatusOK)
 }
 
 // @Summary		Удалить черновую первозку перевозку
@@ -167,7 +167,7 @@ func (app *Application) DeleteTransportation(c *gin.Context) {
 // @Description	Удалить контейнер из черновой перевозки
 // @Produce		json
 // @Param		id path string true "id контейнера"
-// @Success		200 {object} schemes.AllContainersResponse
+// @Success		200
 // @Router		/api/transportations/delete_container/{id} [delete]
 func (app *Application) DeleteFromTransportation(c *gin.Context) {
 	var request schemes.DeleteFromTransportationRequest
@@ -195,19 +195,13 @@ func (app *Application) DeleteFromTransportation(c *gin.Context) {
 		return
 	}
 
-	containers, err := app.repo.GetTransportatioinComposition(transportation.UUID)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, schemes.AllContainersResponse{Containers: containers})
+	c.Status(http.StatusOK)
 }
 
 // @Summary		Сформировать перевозку
 // @Tags		Перевозки
 // @Description	Сформировать перевозку перевозку пользователем
-// @Success		200 {object} schemes.TransportationOutput
+// @Success		200
 // @Router		/api/transportations/user_confirm [put]
 func (app *Application) UserConfirm(c *gin.Context) {
 	userId := getUserId(c)
@@ -236,7 +230,8 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, schemes.ConvertTransportation(transportation))
+
+	c.Status(http.StatusOK)
 }
 
 // @Summary		Подтвердить перевозку

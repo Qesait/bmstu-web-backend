@@ -29,23 +29,16 @@ func (app *Application) GetAllContainers(c *gin.Context) {
 		return
 	}
 
-	var draftTransportation *ds.Transportation = nil
-	if userId, exists := c.Get("userId"); exists {
-		draftTransportation, err = app.repo.GetDraftTransportation(userId.(string))
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-	}
 	response := schemes.GetAllContainersResponse{DraftTransportation: nil, Containers: containers}
-	if draftTransportation != nil {
-		response.DraftTransportation = &schemes.TransportationShort{UUID: draftTransportation.UUID}
-		containersCount, err := app.repo.CountContainers(draftTransportation.UUID)
+	if userId, exists := c.Get("userId"); exists {
+		draftTransportation, err := app.repo.GetDraftTransportation(userId.(string))
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		response.DraftTransportation.ContainerCount = containersCount
+		if draftTransportation != nil {
+			response.DraftTransportation = &draftTransportation.UUID
+		}
 	}
 	c.JSON(http.StatusOK, response)
 }
@@ -239,9 +232,8 @@ func (app *Application) ChangeContainer(c *gin.Context) {
 // @Summary		Добавить в перевозку
 // @Tags		Контейнеры
 // @Description	Добавить выбранный контейнер в черновик перевозки
-// @Produce		json
 // @Param		id path string true "id контейнера"
-// @Success		200 {object} schemes.TransportationShort
+// @Success		200
 // @Router		/api/containers/{id}/add_to_transportation [post]
 func (app *Application) AddToTranspostation(c *gin.Context) {
 	var request schemes.AddToTransportationRequest
@@ -284,11 +276,5 @@ func (app *Application) AddToTranspostation(c *gin.Context) {
 		return
 	}
 
-	containersCount, err := app.repo.CountContainers(transportation.UUID)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, schemes.TransportationShort{UUID: transportation.UUID, ContainerCount: containersCount})
+	c.Status(http.StatusOK)
 }

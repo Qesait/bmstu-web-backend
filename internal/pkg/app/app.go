@@ -49,10 +49,10 @@ func (app *Application) Run() {
 		// Заявки (перевозки)
 		t := api.Group("/transportations")
 		{
-			t.GET("", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllTransportations)   // Список (отфильтровать по дате формирования и статусу)
-			t.GET("/:id", app.WithAuthCheck(role.Customer, role.Moderator), app.GetTranspostation)   // Одна заявка
-			t.PUT("", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateTransportation)    // Изменение (добавление транспорта)
-			t.DELETE("", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteTransportation) //Удаление
+			t.GET("", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllTransportations)                            // Список (отфильтровать по дате формирования и статусу)
+			t.GET("/:id", app.WithAuthCheck(role.Customer, role.Moderator), app.GetTranspostation)                            // Одна заявка
+			t.PUT("", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateTransportation)                             // Изменение (добавление транспорта)
+			t.DELETE("", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteTransportation)                          //Удаление
 			t.DELETE("/delete_container/:id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFromTransportation) // Изменеие (удаление услуг)
 			t.PUT("/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                         // Сформировать создателем
 			t.PUT("/:id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                          // Завершить отклонить модератором
@@ -63,7 +63,7 @@ func (app *Application) Run() {
 		{
 			u.POST("/sign_up", app.Register)
 			u.POST("/login", app.Login)
-			u.POST("/logout", app.Logout)
+			u.GET("/logout", app.Logout)
 		}
 	}
 
