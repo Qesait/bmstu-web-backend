@@ -154,7 +154,6 @@ func (app *Application) AddContainer(c *gin.Context) {
 // @Tags		Контейнеры
 // @Description	Изменить данные полей о контейнере
 // @Accept		mpfd
-// @Produce		json
 // @Param		id path string true "Идентификатор контейнера" format:"uuid"
 // @Param		marking formData string false "Маркировка" format:"string" maxLength:11
 // @Param		type formData string false "Тип" format:"string" maxLength:50
@@ -164,6 +163,7 @@ func (app *Application) AddContainer(c *gin.Context) {
 // @Param		image formData file false "Изображение контейнера"
 // @Param		cargo formData string false "Груз" format:"string" maxLength:50
 // @Param		weight formData int false "Вес" format:"int"
+// @Success		200
 // @Router		/api/containers/{id} [put]
 func (app *Application) ChangeContainer(c *gin.Context) {
 	var request schemes.ChangeContainerRequest
@@ -226,7 +226,7 @@ func (app *Application) ChangeContainer(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, container)
+	c.Status(http.StatusOK)
 }
 
 // @Summary		Добавить в перевозку

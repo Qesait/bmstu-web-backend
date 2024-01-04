@@ -144,9 +144,6 @@
                 "consumes": [
                     "multipart/form-data"
                 ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Контейнеры"
                 ],
@@ -208,7 +205,11 @@
                         "in": "formData"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
             },
             "delete": {
                 "description": "Удаляет контейнер по id",
@@ -235,9 +236,6 @@
         "/api/containers/{id}/add_to_transportation": {
             "post": {
                 "description": "Добавить выбранный контейнер в черновик перевозки",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Контейнеры"
                 ],
@@ -253,10 +251,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.AddToTranspostationResp"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -322,10 +317,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.TransportationOutput"
-                        }
+                        "description": "OK"
                     }
                 }
             },
@@ -363,10 +355,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.AllContainersResponse"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -380,10 +369,7 @@
                 "summary": "Сформировать перевозку",
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.TransportationOutput"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -444,10 +430,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.TransportationOutput"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -480,19 +463,16 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemes.SwaggerLoginResp"
+                            "$ref": "#/definitions/schemes.AuthResp"
                         }
                     }
                 }
             }
         },
         "/api/user/loguot": {
-            "post": {
+            "get": {
                 "description": "Выход из аккаунта",
                 "consumes": [
-                    "application/json"
-                ],
-                "produces": [
                     "application/json"
                 ],
                 "tags": [
@@ -512,9 +492,6 @@
                 "consumes": [
                     "application/json"
                 ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Авторизация"
                 ],
@@ -532,10 +509,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.RegisterResp"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -594,25 +568,6 @@
                 }
             }
         },
-        "schemes.AddToTranspostationResp": {
-            "type": "object",
-            "properties": {
-                "cotainer_count": {
-                    "type": "integer"
-                }
-            }
-        },
-        "schemes.AllContainersResponse": {
-            "type": "object",
-            "properties": {
-                "containers": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ds.Container"
-                    }
-                }
-            }
-        },
         "schemes.AllTransportationsResponse": {
             "type": "object",
             "properties": {
@@ -621,6 +576,17 @@
                     "items": {
                         "$ref": "#/definitions/schemes.TransportationOutput"
                     }
+                }
+            }
+        },
+        "schemes.AuthResp": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "token_type": {
+                    "type": "string"
                 }
             }
         },
@@ -634,7 +600,7 @@
                     }
                 },
                 "draft_transportation": {
-                    "$ref": "#/definitions/schemes.TransportationShort"
+                    "type": "string"
                 }
             }
         },
@@ -669,28 +635,6 @@
                 "password": {
                     "type": "string",
                     "maxLength": 30
-                }
-            }
-        },
-        "schemes.RegisterResp": {
-            "type": "object",
-            "properties": {
-                "ok": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "schemes.SwaggerLoginResp": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "expires_in": {
-                    "type": "integer"
-                },
-                "token_type": {
-                    "type": "string"
                 }
             }
         },
@@ -737,17 +681,6 @@
                 },
                 "transportation": {
                     "$ref": "#/definitions/schemes.TransportationOutput"
-                }
-            }
-        },
-        "schemes.TransportationShort": {
-            "type": "object",
-            "properties": {
-                "container_count": {
-                    "type": "integer"
-                },
-                "uuid": {
-                    "type": "string"
                 }
             }
         }

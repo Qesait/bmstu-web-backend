@@ -148,9 +148,6 @@ const docTemplate = `{
                 "consumes": [
                     "multipart/form-data"
                 ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Контейнеры"
                 ],
@@ -212,7 +209,11 @@ const docTemplate = `{
                         "in": "formData"
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
             },
             "delete": {
                 "description": "Удаляет контейнер по id",
@@ -239,9 +240,6 @@ const docTemplate = `{
         "/api/containers/{id}/add_to_transportation": {
             "post": {
                 "description": "Добавить выбранный контейнер в черновик перевозки",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Контейнеры"
                 ],
@@ -257,10 +255,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.AddToTranspostationResp"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -326,10 +321,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.TransportationOutput"
-                        }
+                        "description": "OK"
                     }
                 }
             },
@@ -367,10 +359,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.AllContainersResponse"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -384,10 +373,7 @@ const docTemplate = `{
                 "summary": "Сформировать перевозку",
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.TransportationOutput"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -448,10 +434,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.TransportationOutput"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -484,19 +467,16 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemes.SwaggerLoginResp"
+                            "$ref": "#/definitions/schemes.AuthResp"
                         }
                     }
                 }
             }
         },
         "/api/user/loguot": {
-            "post": {
+            "get": {
                 "description": "Выход из аккаунта",
                 "consumes": [
-                    "application/json"
-                ],
-                "produces": [
                     "application/json"
                 ],
                 "tags": [
@@ -516,9 +496,6 @@ const docTemplate = `{
                 "consumes": [
                     "application/json"
                 ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Авторизация"
                 ],
@@ -536,10 +513,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.RegisterResp"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -598,25 +572,6 @@ const docTemplate = `{
                 }
             }
         },
-        "schemes.AddToTranspostationResp": {
-            "type": "object",
-            "properties": {
-                "cotainer_count": {
-                    "type": "integer"
-                }
-            }
-        },
-        "schemes.AllContainersResponse": {
-            "type": "object",
-            "properties": {
-                "containers": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ds.Container"
-                    }
-                }
-            }
-        },
         "schemes.AllTransportationsResponse": {
             "type": "object",
             "properties": {
@@ -625,6 +580,17 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/schemes.TransportationOutput"
                     }
+                }
+            }
+        },
+        "schemes.AuthResp": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "token_type": {
+                    "type": "string"
                 }
             }
         },
@@ -638,7 +604,7 @@ const docTemplate = `{
                     }
                 },
                 "draft_transportation": {
-                    "$ref": "#/definitions/schemes.TransportationShort"
+                    "type": "string"
                 }
             }
         },
@@ -673,28 +639,6 @@ const docTemplate = `{
                 "password": {
                     "type": "string",
                     "maxLength": 30
-                }
-            }
-        },
-        "schemes.RegisterResp": {
-            "type": "object",
-            "properties": {
-                "ok": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "schemes.SwaggerLoginResp": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "expires_in": {
-                    "type": "integer"
-                },
-                "token_type": {
-                    "type": "string"
                 }
             }
         },
@@ -741,17 +685,6 @@ const docTemplate = `{
                 },
                 "transportation": {
                     "$ref": "#/definitions/schemes.TransportationOutput"
-                }
-            }
-        },
-        "schemes.TransportationShort": {
-            "type": "object",
-            "properties": {
-                "container_count": {
-                    "type": "integer"
-                },
-                "uuid": {
-                    "type": "string"
                 }
             }
         }
