@@ -239,7 +239,7 @@ func (app *Application) UserConfirm(c *gin.Context) {
 // @Description	Подтвердить или отменить перевозку модератором
 // @Param		id path string true "id перевозки"
 // @Param		confirm body boolean true "подтвердить"
-// @Success		200 {object} schemes.TransportationOutput
+// @Success		200
 // @Router		/api/transportations/{id}/moderator_confirm [put]
 func (app *Application) ModeratorConfirm(c *gin.Context) {
 	var request schemes.ModeratorConfirmRequest
@@ -287,7 +287,7 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, schemes.ConvertTransportation(transportation))
+	c.Status(http.StatusOK)
 }
 
 func (app *Application) Delivery(c *gin.Context) {

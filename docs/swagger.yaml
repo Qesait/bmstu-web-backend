@@ -37,24 +37,19 @@ definitions:
     - weight
     - width
     type: object
-  schemes.AddToTranspostationResp:
-    properties:
-      cotainer_count:
-        type: integer
-    type: object
-  schemes.AllContainersResponse:
-    properties:
-      containers:
-        items:
-          $ref: '#/definitions/ds.Container'
-        type: array
-    type: object
   schemes.AllTransportationsResponse:
     properties:
       transportations:
         items:
           $ref: '#/definitions/schemes.TransportationOutput'
         type: array
+    type: object
+  schemes.AuthResp:
+    properties:
+      access_token:
+        type: string
+      token_type:
+        type: string
     type: object
   schemes.GetAllContainersResponse:
     properties:
@@ -63,7 +58,7 @@ definitions:
           $ref: '#/definitions/ds.Container'
         type: array
       draft_transportation:
-        $ref: '#/definitions/schemes.TransportationShort'
+        type: string
     type: object
   schemes.LoginReq:
     properties:
@@ -88,20 +83,6 @@ definitions:
     required:
     - login
     - password
-    type: object
-  schemes.RegisterResp:
-    properties:
-      ok:
-        type: boolean
-    type: object
-  schemes.SwaggerLoginResp:
-    properties:
-      access_token:
-        type: string
-      expires_in:
-        type: integer
-      token_type:
-        type: string
     type: object
   schemes.TransportationOutput:
     properties:
@@ -132,13 +113,6 @@ definitions:
         type: array
       transportation:
         $ref: '#/definitions/schemes.TransportationOutput'
-    type: object
-  schemes.TransportationShort:
-    properties:
-      container_count:
-        type: integer
-      uuid:
-        type: string
     type: object
 host: 127.0.0.1:8080
 info:
@@ -290,9 +264,9 @@ paths:
         in: formData
         name: weight
         type: integer
-      produces:
-      - application/json
-      responses: {}
+      responses:
+        "200":
+          description: OK
       summary: Изменить котейнер
       tags:
       - Контейнеры
@@ -305,13 +279,9 @@ paths:
         name: id
         required: true
         type: string
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/schemes.AddToTranspostationResp'
       summary: Добавить в перевозку
       tags:
       - Контейнеры
@@ -364,8 +334,6 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/schemes.TransportationOutput'
       summary: Указать транспорт перевозки
       tags:
       - Перевозки
@@ -406,8 +374,6 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/schemes.TransportationOutput'
       summary: Подтвердить перевозку
       tags:
       - Перевозки
@@ -425,8 +391,6 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/schemes.AllContainersResponse'
       summary: Удалить контейнер из чернвоой перевозки
       tags:
       - Перевозки
@@ -436,8 +400,6 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/schemes.TransportationOutput'
       summary: Сформировать перевозку
       tags:
       - Перевозки
@@ -460,17 +422,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schemes.SwaggerLoginResp'
+            $ref: '#/definitions/schemes.AuthResp'
       summary: Авторизация
       tags:
       - Авторизация
   /api/user/loguot:
-    post:
+    get:
       consumes:
       - application/json
       description: Выход из аккаунта
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -489,13 +449,9 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/schemes.RegisterReq'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/schemes.RegisterResp'
       summary: Регистрация
       tags:
       - Авторизация

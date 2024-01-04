@@ -28,9 +28,9 @@ type Container struct {
 
 const StatusDraft string = "черновик"
 const StatusFormed string = "сформирована"
-const StatusCompleted string = "завершёна"
+const StatusCompleted string = "завершена"
 const StatusRejected string = "отклонена"
-const StatusDeleted string = "удалёна"
+const StatusDeleted string = "удалена"
 
 const DeliveryCompleted string = "доставлена"
 const DeliveryFailed string = "отменена"
