@@ -56,7 +56,6 @@ func (app *Application) Run() {
 			t.DELETE("/delete_container/:id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFromTransportation) // Изменеие (удаление услуг)
 			t.PUT("/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                         // Сформировать создателем
 			t.PUT("/:id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                          // Завершить отклонить модератором
-			t.PUT("/:id/delivery", app.Delivery)
 		}
 		// Пользователи (авторизация)
 		u := api.Group("/user")

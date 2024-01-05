@@ -32,10 +32,6 @@ const StatusCompleted string = "завершёна"
 const StatusRejected string = "отклонена"
 const StatusDeleted string = "удалёна"
 
-const DeliveryCompleted string = "доставлена"
-const DeliveryFailed string = "отменена"
-const DeliveryStarted string = "отправлена в доставку"
-
 type Transportation struct {
 	UUID           string     `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
 	Status         string     `gorm:"size:20;not null"`
@@ -45,7 +41,6 @@ type Transportation struct {
 	ModeratorId    *string    `json:"-"`
 	CustomerId     string     `gorm:"not null"`
 	Transport      *string    `gorm:"size:50"`
-	DeliveryStatus *string    `gorm:"size:40"`
 
 	Moderator *User
 	Customer  User

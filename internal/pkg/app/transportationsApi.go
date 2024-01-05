@@ -215,13 +215,6 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		return
 	}
 
-	if err := deliveryRequest(transportation.UUID); err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf(`delivery service is unavailable: {%s}`, err))
-		return
-	}
-
-	deliveryStatus := ds.DeliveryStarted
-	transportation.DeliveryStatus = &deliveryStatus
 	transportation.Status = ds.StatusFormed
 	now := time.Now()
 	transportation.FormationDate = &now
@@ -282,51 +275,6 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 	}
 	transportation.ModeratorId = &userId
 	transportation.Moderator = moderator
-
-	if err := app.repo.SaveTransportation(transportation); err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	c.Status(http.StatusOK)
-}
-
-func (app *Application) Delivery(c *gin.Context) {
-	var request schemes.DeliveryReq
-	if err := c.ShouldBindUri(&request.URI); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-	if err := c.ShouldBind(&request); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	if request.Token != app.config.Token {
-		c.AbortWithStatus(http.StatusForbidden)
-		return
-	}
-
-	transportation, err := app.repo.GetTransportationById(request.URI.TransportationId, nil)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	if transportation == nil {
-		c.AbortWithError(http.StatusNotFound, fmt.Errorf("перевозка не найдена"))
-		return
-	}
-	// if transportation.Status != ds.StatusFormed || *transportation.DeliveryStatus != ds.DeliveryStarted {
-	// 	c.AbortWithStatus(http.StatusMethodNotAllowed)
-	// 	return
-	// }
-
-	var deliveryStatus string
-	if *request.DeliveryStatus {
-		deliveryStatus = ds.DeliveryCompleted
-	} else {
-		deliveryStatus = ds.DeliveryFailed
-	}
-	transportation.DeliveryStatus = &deliveryStatus
 
 	if err := app.repo.SaveTransportation(transportation); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)

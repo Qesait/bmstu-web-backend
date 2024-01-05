@@ -36,7 +36,6 @@ type TransportationOutput struct {
 	Moderator      *string `json:"moderator"`
 	Customer       string  `json:"customer"`
 	Transport      *string `json:"transport"`
-	DeliveryStatus *string `json:"delivery_status"`
 }
 
 func ConvertTransportation(transportation *ds.Transportation) TransportationOutput {
@@ -45,7 +44,6 @@ func ConvertTransportation(transportation *ds.Transportation) TransportationOutp
 		Status:         transportation.Status,
 		CreationDate:   transportation.CreationDate.Format("2006-01-02T15:04:05Z07:00"),
 		Transport:      transportation.Transport,
-		DeliveryStatus: transportation.DeliveryStatus,
 		Customer:       transportation.Customer.Login,
 	}
 

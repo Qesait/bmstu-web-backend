@@ -1,9 +1,7 @@
 package app
 
 import (
-	"bytes"
 	"fmt"
-	"net/http"
 	"path/filepath"
 
 	"mime/multipart"
@@ -63,18 +61,4 @@ func generateHashString(s string) string {
 	h := sha1.New()
 	h.Write([]byte(s))
 	return hex.EncodeToString(h.Sum(nil))
-}
-
-func deliveryRequest(transportation_id string) error {
-	url := "http://localhost:8000/api/delivery/"
-	payload := fmt.Sprintf(`{"transportation_id": "%s"}`, transportation_id)
-
-	resp, err := http.Post(url, "application/json", bytes.NewBufferString(payload))
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode >= 300 {
-		return fmt.Errorf(`delivery failed with status: {%s}`, resp.Status)
-	}
-	return nil
 }
