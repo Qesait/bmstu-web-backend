@@ -50,7 +50,7 @@ type UpdateTransportationRequest struct {
 }
 
 type DeleteFromTransportationRequest struct {
-	ContainerId      string `uri:"id" binding:"required,uuid"`
+	ContainerId string `uri:"id" binding:"required,uuid"`
 }
 
 type ModeratorConfirmRequest struct {
@@ -74,6 +74,6 @@ type DeliveryReq struct {
 	URI struct {
 		TransportationId string `uri:"id" binding:"required,uuid"`
 	}
-	DeliveryStatus *bool `json:"delivery_status" form:"delivery_status" binding:"required"`
-	Token string `json:"token" form:"token" binding:"required"`
+	DeliveryStatus *bool  `json:"delivery_status" form:"delivery_status" binding:"required"`
+	Token          string `json:"token" form:"token" binding:"required"`
 }

@@ -119,7 +119,7 @@ func (app *Application) DeleteContainer(c *gin.Context) {
 // @Param		width formData int true "Ширина" format:"int"
 // @Param		cargo formData string true "Груз" format:"string" maxLength:50
 // @Param		weight formData int true "Вес" format:"int"
-// @Success		200
+// @Success		200 string
 // @Router		/api/containers [post]
 func (app *Application) AddContainer(c *gin.Context) {
 	var request schemes.AddContainerRequest
@@ -147,7 +147,7 @@ func (app *Application) AddContainer(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusCreated)
+	c.JSON(http.StatusCreated, container.UUID)
 }
 
 // @Summary		Изменить котейнер

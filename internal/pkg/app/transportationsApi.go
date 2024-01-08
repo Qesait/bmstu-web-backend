@@ -30,7 +30,6 @@ func (app *Application) GetAllTransportations(c *gin.Context) {
 
 	userId := getUserId(c)
 	userRole := getUserRole(c)
-	fmt.Println(userId, userRole)
 	var transportations []ds.Transportation
 	if userRole == role.Customer {
 		transportations, err = app.repo.GetAllTransportations(&userId, request.FormationDateStart, request.FormationDateEnd, request.Status)
@@ -269,11 +268,11 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 
 	if *request.Confirm {
 		transportation.Status = ds.StatusCompleted
-		now := time.Now()
-		transportation.CompletionDate = &now
 	} else {
 		transportation.Status = ds.StatusRejected
 	}
+	now := time.Now()
+	transportation.CompletionDate = &now
 
 	moderator, err := app.repo.GetUserById(userId)
 	if err != nil {
